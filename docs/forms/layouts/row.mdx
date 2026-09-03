@@ -1,0 +1,294 @@
+---
+title: Form rows
+description: Ant Design Form.Item
+antd_components: [Form]
+sidebar_position: 1
+---
+
+# Form rows
+
+A form row ties a control to its label, its help text and its error text. It is
+what makes a control readable: the label names it, the help text says what is
+wanted, and the error says what went wrong - all attached to the same field,
+not floating near it.
+
+In Ant Design this is `Form.Item`, inside a `Form`.
+
+:::warning[The row owns the control's id]
+
+`Form.Item` composes the ids for label, help text and error from the field's
+`name` and passes them down to the control. Setting your own `id` on the child
+takes that away, and the label stops pointing at anything.
+
+:::
+
+:::info[Accessibility requirement]
+
+Give every row a `label` where you can. Where you cannot, the control itself
+needs an `aria-label`, or an `aria-labelledby` naming an existing text node.
+A control with no accessible name is a control a screen reader cannot announce.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import {
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  Select,
+  Slider,
+  Switch,
+  Typography,
+  Upload,
+} from 'antd';
+
+export default () => {
+  const [form] = Form.useForm();
+
+  return (
+    <Form
+      form={form}
+      layout="vertical"
+      initialValues={{ toggles: false }}
+      style={{ maxInlineSize: 400 }}
+    >
+      <Form.Item label="Text field" name="first" extra="I am some friendly help text.">
+        <Input />
+      </Form.Item>
+
+      <Form.Item label="Disabled through form row" name="last">
+        <Input disabled />
+      </Form.Item>
+
+      <Form.Item
+        name="choice"
+        label={
+          <span style={{ display: 'flex', gap: 8, alignItems: 'baseline' }}>
+            Select (with no initial selection)
+            <Typography.Link style={{ fontSize: 12 }}>Link to some help</Typography.Link>
+          </span>
+        }
+      >
+        <Select
+          placeholder=" "
+          options={[
+            { value: 'option_one', label: 'Option one' },
+            { value: 'option_two', label: 'Option two' },
+            { value: 'option_three', label: 'Option three' },
+          ]}
+        />
+      </Form.Item>
+
+      <Form.Item label="File picker" name="datei" valuePropName="fileList">
+        <Upload beforeUpload={() => false}>
+          <Button>Select or drag and drop a file</Button>
+        </Upload>
+      </Form.Item>
+
+      <Form.Item label="Range" name="range">
+        <Slider min={0} max={100} />
+      </Form.Item>
+
+      <fieldset style={{ border: 0, padding: 0, margin: '0 0 24px' }}>
+        <legend style={{ fontSize: 12, marginBottom: 8 }}>
+          Checkbox groups should use a legend instead of a form row
+        </legend>
+        <Checkbox.Group
+          defaultValue={['two']}
+          options={[
+            { value: 'one', label: 'Option one' },
+            { value: 'two', label: 'Option two is checked by default' },
+            { value: 'drei', label: 'Option three' },
+          ]}
+        />
+      </fieldset>
+
+      <Form.Item
+        label="Use a switch instead of a single checkbox"
+        name="toggles"
+        valuePropName="checked"
+      >
+        <Switch />
+      </Form.Item>
+
+      <Button type="primary" htmlType="submit">
+        Save form
+      </Button>
+    </Form>
+  );
+};
+```
+
+## Full-width
+
+A control could be constrained to `400px` and opened up with a `fullWidth`
+flag. Ant Design starts from the other end: a control fills what contains it, and is
+narrowed by narrowing the container.
+
+Either way the point is the same. A form that runs the width of a page is hard
+to read, so keep it to a scannable measure and let out only what needs the room
+- a search bar, a slider, a text area.
+
+```tsx interactive
+import React from 'react';
+import { Button, Form, Input, Slider, Space } from 'antd';
+
+export default () => (
+  <Form layout="vertical">
+    <Space.Compact style={{ inlineSize: '100%', marginBottom: 24 }}>
+      <Input placeholder="Search..." aria-label="An example of search at full width" />
+      <Button>Search</Button>
+    </Space.Compact>
+
+    <Form.Item
+      label="Works on form rows too"
+      extra="The row fills its container; the control inside fills the row"
+    >
+      <Slider min={0} max={100} />
+    </Form.Item>
+
+    <Form.Item label="Often useful for text areas">
+      <Input.TextArea
+        rows={3}
+        placeholder="There is a reason we do not make forms ALWAYS 100% width. See how this text area becomes extremely hard to read when the individual lines get this long? It is much more readable when contained to a scannable max-width."
+      />
+    </Form.Item>
+  </Form>
+);
+```
+
+### Global full-width
+
+Since the width comes from the container, one wrapper sets it for every row
+beneath - there is no prop to pass down and nothing to repeat per control.
+
+Where a single control should not follow, give that one a width of its own.
+
+```tsx interactive
+import React from 'react';
+import { Button, Form, Input, Select, Slider, Space, Typography, Upload } from 'antd';
+
+export default () => (
+  <Form layout="vertical" style={{ inlineSize: '100%' }}>
+    <Space.Compact style={{ inlineSize: '100%', marginBottom: 24 }}>
+      <Input placeholder="Search..." aria-label="An example of search at full width" />
+      <Button>Search</Button>
+    </Space.Compact>
+
+    <Form.Item
+      label="Works on form rows too"
+      extra="The width is read from the container, not passed to each element"
+    >
+      <Slider min={0} max={100} defaultValue={42} />
+    </Form.Item>
+
+    <div style={{ display: 'flex', gap: 24, marginBottom: 24, flexWrap: 'wrap' }}>
+      <div style={{ flex: '1 1 240px' }}>
+        <Typography.Title level={5} style={{ marginBlockStart: 0 }}>
+          Works with all form controls and layout components
+        </Typography.Title>
+        <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+          Make sure it is appropriate at all of the widths the container can
+          take. There are many situations where a full-width form is not.
+        </Typography.Paragraph>
+      </div>
+
+      <div style={{ flex: '2 1 320px' }}>
+        <Form.Item label="Text area" style={{ marginBottom: 0 }}>
+          <Input.TextArea rows={3} />
+        </Form.Item>
+      </div>
+    </div>
+
+    <Form.Item label="Works on a select">
+      <Select
+        options={[
+          {
+            value: 'option_one',
+            label:
+              'Option one is very long in order to try justifying the use of a full-width select box',
+          },
+          { value: 'option_two', label: 'Option two' },
+          { value: 'option_three', label: 'Option three' },
+        ]}
+      />
+    </Form.Item>
+
+    <Form.Item label="It can be narrowed for a specific control">
+      <div style={{ maxInlineSize: 240 }}>
+        <Upload beforeUpload={() => false}>
+          <Button>Select a file</Button>
+        </Upload>
+      </div>
+    </Form.Item>
+  </Form>
+);
+```
+
+## Inline
+
+An inline form is rows side by side. Anything that should not stretch - a
+button, a short number field - is kept from growing; everything else shares
+what is left.
+
+A button beside labelled fields needs an empty label space of its own, or it
+sits a line too high.
+
+```tsx interactive
+import React from 'react';
+import { Button, Form, Input } from 'antd';
+
+export default () => (
+  <Form layout="vertical" style={{ display: 'flex', gap: 16, maxInlineSize: 600 }}>
+    <Form.Item label="First name" extra="I am helpful help text!" style={{ flex: 1 }}>
+      <Input />
+    </Form.Item>
+
+    <Form.Item label="Last name" style={{ flex: 1 }}>
+      <Input />
+    </Form.Item>
+
+    <Form.Item label={<span aria-hidden>&nbsp;</span>}>
+      <Button>Save</Button>
+    </Form.Item>
+  </Form>
+);
+```
+
+### Sizing inline form rows
+
+Give the width to the row, never to the input. The control inside resizes with
+it, and a field that is later swapped for a wider one still fits.
+
+Where the thing in the row is not a control at all - an avatar, a piece of text
+- it needs centring by hand, since it has no control's height to align to.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Button, Form, Input, InputNumber } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
+
+export default () => (
+  <Form layout="vertical" style={{ display: 'flex', gap: 16, maxInlineSize: 600 }}>
+    <Form.Item label="Age" style={{ inlineSize: 100 }}>
+      <InputNumber max={10} placeholder="42" style={{ inlineSize: '100%' }} />
+    </Form.Item>
+
+    <Form.Item label="Full name" style={{ flex: 1 }}>
+      <Input prefix={<UserOutlined />} placeholder="John Doe" />
+    </Form.Item>
+
+    <Form.Item label="Avatar">
+      <div style={{ display: 'flex', alignItems: 'center', blockSize: 32 }}>
+        <Avatar size={24}>JD</Avatar>
+      </div>
+    </Form.Item>
+
+    <Form.Item label={<span aria-hidden>&nbsp;</span>}>
+      <Button>Save</Button>
+    </Form.Item>
+  </Form>
+);
+```

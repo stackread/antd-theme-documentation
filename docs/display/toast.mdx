@@ -1,0 +1,152 @@
+---
+title: Toast
+description: Ant Design notification
+antd_components: [notification]
+---
+
+# Toast
+
+A toast reports something that has already happened, without interrupting. It
+appears at the edge of the screen, waits, and goes.
+
+Use it sparingly. A toast cannot be relied upon to be read - it may be gone
+before the reader looks - so nothing that must be acted on belongs in one.
+
+In Ant Design this is `notification`, called rather than rendered.
+
+## Component
+
+The list of toasts is managed by the application, not by the page: a toast is
+added, and it removes itself when its time is up.
+
+:::note[Omitted: the toast list as an element]
+
+**Affects:** 1 specimen - a component that has no counterpart to render.
+
+A toast list can be an element rendered into the page and handed an array. Ant
+Design has no such element: toasts are **called**, and a small holder returned
+by the hook puts them on screen.
+
+The difference is not cosmetic. A toast list can be a thing you find in the
+tree and style; here it is a side effect. Anything the theme wants
+to say about toasts has to be said through the component's own tokens rather
+than through a wrapper.
+
+:::
+
+## Usage
+
+### Toast list
+
+A toast can be dismissed early, or left to expire. Where several arrive at once,
+they stack, and the newest goes nearest the edge.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, notification } from 'antd';
+
+export default () => {
+  const [api, holder] = notification.useNotification();
+
+  return (
+    <>
+      {holder}
+      <Space size={8}>
+        <Button
+          color="primary"
+          variant="filled"
+          onClick={() =>
+            api.info({
+              message: 'Example of a good toast',
+              description: 'A good toast message is short and to the point.',
+              placement: 'bottomRight',
+            })
+          }
+        >
+          Add toast
+        </Button>
+
+        <Button onClick={() => api.destroy()}>Dismiss all</Button>
+      </Space>
+    </>
+  );
+};
+```
+
+### Colors
+
+A toast carries the same meanings as a callout: information, success, warning,
+error. The colour is the first thing read, and often the only thing - which is
+why an error toast that says only "something went wrong" is worse than no toast.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, notification } from 'antd';
+
+export default () => {
+  const [api, holder] = notification.useNotification();
+
+  const show = (kind, title, text) => () =>
+    api[kind]({ message: title, description: text, placement: 'bottomRight' });
+
+  return (
+    <>
+      {holder}
+      <Space size={8} wrap>
+        <Button onClick={show('info', '3 new messages', 'A toast can carry an icon, but rarely needs one.')}>
+          Info
+        </Button>
+        <Button onClick={show('success', 'Your report is complete', 'It is in your downloads.')}>
+          Success
+        </Button>
+        <Button onClick={show('warning', 'Node 726 is having trouble', 'It is still responding, but slowly.')}>
+          Warning
+        </Button>
+        <Button onClick={show('error', "Couldn't complete the search", 'The index is unavailable.')}>
+          Error
+        </Button>
+      </Space>
+    </>
+  );
+};
+```
+
+### Actions
+
+A toast can carry one action. It has to be one the reader can afford to miss -
+if it disappears with the toast, it was never really offered.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, notification } from 'antd';
+
+export default () => {
+  const [api, holder] = notification.useNotification();
+
+  return (
+    <>
+      {holder}
+      <Button
+        color="primary"
+        variant="filled"
+        onClick={() =>
+          api.success({
+            message: "Created report for dashboard 'Tuba Sales by Region'",
+            description: 'It will stay in your downloads for seven days.',
+            placement: 'bottomRight',
+            btn: (
+              <Space size={8}>
+                <Button size="small" type="primary">
+                  Download
+                </Button>
+              </Space>
+            ),
+          })
+        }
+      >
+        Add toast with an action
+      </Button>
+    </>
+  );
+};
+```

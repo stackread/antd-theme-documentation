@@ -1,0 +1,187 @@
+---
+title: Described form groups
+description: A two-column form group built from Row and Col
+antd_components: [Row, Col]
+sidebar_position: 2
+---
+
+# Described form groups
+
+A described group puts a heading and an explanation beside the fields they
+apply to. It is worth reaching for where a group of rows needs a sentence that
+no single label could carry - and where that sentence is long enough that
+putting it under one field would bury it.
+
+On a narrow screen the two columns stack, description first.
+
+Ant Design has no component for this. The description column and the field
+column are ordinary grid columns, so a described group here is a `Row` with two
+`Col`s - which also means the ratio between them is set where it is used, not
+chosen from a list.
+
+```tsx interactive
+import React from 'react';
+import { Col, Form, Input, Row, Slider, Typography, Upload, Button, Select } from 'antd';
+
+const Description = ({ title, text }) => (
+  <>
+    <Typography.Title level={5} style={{ marginBlockStart: 0 }}>
+      {title}
+    </Typography.Title>
+    {text ? (
+      <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+        {text}
+      </Typography.Paragraph>
+    ) : null}
+  </>
+);
+
+export default () => (
+  <Form layout="vertical" style={{ maxInlineSize: 800 }}>
+    <Row gutter={[24, 8]} style={{ marginBottom: 24 }}>
+      <Col xs={24} sm={12}>
+        <Description
+          title="Single text field"
+          text={
+            <>
+              Descriptions are wrapped in a small, subdued paragraph. They take
+              a <Typography.Link>link</Typography.Link> where one helps.
+            </>
+          }
+        />
+      </Col>
+      <Col xs={24} sm={12}>
+        <Form.Item label="Text field" style={{ marginBottom: 0 }}>
+          <Input aria-label="Example" />
+        </Form.Item>
+      </Col>
+    </Row>
+
+    <Row gutter={[24, 8]} style={{ marginBottom: 24 }}>
+      <Col xs={24} sm={12}>
+        <Description title="No description" />
+      </Col>
+      <Col xs={24} sm={12}>
+        <Form.Item label="Text field" style={{ marginBottom: 0 }}>
+          <Input />
+        </Form.Item>
+      </Col>
+    </Row>
+
+    <Row gutter={[24, 8]}>
+      <Col xs={24} sm={12}>
+        <Description
+          title="Multiple fields"
+          text="Here are three form rows. The first form row does not have a label."
+        />
+      </Col>
+      <Col xs={24} sm={12}>
+        <Form.Item extra={<span>This is a help text</span>}>
+          <Select
+            aria-label="An example of a form element without a visible label"
+            options={[
+              { value: 'one', label: 'Option one' },
+              { value: 'two', label: 'Option two' },
+            ]}
+          />
+        </Form.Item>
+
+        <Form.Item label="File picker">
+          <Upload beforeUpload={() => false}>
+            <Button>Select a file</Button>
+          </Upload>
+        </Form.Item>
+
+        <Form.Item label="Range" style={{ marginBottom: 0 }}>
+          <Slider min={0} max={100} />
+        </Form.Item>
+      </Col>
+    </Row>
+  </Form>
+);
+```
+
+### Sizing described form rows
+
+The group could be capped at 800px for readability and opened up with a
+`fullWidth` flag. Here the cap is whatever the container gives, so a full-width
+group is one without a `max-inline-size` above it - no prop to pass down, and
+nothing to repeat on each field.
+
+```tsx interactive
+import React from 'react';
+import { Button, Col, Form, Input, Row, Typography, Upload } from 'antd';
+
+export default () => (
+  <Form layout="vertical">
+    <Row gutter={[24, 8]}>
+      <Col xs={24} sm={12}>
+        <Typography.Title level={4} style={{ marginBlockStart: 0 }}>
+          Full width
+        </Typography.Title>
+        <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+          The group takes the width of what contains it, and the columns divide
+          that width between them.
+        </Typography.Paragraph>
+      </Col>
+
+      <Col xs={24} sm={12}>
+        <Form.Item
+          label="Text field"
+          extra={<span>The field fills its column, whatever that column is</span>}
+        >
+          <Input aria-label="Example" />
+        </Form.Item>
+
+        <Form.Item label="File picker" style={{ marginBottom: 0 }}>
+          <Upload beforeUpload={() => false}>
+            <Button>Select a file</Button>
+          </Upload>
+        </Form.Item>
+      </Col>
+    </Row>
+  </Form>
+);
+```
+
+The ratio between the two columns is a choice, not a default. Half and half
+suits a long description; where the description is a line and the fields are
+the work, give the fields two thirds or three quarters.
+
+The description column has a readable minimum below which it should not be
+squeezed - past that it stops being prose and becomes a stack of single words.
+
+```tsx interactive
+import React from 'react';
+import { Button, Col, Form, Input, Row, Typography, Upload } from 'antd';
+
+export default () => (
+  <Form layout="vertical">
+    <Row gutter={[24, 8]}>
+      <Col xs={24} sm={8} style={{ minInlineSize: 180 }}>
+        <Typography.Title level={4} style={{ marginBlockStart: 0 }}>
+          Ratio of thirds
+        </Typography.Title>
+        <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+          One third for the description, two for the fields.
+        </Typography.Paragraph>
+      </Col>
+
+      <Col xs={24} sm={16}>
+        <Form.Item
+          label="Text field"
+          extra={<span>The fields now have the larger share</span>}
+        >
+          <Input aria-label="Example" />
+        </Form.Item>
+
+        <Form.Item label="File picker" style={{ marginBottom: 0 }}>
+          <Upload beforeUpload={() => false}>
+            <Button>Select a file</Button>
+          </Upload>
+        </Form.Item>
+      </Col>
+    </Row>
+  </Form>
+);
+```

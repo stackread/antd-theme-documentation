@@ -1,0 +1,433 @@
+---
+title: Resizable container
+description: Ant Design Splitter
+antd_components: [Splitter]
+---
+
+# Resizable container
+
+A resizable container splits an area into panels with a handle between them.
+The reader drags the handle to change how the space is divided.
+
+In Ant Design this is `Splitter`, with `Splitter.Panel` for each part. The
+handle is drawn by the splitter itself, so it does not have to be placed by
+hand.
+
+Where a container is tall or holds a lot, give it a tab stop of its own -
+otherwise keyboard users cannot scroll it.
+
+## Horizontal resizing
+
+Two panels with a handle between them. Dragging the handle changes their sizes,
+and the arrow keys do the same once the handle has focus.
+
+A panel can be given a starting size, and scrolling inside it can be turned off
+where the content should not overflow.
+
+```tsx interactive
+import React from 'react';
+import { Splitter, Typography } from 'antd';
+
+const text = (
+  <Typography>
+    <p>
+      Fugiat officia deserunt sit ullamco cupidatat esse eiusmod anim laboris
+      culpa consectetur.
+    </p>
+  </Typography>
+);
+
+export default () => (
+  <Splitter style={{ blockSize: 200, border: '1px solid var(--ant-color-border)' }}>
+    <Splitter.Panel defaultSize="60%">
+      <div style={{ padding: 16 }}>{text}</div>
+    </Splitter.Panel>
+    <Splitter.Panel>
+      <div style={{ padding: 16 }}>{text}</div>
+    </Splitter.Panel>
+  </Splitter>
+);
+```
+
+## Resizable panel options
+
+Each panel is a plain surface stretched to fill its share of the container. It
+takes the same styling as any other panel - a colour, a shadow, padding.
+
+The defaults strip most of that away, so that panels inside a container do not
+read as a stack of separate cards.
+
+```tsx interactive
+import React from 'react';
+import { Card, Splitter, Typography } from 'antd';
+
+const text = (
+  <Typography>
+    <p style={{ marginBottom: 0 }}>
+      Fugiat officia deserunt sit ullamco cupidatat esse eiusmod anim laboris.
+    </p>
+  </Typography>
+);
+
+export default () => (
+  <Splitter style={{ blockSize: 200 }}>
+    <Splitter.Panel defaultSize="50%">
+      <Card style={{ blockSize: '100%', borderRadius: 0 }}>{text}</Card>
+    </Splitter.Panel>
+    <Splitter.Panel>
+      <Card
+        variant="borderless"
+        style={{ blockSize: '100%', borderRadius: 0, background: 'var(--ant-color-bg-layout)' }}
+      >
+        {text}
+      </Card>
+    </Splitter.Panel>
+  </Splitter>
+);
+```
+
+## Horizontal resizing with controlled widths
+
+Sometimes the sizes have to be controlled from outside - to keep them between
+visits, or to switch between preset layouts. The container reports each change
+and accepts the sizes back.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Splitter, Typography } from 'antd';
+
+export default () => {
+  const [sizes, setSizes] = React.useState(['50%', '50%']);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={8}>
+        <Button size="small" onClick={() => setSizes(['30%', '70%'])}>
+          30 / 70
+        </Button>
+        <Button size="small" onClick={() => setSizes(['50%', '50%'])}>
+          50 / 50
+        </Button>
+        <Button size="small" onClick={() => setSizes(['70%', '30%'])}>
+          70 / 30
+        </Button>
+      </Space>
+
+      <Splitter
+        onResize={setSizes}
+        style={{ blockSize: 200, border: '1px solid var(--ant-color-border)' }}
+      >
+        <Splitter.Panel size={sizes[0]}>
+          <div style={{ padding: 16 }}>
+            <Typography>
+              <p style={{ marginBottom: 0 }}>First panel: {sizes[0]}</p>
+            </Typography>
+          </div>
+        </Splitter.Panel>
+        <Splitter.Panel size={sizes[1]}>
+          <div style={{ padding: 16 }}>
+            <Typography>
+              <p style={{ marginBottom: 0 }}>Second panel: {sizes[1]}</p>
+            </Typography>
+          </div>
+        </Splitter.Panel>
+      </Splitter>
+    </Space>
+  );
+};
+```
+
+## Vertical resizing
+
+The same container can divide vertically instead.
+
+```tsx interactive
+import React from 'react';
+import { Splitter, Typography } from 'antd';
+
+const text = (
+  <Typography>
+    <p style={{ marginBottom: 0 }}>
+      Fugiat officia deserunt sit ullamco cupidatat esse eiusmod anim laboris.
+    </p>
+  </Typography>
+);
+
+export default () => (
+  <Splitter
+    orientation="vertical"
+    style={{ blockSize: 260, border: '1px solid var(--ant-color-border)' }}
+  >
+    <Splitter.Panel defaultSize="50%">
+      <div style={{ padding: 16 }}>{text}</div>
+    </Splitter.Panel>
+    <Splitter.Panel>
+      <div style={{ padding: 16 }}>{text}</div>
+    </Splitter.Panel>
+  </Splitter>
+);
+```
+
+## Resizable container callbacks
+
+The container reports when resizing starts and when it ends. The start also
+says what triggered it - a pointer or a key - which matters when the reaction
+should differ.
+
+Ant Design reports the end of a resize; the start is not separately available.
+
+```tsx interactive
+import React from 'react';
+import { Splitter, Typography } from 'antd';
+
+export default () => {
+  const [message, setMessage] = React.useState('Nothing yet');
+
+  return (
+    <>
+      <Typography>
+        <p>{message}</p>
+      </Typography>
+
+      <Splitter
+        onResize={() => setMessage('Resizing...')}
+        onResizeEnd={(g) => setMessage(`Resize ended at ${g.map(Math.round).join(' / ')}`)}
+        style={{ blockSize: 200, border: '1px solid var(--ant-color-border)' }}
+      >
+        <Splitter.Panel defaultSize="50%">
+          <div style={{ padding: 16 }}>Drag the handle</div>
+        </Splitter.Panel>
+        <Splitter.Panel>
+          <div style={{ padding: 16 }}>and watch the message above</div>
+        </Splitter.Panel>
+      </Splitter>
+    </>
+  );
+};
+```
+
+## Collapsible resizable panels
+
+A panel can be collapsible: it hides its content and shrinks to a minimum, so
+that a large layout area can give up its space to the main one.
+
+Not every panel can be collapsible - at least one has to stay, or the container
+would end up empty.
+
+```tsx interactive
+import React from 'react';
+import { Splitter, Typography } from 'antd';
+
+const text = (
+  <Typography>
+    <p style={{ marginBottom: 0 }}>
+      Fugiat officia deserunt sit ullamco cupidatat esse eiusmod anim laboris.
+    </p>
+  </Typography>
+);
+
+export default () => (
+  <>
+    <Splitter style={{ blockSize: 200, border: '1px solid var(--ant-color-border)' }}>
+      <Splitter.Panel collapsible defaultSize="30%">
+        <div style={{ padding: 16 }}>Collapsible side panel</div>
+      </Splitter.Panel>
+      <Splitter.Panel>
+        <div style={{ padding: 16 }}>{text}</div>
+      </Splitter.Panel>
+    </Splitter>
+
+    <Splitter style={{ blockSize: 200, marginBlockStart: 16, border: '1px solid var(--ant-color-border)' }}>
+      <Splitter.Panel>
+        <div style={{ padding: 16 }}>{text}</div>
+      </Splitter.Panel>
+      <Splitter.Panel collapsible defaultSize="30%">
+        <div style={{ padding: 16 }}>Collapsible on the other side</div>
+      </Splitter.Panel>
+    </Splitter>
+
+    <Splitter
+      orientation="vertical"
+      style={{ blockSize: 260, marginBlockStart: 16, border: '1px solid var(--ant-color-border)' }}
+    >
+      <Splitter.Panel collapsible defaultSize="30%">
+        <div style={{ padding: 16 }}>Collapsible top panel</div>
+      </Splitter.Panel>
+      <Splitter.Panel>
+        <div style={{ padding: 16 }}>{text}</div>
+      </Splitter.Panel>
+    </Splitter>
+  </>
+);
+```
+
+## Responsive layout
+
+The direction can change with the available room, so that a side-by-side layout
+becomes a stacked one on a narrow screen.
+
+```tsx interactive
+import React from 'react';
+import { Splitter, Typography } from 'antd';
+
+export default () => {
+  const [vertical, setVertical] = React.useState(false);
+  const boxStyle = React.useRef(null);
+
+  React.useEffect(() => {
+    const observer = new ResizeObserver(([e]) => {
+      setVertical(e.contentRect.width < 600);
+    });
+    if (boxStyle.current) observer.observe(boxStyle.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={boxStyle}>
+      <Typography>
+        <p>Resize the window to see the panels change orientation.</p>
+      </Typography>
+
+      <Splitter
+        orientation={vertical ? 'vertical' : 'horizontal'}
+        style={{ blockSize: 240, border: '1px solid var(--ant-color-border)' }}
+      >
+        <Splitter.Panel defaultSize="50%">
+          <div style={{ padding: 16 }}>First panel</div>
+        </Splitter.Panel>
+        <Splitter.Panel>
+          <div style={{ padding: 16 }}>Second panel</div>
+        </Splitter.Panel>
+      </Splitter>
+    </div>
+  );
+};
+```
+
+## Collapsible panel options
+
+The collapse button takes options of its own: which way it points, where it
+sits, how it is labelled.
+
+Ant Design draws the button itself and offers no configuration for it.
+
+```tsx interactive
+import React from 'react';
+import { Splitter } from 'antd';
+
+export default () => (
+  <Splitter style={{ blockSize: 200, border: '1px solid var(--ant-color-border)' }}>
+    <Splitter.Panel collapsible={{ start: true }} defaultSize="30%">
+      <div style={{ padding: 16 }}>This panel only collapses in one direction</div>
+    </Splitter.Panel>
+    <Splitter.Panel>
+      <div style={{ padding: 16 }}>Main panel</div>
+    </Splitter.Panel>
+  </Splitter>
+);
+```
+
+## Collapsible panels with external control
+
+The container hands out its own methods, so a surrounding component can
+collapse a panel from elsewhere.
+
+Reaching past the container's own logic makes states possible that it would
+otherwise prevent - all panels collapsed, for instance. What happens then is
+the application's problem, including what a screen reader is told.
+
+### Custom collapse button
+
+A collapse button of one's own can be placed anywhere in the panel. Once the
+panel is collapsed, the container's own button takes over again, because there
+is nowhere left to put a custom one.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Splitter } from 'antd';
+
+export default () => {
+  const [sizes, setSizes] = React.useState(['30%', '70%']);
+  const collapsed = sizes[0] === '0%';
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Button
+        size="small"
+        onClick={() => setSizes(collapsed ? ['30%', '70%'] : ['0%', '100%'])}
+      >
+        {collapsed ? 'Expand' : 'Collapse'} the first panel
+      </Button>
+
+      <Splitter
+        onResize={setSizes}
+        style={{ blockSize: 200, border: '1px solid var(--ant-color-border)' }}
+      >
+        <Splitter.Panel size={sizes[0]} collapsible>
+          <div style={{ padding: 16 }}>Side panel</div>
+        </Splitter.Panel>
+        <Splitter.Panel size={sizes[1]}>
+          <div style={{ padding: 16 }}>Main panel</div>
+        </Splitter.Panel>
+      </Splitter>
+    </Space>
+  );
+};
+```
+
+## Resizable button indicator
+
+The handle shows a grab indicator as a hint. Where resizing is a convenience
+rather than the point of the screen, or where the page is already busy, a
+subdued border can take its place - visible only when the handle is hovered or
+focused.
+
+```tsx interactive
+import React from 'react';
+import { Splitter, Typography } from 'antd';
+
+export default () => (
+  <>
+    <Typography>
+      <p>With the default handle indicator:</p>
+    </Typography>
+    <Splitter style={{ blockSize: 160, border: '1px solid var(--ant-color-border)' }}>
+      <Splitter.Panel defaultSize="50%">
+        <div style={{ padding: 16 }}>First panel</div>
+      </Splitter.Panel>
+      <Splitter.Panel>
+        <div style={{ padding: 16 }}>Second panel</div>
+      </Splitter.Panel>
+    </Splitter>
+
+    <Typography style={{ marginBlockStart: 16 }}>
+      <p>With a subdued border instead:</p>
+    </Typography>
+    <Splitter
+      className="stackread-splitter-schlicht"
+      style={{ blockSize: 160, border: '1px solid var(--ant-color-border)' }}
+    >
+      <Splitter.Panel defaultSize="50%">
+        <div style={{ padding: 16 }}>First panel</div>
+      </Splitter.Panel>
+      <Splitter.Panel>
+        <div style={{ padding: 16 }}>Second panel</div>
+      </Splitter.Panel>
+    </Splitter>
+  </>
+);
+```
+
+## Custom resize logic
+
+:::note[Omitted: the standalone resize handle]
+
+**Affects:** 0 specimens - a handle on its own, not a container.
+
+The resize handle could be importable on its own, so that an application can
+attach its own pointer, touch and keyboard logic. Ant Design's
+splitter does not expose its handle separately.
+
+Building one would be component work rather than theming.
+
+:::

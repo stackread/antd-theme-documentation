@@ -1,0 +1,119 @@
+---
+title: Loading
+description: Ant Design Spin
+antd_components: [Spin]
+---
+
+# Loading
+
+Use loading indicators sparingly, and prefer showing **actual progress** over an
+endless spinner - a progress bar says how long, a spinner only says "still
+working".
+
+Several loaders on one page are fine when each section arrives on its own. When
+the whole page arrives at once, use a single larger one instead: a screen full
+of spinners reads as several failures rather than one wait.
+
+In Ant Design this is `Spin`.
+
+## Branded
+
+A loader can carry a product mark, for a full page or a product loading
+screen.
+
+:::note[Omitted: the branded loader]
+
+**Affects:** 4 specimens - a logo animation, not a loader.
+
+Three of the four measured loaders animate product marks: a company logo,
+product logos, and a chart placeholder. Reproducing them would mean reproducing
+artwork rather than a design decision.
+
+The plain spinner below carries the same sizes and the same behaviour. What a
+branded loader should look like belongs to the divergence.
+
+:::
+
+## Logos
+
+:::note[Omitted: the product logos]
+
+**Affects:** 3 specimens - artwork, not loaders.
+
+See above.
+
+:::
+
+## Chart
+
+:::note[Omitted: the chart placeholder]
+
+**Affects:** 3 specimens - a chart skeleton, not a loader.
+
+A small animated bar chart can stand in while chart data loads. Ant Design has
+nothing equivalent; a skeleton in the shape of the coming content is the nearer
+idea, and it has its own page.
+
+:::
+
+## Spinner
+
+The plain spinner comes in five sizes. It takes a label, because a spinner
+without one announces nothing - a screen reader reaches it and moves on.
+
+```tsx interactive
+import React from 'react';
+import { Space, Spin } from 'antd';
+
+export default () => (
+  <Space size={24} align="center">
+    <Spin size="small" aria-label="Loading, small" />
+    <Spin aria-label="Loading, default" />
+    <Spin size="large" aria-label="Loading, large" />
+  </Space>
+);
+```
+
+:::note[Omitted: two of the five sizes]
+
+**Affects:** 1 specimen - sizes Ant Design does not have.
+
+Five spinner sizes were measured; Ant Design offers three. The two largest fall
+away.
+
+A loader large enough to fill a page is arguably a different thing from one that
+sits in a button - whether we want that distinction belongs to the divergence.
+
+:::
+
+A spinner can also wrap the thing that is loading, so that the wait sits where
+the content will be rather than beside it.
+
+```tsx interactive
+import React from 'react';
+import { Card, Spin, Switch, Typography } from 'antd';
+
+export default () => {
+  const [loading, setLoading] = React.useState(true);
+
+  return (
+    <div>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+        <Switch size="small" checked={loading} onChange={setLoading} />
+        Loading
+      </label>
+
+      <Spin spinning={loading} aria-label="Loading the content below">
+        <Card>
+          <Typography>
+            <p style={{ marginBottom: 0 }}>
+              This content is covered while it loads, so the wait happens where
+              the content will be.
+            </p>
+          </Typography>
+        </Card>
+      </Spin>
+    </div>
+  );
+};
+```

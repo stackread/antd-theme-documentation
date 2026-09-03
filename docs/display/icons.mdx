@@ -1,0 +1,221 @@
+---
+title: Icons
+description: The icon set, searchable
+antd_components: [Icon]
+---
+
+# Icons
+
+Ant Design ships **846 icons** in three cuts. Icons are the one part of this
+theme that is not reproduced: a glyph set is artwork, and Ant Design's own set
+is what these pages draw with.
+
+```
+  Outlined   447    ours
+  Filled     249    a solid counterpart for most of the above
+  TwoTone    150    two colours, used nowhere in these pages
+```
+
+**Outlined is the cut used here.** Its glyphs are single-weight strokes, which
+is what these pages are drawn with. Filled and TwoTone exist and are listed
+below so you know they exist - not because a page should mix them.
+
+## All icons
+
+Type to filter. The names are the export names from `@ant-design/icons`, so
+what you read here is what you import.
+
+```tsx interactive
+import React from 'react';
+import * as icons from '@ant-design/icons';
+import { Empty, Flex, Input, Radio, Typography } from 'antd';
+
+const cuts = ['Outlined', 'Filled', 'TwoTone'];
+
+const byCut = {};
+for (const cut of cuts) {
+  byCut[cut] = Object.keys(icons)
+    .filter((name) => name.endsWith(cut))
+    .sort();
+}
+
+export default () => {
+  const [cut, setCut] = React.useState('Outlined');
+  const [filter, setFilter] = React.useState('');
+
+  const needle = filter.trim().toLowerCase();
+  const shown = byCut[cut].filter((name) => !needle || name.toLowerCase().includes(needle));
+
+  return (
+    <Flex vertical gap={16}>
+      <Flex gap={12} wrap align="center">
+        <Radio.Group
+          value={cut}
+          onChange={(event) => setCut(event.target.value)}
+          optionType="button"
+          options={cuts.map((c) => ({ label: `${c} (${byCut[c].length})`, value: c }))}
+        />
+        <Input
+          placeholder="Filter, e.g. arrow"
+          value={filter}
+          onChange={(event) => setFilter(event.target.value)}
+          allowClear
+          style={{ maxInlineSize: 260 }}
+        />
+        <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+          {shown.length} of {byCut[cut].length}
+        </Typography.Text>
+      </Flex>
+
+      {shown.length === 0 ? (
+        <Empty description={`No icon matches “${filter}”`} />
+      ) : (
+        <Flex wrap gap={8}>
+          {shown.map((name) => {
+            const Icon = icons[name];
+            return (
+              <Flex
+                key={name}
+                vertical
+                align="center"
+                gap={6}
+                title={name}
+                style={{
+                  inlineSize: 108,
+                  paddingBlock: 12,
+                  paddingInline: 4,
+                  borderRadius: 4,
+                  border: '1px solid var(--ant-color-border-secondary)',
+                }}
+              >
+                <Icon style={{ fontSize: 20 }} />
+                <Typography.Text
+                  style={{ fontSize: 10, inlineSize: '100%', textAlign: 'center' }}
+                  ellipsis={{ tooltip: name }}
+                >
+                  {name.replace(cut, '')}
+                </Typography.Text>
+              </Flex>
+            );
+          })}
+        </Flex>
+      )}
+    </Flex>
+  );
+};
+```
+
+## Sizes
+
+An icon has no size of its own - it takes `font-size`, like a letter. That is
+why an icon inside a button is the button's size without anyone setting it, and
+why an icon in a heading grows with the heading.
+
+```tsx interactive
+import React from 'react';
+import { Flex, Typography } from 'antd';
+import { SettingOutlined } from '@ant-design/icons';
+
+const sizes = [12, 14, 16, 20, 24, 32];
+
+export default () => (
+  <Flex gap={24} align="flex-end">
+    {sizes.map((size) => (
+      <Flex key={size} vertical align="center" gap={8}>
+        <SettingOutlined style={{ fontSize: size }} />
+        <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+          {size}px
+        </Typography.Text>
+      </Flex>
+    ))}
+  </Flex>
+);
+```
+
+## Colors
+
+An icon takes `currentColor`. Setting a colour on the icon is the exception;
+setting it on what contains the icon is the rule - that way a disabled button's
+icon dims with its label instead of staying bright.
+
+```tsx interactive
+import React from 'react';
+import { Flex, Typography } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined, ExclamationCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
+
+const meanings = [
+  ['Neutral', 'var(--ant-color-info)', InfoCircleOutlined],
+  ['Success', 'var(--ant-color-success)', CheckCircleOutlined],
+  ['Warning', 'var(--ant-color-warning-text)', ExclamationCircleOutlined],
+  ['Danger', 'var(--ant-color-error)', CloseCircleOutlined],
+];
+
+export default () => (
+  <Flex gap={28} wrap>
+    {meanings.map(([label, color, Icon]) => (
+      <Flex key={label} vertical align="center" gap={8} style={{ color }}>
+        <Icon style={{ fontSize: 24 }} />
+        <Typography.Text style={{ fontSize: 12, color: 'inherit' }}>{label}</Typography.Text>
+      </Flex>
+    ))}
+  </Flex>
+);
+```
+
+:::note[Warning takes its text colour, not its raw one]
+
+`--ant-color-warning` is `#FACB3D` - readable as a fill behind dark text, and
+invisible as a stroke on a white page. Every warning glyph in these pages takes
+`--ant-color-warning-text`, and that is Rule A applied to a line rather than a
+surface.
+
+:::
+
+## Custom SVGs
+
+Ant Design's `Icon` takes any component that renders an SVG, so a mark of your
+own behaves like one from the set - same sizing, same `currentColor`, same
+alignment.
+
+```tsx interactive
+import React from 'react';
+import Icon from '@ant-design/icons';
+import { Flex, Typography } from 'antd';
+
+const Wedge = () => (
+  <svg viewBox="0 0 16 16" width="1em" height="1em" fill="currentColor">
+    <path d="M8 1.5 14.5 14.5H1.5z" />
+  </svg>
+);
+
+export default () => (
+  <Flex gap={24} align="center">
+    <Icon component={Wedge} style={{ fontSize: 24 }} />
+    <Icon component={Wedge} style={{ fontSize: 24, color: 'var(--ant-color-primary)' }} />
+    <Typography.Text style={{ fontSize: 24 }}>
+      <Icon component={Wedge} /> in a line of text
+    </Typography.Text>
+  </Flex>
+);
+```
+
+## Icons in these pages
+
+These pages once used an emoji in 105 places
+where an icon belonged. An emoji is a font glyph: it does not take
+`currentColor`, it does not scale with `font-size` predictably, and it renders
+differently on every platform.
+
+All 105 now use this set. The four ways they were written - an `aria-hidden`
+span, a labelled span, a bare entity in JSX, and an entity inside a prop value
+- are why the first sweep found 70 of them and the second found the rest.
+
+:::note[Omitted: product logos and application marks]
+
+**Affects:** 0 specimens - product marks, not an icon set.
+
+Design systems often list their own product logos and application marks
+alongside their icons. Those identify products rather than actions, and none
+are reproduced here.
+
+:::

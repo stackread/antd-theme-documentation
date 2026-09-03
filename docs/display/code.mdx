@@ -1,0 +1,369 @@
+---
+title: Code
+description: Ant Design Typography.Text code and a code block
+antd_components: [Typography]
+---
+
+# Code
+
+Code comes in two forms: a fragment within a sentence, and a block on its own.
+
+Ant Design has the first as `Typography.Text` with `code`. For the second it has
+nothing, so the block below is a plain `<pre>` dressed with our tokens.
+
+## Components
+
+### Inline
+
+A fragment inside running text: a prop name, a value, a path. It should stay
+short enough not to break the line it sits in.
+
+```tsx interactive
+import React from 'react';
+import { Typography } from 'antd';
+
+export default () => (
+  <Typography>
+    <p style={{ marginBottom: 0 }}>
+      Setting <Typography.Text code>showIcon</Typography.Text> to{' '}
+      <Typography.Text code>true</Typography.Text> puts an icon before the
+      title, and <Typography.Text code>closable</Typography.Text> adds a close
+      control.
+    </p>
+  </Typography>
+);
+```
+
+### Code block
+
+A block stands on its own, with its own surface.
+
+```tsx interactive
+import React from 'react';
+import { Typography } from 'antd';
+
+const example = `<h1>Title</h1>
+<p>A paragraph beneath it.</p>`;
+
+export default () => (
+  <pre
+    style={{
+      margin: 0,
+      padding: 16,
+      background: 'var(--ant-color-bg-layout)',
+      border: '1px solid var(--ant-color-border)',
+      borderRadius: 4,
+      fontFamily: 'var(--ant-font-family-code)',
+      fontSize: 14,
+      overflowX: 'auto',
+    }}
+  >
+    <code>{example}</code>
+  </pre>
+);
+```
+
+The same block with a language named on it, so a highlighter has something to
+work with:
+
+```tsx interactive
+import React from 'react';
+
+const example = `{
+  "type": "info"
+}`;
+
+export default () => (
+  <pre
+    data-language="json"
+    style={{
+      margin: 0,
+      padding: 16,
+      background: 'var(--ant-color-bg-layout)',
+      border: '1px solid var(--ant-color-border)',
+      borderRadius: 4,
+      fontFamily: 'var(--ant-font-family-code)',
+      fontSize: 14,
+      overflowX: 'auto',
+    }}
+  >
+    <code>{example}</code>
+  </pre>
+);
+```
+
+## Usage
+
+### Copying
+
+A block that is meant to be used should be copyable. The control sits in the
+block's corner rather than beside it, so that it travels with the code when the
+page is narrow.
+
+```tsx interactive
+import React from 'react';
+import { Button, Typography } from 'antd';
+
+const example = `{
+  "type": "info",
+  "showIcon": true
+}`;
+
+export default () => {
+  const [copied, setCopied] = React.useState(false);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(example);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* refused - no reason to disturb the example */
+    }
+  };
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <Button
+        size="small"
+        onClick={copy}
+        style={{ position: 'absolute', insetBlockStart: 8, insetInlineEnd: 8 }}
+      >
+        {copied ? 'Copied' : 'Copy'}
+      </Button>
+      <pre
+        style={{
+          margin: 0,
+          padding: 16,
+          background: 'var(--ant-color-bg-layout)',
+          border: '1px solid var(--ant-color-border)',
+          borderRadius: 4,
+          fontFamily: 'var(--ant-font-family-code)',
+          fontSize: 14,
+        }}
+      >
+        <code>{example}</code>
+      </pre>
+    </div>
+  );
+};
+```
+
+### Scrolling
+
+A tall block gets a maximum height and scrolls inside it, so that one long
+example does not push the rest of the page away.
+
+```tsx interactive
+import React from 'react';
+
+const longText = Array.from({ length: 30 }, (_, i) => `line ${i + 1}`).join('\n');
+
+export default () => (
+  <pre
+    style={{
+      margin: 0,
+      padding: 16,
+      maxBlockSize: 200,
+      overflow: 'auto',
+      background: 'var(--ant-color-bg-layout)',
+      border: '1px solid var(--ant-color-border)',
+      borderRadius: 4,
+      fontFamily: 'var(--ant-font-family-code)',
+      fontSize: 14,
+    }}
+  >
+    <code>{longText}</code>
+  </pre>
+);
+```
+
+### Wrapping
+
+By default a long line scrolls sideways, because a wrapped line of code can be
+misread as two. Where the content is prose-like - a log line, a message -
+wrapping is the better choice.
+
+```tsx interactive
+import React from 'react';
+import { Space, Switch } from 'antd';
+
+const longText =
+  'const aVeryLongLine = { this: "does", not: "fit", on: "one", line: "and", therefore: "either", scrolls: "or wraps" };';
+
+export default () => {
+  const [wrapLines, setWrapLines] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={wrapLines} onChange={setWrapLines} />
+        Wrap long lines
+      </label>
+
+      <pre
+        style={{
+          margin: 0,
+          padding: 16,
+          background: 'var(--ant-color-bg-layout)',
+          border: '1px solid var(--ant-color-border)',
+          borderRadius: 4,
+          fontFamily: 'var(--ant-font-family-code)',
+          fontSize: 14,
+          whiteSpace: wrapLines ? 'pre-wrap' : 'pre',
+          overflowX: wrapLines ? 'visible' : 'auto',
+        }}
+      >
+        <code>{longText}</code>
+      </pre>
+    </Space>
+  );
+};
+```
+
+### Line numbers
+
+Numbers make a block referable: "line 12" only means something when the lines
+are counted on screen.
+
+They can start at something other than one, for an excerpt out of a larger file.
+
+```tsx interactive
+import React from 'react';
+
+const rows = ['const a = 1;', 'const b = 2;', 'const c = a + b;'];
+
+export default () => (
+  <pre
+    style={{
+      margin: 0,
+      padding: 16,
+      background: 'var(--ant-color-bg-layout)',
+      border: '1px solid var(--ant-color-border)',
+      borderRadius: 4,
+      fontFamily: 'var(--ant-font-family-code)',
+      fontSize: 14,
+    }}
+  >
+    <code>
+      {rows.map((z, i) => (
+        <div key={z} style={{ display: 'flex', gap: 16 }}>
+          <span
+            aria-hidden
+            style={{ color: 'var(--ant-color-text-description)', userSelect: 'none' }}
+          >
+            {String(i + 12).padStart(2, ' ')}
+          </span>
+          <span>{z}</span>
+        </div>
+      ))}
+    </code>
+  </pre>
+);
+```
+
+Numbers starting at one, a block with one line marked, and a block without
+numbers for comparison:
+
+```tsx interactive
+import React from 'react';
+
+const framed = {
+  margin: 0,
+  padding: 16,
+  background: 'var(--ant-color-bg-layout)',
+  border: '1px solid var(--ant-color-border)',
+  borderRadius: 4,
+  fontFamily: 'var(--ant-font-family-code)',
+  fontSize: 14,
+};
+
+const rows = ['const a = 1;', 'const b = 2;'];
+
+export default () => (
+  <div style={{ display: 'flex', gap: 16 }}>
+    <pre style={{ ...framed, flex: 1 }}>
+      <code>
+        {rows.map((z, i) => (
+          <div key={z} style={{ display: 'flex', gap: 16 }}>
+            <span aria-hidden style={{ color: 'var(--ant-color-text-description)', userSelect: 'none' }}>
+              {i + 1}
+            </span>
+            <span>{z}</span>
+          </div>
+        ))}
+      </code>
+    </pre>
+
+    <pre style={{ ...framed, flex: 1 }}>
+      <code>
+        {rows.map((z, i) => (
+          <div
+            key={z}
+            style={{
+              display: 'flex',
+              gap: 16,
+              background: i === 1 ? 'var(--ant-color-warning-bg)' : undefined,
+            }}
+          >
+            <span aria-hidden style={{ color: 'var(--ant-color-text-description)', userSelect: 'none' }}>
+              {i + 1}
+            </span>
+            <span>{z}</span>
+          </div>
+        ))}
+      </code>
+    </pre>
+
+    <pre style={{ ...framed, flex: 1 }}>
+      <code>{rows.join('\n')}</code>
+    </pre>
+  </div>
+);
+```
+
+### Code block virtualization
+
+:::note[Omitted: virtualised rendering]
+
+**Affects:** 1 specimen - a rendering strategy, not an appearance.
+
+For a block of thousands of lines only the visible ones need rendering.
+That is a performance decision inside a component; there is nothing for a theme
+to dress, and our plain block has no such machinery.
+
+Where such a block is needed, it is component work.
+
+:::
+
+### Fill vertical space
+
+A block can be told to fill the height available to it rather than its content's
+height - useful in a flyout or a split panel, where the code is the main thing
+and should use the room.
+
+```tsx interactive
+import React from 'react';
+
+const longText = Array.from({ length: 12 }, (_, i) => `line ${i + 1}`).join('\n');
+
+export default () => (
+  <div style={{ blockSize: 220, display: 'flex' }}>
+    <pre
+      style={{
+        margin: 0,
+        padding: 16,
+        flex: 1,
+        overflow: 'auto',
+        background: 'var(--ant-color-bg-layout)',
+        border: '1px solid var(--ant-color-border)',
+        borderRadius: 4,
+        fontFamily: 'var(--ant-font-family-code)',
+        fontSize: 14,
+      }}
+    >
+      <code>{longText}</code>
+    </pre>
+  </div>
+);
+```

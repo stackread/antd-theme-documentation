@@ -1,0 +1,278 @@
+---
+title: Tabs
+description: Ant Design Tabs
+antd_components: [Tabs]
+---
+
+# Tabs
+
+Tabs organise related but distinct content for a single subject. They show and
+hide it through navigation within the page, not by loading a new one.
+
+In Ant Design this is `Tabs`, and one component does both jobs: pass `items`
+with `children` and it manages the content, leave `children` out and it is a
+plain strip. Some libraries split those into two components; this one does
+not.
+
+Content can be placed before and after a tab's label through `icon` and through
+the label itself.
+
+## Component
+
+```tsx interactive
+import React from 'react';
+import { Badge, Tabs, Typography } from 'antd';
+
+const contents = {
+  cobalt:
+    "Cobalt is a chemical element with symbol Co and atomic number 27. Like nickel, cobalt is found in the Earth's crust only in chemically combined form, save for small deposits found in alloys of natural meteoric iron. The free element, produced by reductive smelting, is a hard, lustrous, silver-gray metal.",
+  dextrose:
+    'Intravenous sugar solution, also known as dextrose solution, is a mixture of dextrose (glucose) and water. It is used to treat low blood sugar or water loss without electrolyte loss.',
+  hydrogen:
+    'Hydrogen is a chemical element with symbol H and atomic number 1. With a standard atomic weight of 1.008, hydrogen is the lightest element on the periodic table.',
+  msg: 'Monosodium glutamate is the sodium salt of glutamic acid, one of the most abundant naturally occurring non-essential amino acids.',
+};
+
+export default () => (
+  <Tabs
+    defaultActiveKey="cobalt"
+    items={[
+      {
+        key: 'cobalt',
+        label: 'Cobalt',
+        children: <Typography><p>{contents.cobalt}</p></Typography>,
+      },
+      {
+        key: 'dextrose',
+        label: 'Dextrose',
+        children: <Typography><p>{contents.dextrose}</p></Typography>,
+      },
+      {
+        key: 'hydrogen',
+        label: (
+          <span>
+            Hydrogen <Badge count={10} color="var(--ant-color-fill-secondary)" />
+          </span>
+        ),
+        children: <Typography><p>{contents.hydrogen}</p></Typography>,
+      },
+      {
+        key: 'msg',
+        label: 'Monosodium Glutamate',
+        disabled: true,
+        children: <Typography><p>{contents.msg}</p></Typography>,
+      },
+    ]}
+  />
+);
+```
+
+## Usage
+
+### Tab sizes
+
+Tabs take a size. Use the default in general; the small size suits a popover or
+another tight container, and the large one is for primary page navigation.
+
+Tabs can also stretch evenly across the available width.
+
+```tsx interactive
+import React from 'react';
+import { Button, Popover, Tabs, Typography } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+
+  const content = (
+    <div style={{ width: 300 }}>
+      <Tabs
+        size="small"
+        defaultActiveKey="cobalt"
+        items={[
+          { key: 'cobalt', label: 'Cobalt' },
+          { key: 'dextrose', label: 'Dextrose' },
+          { key: 'hydrogen', label: 'Hydrogen', disabled: true },
+        ]}
+      />
+      <Typography.Text>
+        A spacer is usually needed between the tabs and the content. Try to use
+        the same size as the surrounding padding.
+      </Typography.Text>
+    </div>
+  );
+
+  return (
+    <Popover
+      content={content}
+      open={open}
+      onOpenChange={setOpen}
+      trigger="click"
+      placement="bottomLeft"
+    >
+      <Button>Click to show small tabs in a popover</Button>
+    </Popover>
+  );
+};
+```
+
+### Bottom border
+
+The border under the tab strip separates it from the content below and is on by
+default. Some containers already carry a border that does the same work - a
+flyout header, for instance - and then the tab border can go.
+
+Ant Design draws the line as part of the tab bar; it is removed here through
+`tabBarStyle`.
+
+```tsx interactive
+import React from 'react';
+import { Button, Drawer, Space, Tabs, Typography } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Show flyout with tabs</Button>
+
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        title={
+          <div>
+            <Typography.Title level={4} style={{ marginBottom: 4 }}>
+              Flyout header
+            </Typography.Title>
+            <Typography.Text type="secondary">
+              The tabs sit in the header, whose border already divides them from
+              the content.
+            </Typography.Text>
+            <Tabs
+              defaultActiveKey="cobalt"
+              items={[
+                { key: 'cobalt', label: 'Cobalt' },
+                { key: 'dextrose', label: 'Dextrose' },
+                { key: 'hydrogen', label: 'Hydrogen' },
+              ]}
+              tabBarStyle={{ borderBottom: 'none', marginBottom: -24 }}
+            />
+          </div>
+        }
+        footer={
+          <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Button type="text" onClick={() => setOpen(false)}>
+              Close
+            </Button>
+            <Button type="primary" onClick={() => setOpen(false)}>
+              Save
+            </Button>
+          </Space>
+        }
+      >
+        <Typography>
+          <p>The tab content goes here.</p>
+        </Typography>
+      </Drawer>
+    </>
+  );
+};
+```
+
+### Tabbed content
+
+Pairing tabs with their content is the common case: each item carries its own
+`children`, and one of them is selected to begin with.
+
+```tsx interactive
+import React from 'react';
+import { Tabs, Typography } from 'antd';
+
+export default () => (
+  <Tabs
+    defaultActiveKey="dextrose"
+    items={[
+      {
+        key: 'cobalt',
+        label: 'Cobalt',
+        children: (
+          <Typography>
+            <p>
+              Cobalt is a chemical element with symbol Co and atomic number 27.
+            </p>
+          </Typography>
+        ),
+      },
+      {
+        key: 'dextrose',
+        label: 'Dextrose',
+        children: (
+          <Typography>
+            <p>
+              Intravenous sugar solution, also known as dextrose solution, is a
+              mixture of dextrose (glucose) and water.
+            </p>
+          </Typography>
+        ),
+      },
+      {
+        key: 'hydrogen',
+        label: 'Hydrogen',
+        children: (
+          <Typography>
+            <p>Hydrogen is the lightest element on the periodic table.</p>
+          </Typography>
+        ),
+      },
+    ]}
+  />
+);
+```
+
+### Controlled tabbed content
+
+Selection can be taken over completely with `activeKey` and `onChange`. That is
+what makes it possible to change tabs from somewhere else on the page.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Tabs, Typography } from 'antd';
+
+export default () => {
+  const [selected, setSelected] = React.useState('cobalt');
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Button
+        onClick={() => setSelected(selected === 'cobalt' ? 'hydrogen' : 'cobalt')}
+      >
+        Select the {selected === 'cobalt' ? 'Hydrogen' : 'Cobalt'} tab
+      </Button>
+
+      <Tabs
+        activeKey={selected}
+        onChange={setSelected}
+        items={[
+          {
+            key: 'cobalt',
+            label: 'Cobalt',
+            children: (
+              <Typography>
+                <p>Cobalt is a hard, lustrous, silver-gray metal.</p>
+              </Typography>
+            ),
+          },
+          {
+            key: 'hydrogen',
+            label: 'Hydrogen',
+            children: (
+              <Typography>
+                <p>Hydrogen is the lightest element on the periodic table.</p>
+              </Typography>
+            ),
+          },
+        ]}
+      />
+    </Space>
+  );
+};
+```

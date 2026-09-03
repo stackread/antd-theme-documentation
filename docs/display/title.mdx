@@ -1,0 +1,79 @@
+---
+title: Title
+description: Ant Design Typography.Title
+antd_components: [Typography]
+---
+
+# Title
+
+A title styles the page, section and content headings. It can hold any markup,
+but usually holds a heading tag.
+
+Unlike running text, a title carries **no margins of its own** - which makes it
+the better choice for laying out a page, because the spacing around it stays
+where the layout put it.
+
+In Ant Design this is `Typography.Title`. It takes a `level` from 1 to 5 and
+renders the matching heading tag.
+
+```tsx interactive
+import React from 'react';
+import { Divider, Typography } from 'antd';
+
+export default () => (
+  <div>
+    <Typography.Title level={1}>
+      This is a large title, only one should exist per page
+    </Typography.Title>
+    <Typography.Text code>level={1}</Typography.Text>
+
+    <Typography.Title level={2} style={{ marginBlockStart: 24 }}>
+      This is the default size for title
+    </Typography.Title>
+    <Typography.Text code>level={2}</Typography.Text>
+
+    <Typography.Title level={3} style={{ marginBlockStart: 24 }}>
+      This is a small title
+    </Typography.Title>
+    <Typography.Text code>level={3}</Typography.Text>
+
+    <Typography.Title level={4} style={{ marginBlockStart: 24 }}>
+      This is an extra small title
+    </Typography.Title>
+    <Typography.Text code>level={4}</Typography.Text>
+
+    <Typography.Title level={5} style={{ marginBlockStart: 24 }}>
+      This is an extra extra small title
+    </Typography.Title>
+    <Typography.Text code>level={5}</Typography.Text>
+
+    <Typography.Text
+      strong
+      style={{ display: 'block', marginBlockStart: 24, fontSize: 12 }}
+    >
+      This is an extra extra extra small title and should only be used when the
+      title is inconsequential (like a label)
+    </Typography.Text>
+    <Typography.Text code>a label, not a heading</Typography.Text>
+
+    <Divider />
+
+    <Typography.Title level={1} style={{ marginBlockStart: 0 }}>
+      <span>Titles are markup agnostic, they only confer style</span>
+    </Typography.Title>
+  </div>
+);
+```
+
+:::note[Omitted: the sixth size]
+
+**Affects:** 1 specimen - a size Ant Design does not have.
+
+The measured scale has six title sizes down to a 12px label; Ant Design's title
+stops at five. The smallest is set here as strong text at 12px, which is what
+the scale calls it: `heading.xxxs`.
+
+That the scale exists but the component does not reach it is a deviation of the
+component, not of the theme.
+
+:::

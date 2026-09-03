@@ -1,0 +1,151 @@
+---
+title: Banner
+description: Ant Design Alert (banner)
+antd_components: [Alert]
+---
+
+# Banner
+
+A banner runs the full width of the page and announces something about the
+product: a new feature, a promotion, a nudge to get started.
+
+**A banner is not a callout.** A callout speaks about the content beside it - a
+warning, an error, a confirmation. A banner speaks about the product, and it
+speaks to everyone on the page. Using one for the other makes an announcement
+look like a problem, or a problem look like marketing.
+
+In Ant Design this is `Alert` with `banner`, which drops the rounded corners and
+the side borders so it can sit flush against the top of a page.
+
+## Component
+
+```tsx interactive
+import React from 'react';
+import { Alert } from 'antd';
+
+export default () => (
+  <Alert
+    banner
+    showIcon
+    type="info"
+    title="Introducing a new feature"
+    description="Something new has arrived, and here is one sentence about what it does."
+  />
+);
+```
+
+## Usage
+
+### With actions
+
+A banner can carry the action it is announcing. One action, and it should be the
+thing the sentence just described - a banner with three choices is no longer an
+announcement.
+
+```tsx interactive
+import React from 'react';
+import { Alert, Button, Space } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Alert
+      banner
+      showIcon
+      type="info"
+      title="Upgrade your plan"
+      description="More of everything, and a few things you cannot get otherwise."
+      action={
+        <Space size={8}>
+          <Button size="small" color="primary" variant="filled">
+            See plans
+          </Button>
+          <Button size="small" type="text">
+            Not now
+          </Button>
+        </Space>
+      }
+    />
+
+  </Space>
+);
+```
+
+### Dismissible
+
+A banner can be dismissed. Whether it comes back is the surrounding
+application's decision - and one worth making deliberately, because a banner
+that returns on every page load stops being read.
+
+```tsx interactive
+import React from 'react';
+import { Alert, Button } from 'antd';
+
+export default () => {
+  const [visible, setVisible] = React.useState(true);
+
+  return visible ? (
+    <Alert
+      banner
+      showIcon
+      closable
+      type="info"
+      title="You have unread notifications"
+      description="Dismiss this and it stays dismissed for as long as you decide."
+      onClose={() => setVisible(false)}
+    />
+  ) : (
+    <Button size="small" onClick={() => setVisible(true)}>
+      Bring the banner back
+    </Button>
+  );
+};
+```
+
+### Size and color
+
+Two sizes and two colour treatments. The smaller size is for a banner that
+should be noticed but not answered; the plain colour is for one that should not
+compete with the page beneath it.
+
+```tsx interactive
+import React from 'react';
+import { Alert, Space } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Alert
+      banner
+      showIcon
+      type="info"
+      title="Default size, highlighted"
+      description="The full treatment, for something that wants an answer."
+    />
+
+    <Alert
+      banner
+      showIcon
+      type="info"
+      title="Default size, plain"
+      description="The same size, without the tint."
+      style={{ background: 'var(--ant-color-bg-container)' }}
+      data-variante="plain"
+    />
+
+    <Alert
+      banner
+      showIcon
+      type="info"
+      title="Small size, highlighted"
+    />
+
+    <Alert
+      banner
+      showIcon
+      type="info"
+      title="Small size, plain"
+      style={{ background: 'var(--ant-color-bg-container)' }}
+      data-variante="plain"
+    />
+  </Space>
+);
+```

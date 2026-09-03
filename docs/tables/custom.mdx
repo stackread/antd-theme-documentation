@@ -1,0 +1,195 @@
+---
+title: Custom table
+description: A table built from plain markup
+antd_components: [Pagination, Checkbox]
+sidebar_position: 2
+---
+
+# Custom tables
+
+Where neither the basic table nor the in-memory one fits, the table can be
+built out of its parts.
+
+Those parts can be published as components. Ant Design does not: the parts of a
+table are `<table>`, `<thead>`, `<tr>`, `<th>` and the rest, styled
+by the theme through the classes below.
+
+That is less to learn and more to write. Nothing is arranged for you, and every
+behaviour the ready-made table supplied has to be supplied again.
+
+:::note[Selection and filtering are yours]
+
+A hand-built table handles its own selection and its own filtering. The header
+checkbox that selects everything, the indeterminate state when some rows are
+selected, the interaction with paging - all of it is code you write.
+
+:::
+
+:::note[Mobile headers]
+
+In the narrow layout each cell needs its column's name beside it, because the
+header row is gone. In a ready-made table that comes from the column
+definition; here every cell has to carry it.
+
+The same goes for the sorting control: on a narrow screen there are no column
+headers to click, so sorting needs somewhere else to live.
+
+:::
+
+:::note[Cell text behavior]
+
+Decide per cell whether the text may wrap or must be cut. A cell whose content
+is a component rather than text needs that content as a direct child, or the
+wrapper the table would otherwise add gets in the way of the layout.
+
+:::
+
+One of many ways to set up such a table:
+
+```tsx interactive
+import React from 'react';
+import { Checkbox, Pagination, Tag, Typography } from 'antd';
+
+const everything = [
+  { id: '1', name: 'Mira Holt', ort: 'Berlin', online: true },
+  { id: '2', name: 'Jonas Frey', ort: 'Lyon', online: false },
+  { id: '3', name: 'Ada Sole', ort: 'Porto', online: true },
+  { id: '4', name: 'Nils Brandt', ort: 'Aarhus', online: false },
+];
+
+const columns = [
+  { key: 'name', title: 'Name', render: (z) => z.name },
+  { key: 'ort', title: 'Location', render: (z) => z.ort },
+  {
+    key: 'online',
+    title: 'Online',
+    render: (z) => <Tag color={z.online ? 'green' : 'red'}>{z.online ? 'Online' : 'Offline'}</Tag>,
+  },
+];
+
+const cellStyle = {
+  padding: '12px 16px',
+  borderBlockEnd: '1px solid var(--ant-color-split)',
+  textAlign: 'start',
+};
+
+export default () => {
+  const [selected, setSelected] = React.useState([]);
+  const [page, setPage] = React.useState(1);
+  const perPage = 2;
+
+  const visible = everything.slice((page - 1) * perPage, page * perPage);
+  const allSelected = visible.every((z) => selected.includes(z.id));
+  const some = visible.some((z) => selected.includes(z.id)) && !allSelected;
+
+  const toggle = (id) =>
+    setSelected((g) => (g.includes(id) ? g.filter((x) => x !== id) : [...g, id]));
+
+  const totals = [
+    `${new Set(visible.map((z) => z.ort)).size} places`,
+    `${visible.filter((z) => z.online).length} online`,
+  ];
+
+  return (
+    <div>
+      <table
+        style={{ inlineSize: '100%', borderCollapse: 'collapse' }}
+        aria-label="A table built by hand"
+      >
+        <thead>
+          <tr>
+            <th style={{ ...cellStyle, inlineSize: 40 }}>
+              <Checkbox
+                checked={allSelected}
+                indeterminate={some}
+                aria-label="Select all rows on this page"
+                onChange={(e) => setSelected(e.target.checked ? visible.map((z) => z.id) : [])}
+              />
+            </th>
+
+            {columns.map((s) => (
+              <th key={s.key} style={cellStyle}>
+                {s.title}
+              </th>
+            ))}
+          </tr>
+        </thead>
+
+        <tbody>
+          {visible.map((z) => (
+            <tr key={z.id}>
+              <td style={cellStyle}>
+                <Checkbox
+                  checked={selected.includes(z.id)}
+                  title="Select this row"
+                  aria-label={`Select ${z.name}`}
+                  onChange={() => toggle(z.id)}
+                />
+              </td>
+
+              {columns.map((s) => (
+                <td key={s.key} style={cellStyle} data-column={s.title}>
+                  {s.render(z)}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td style={{ ...cellStyle, borderBlockEnd: 0 }} colSpan={2}>
+              <em>Page totals:</em>
+            </td>
+
+            {totals.map((value) => (
+              <td key={value} style={{ ...cellStyle, borderBlockEnd: 0 }}>
+                {value}
+              </td>
+            ))}
+          </tr>
+        </tfoot>
+      </table>
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBlockStart: 16 }}>
+        <Pagination
+          aria-label="Custom table pagination"
+          current={page}
+          onChange={setPage}
+          total={everything.length}
+          pageSize={perPage}
+          showSizeChanger={false}
+        />
+      </div>
+
+      <Typography.Text type="secondary" style={{ display: 'block', marginBlockStart: 8 }}>
+        {selected.length ? `${selected.length} selected` : 'Nothing selected'}
+      </Typography.Text>
+    </div>
+  );
+};
+```
+
+Note what had to be written by hand: the header checkbox's indeterminate state,
+the fact that selection survives a page change, the column name on each cell for
+the narrow layout, and the footer's totals for the page rather than the set.
+Each of those is a decision the ready-made table makes for you, and each is a
+decision you can now make differently.
+
+### Sticky headers
+
+On a table longer than the screen, the header should stay put while the rows
+scroll under it. Without that, a reader who has scrolled past the header is
+looking at columns of values with nothing to say what they are.
+
+Use it wherever a table can grow past the height of the viewport - which is
+most tables, once real data arrives.
+
+### Sticky horizontal scrollbar
+
+A table taller than the screen puts its horizontal scrollbar somewhere the
+reader has to scroll down to reach - and scrolling down is exactly what moves
+it further away.
+
+A scrollbar that sticks to the bottom of the viewport while the table is in
+view fixes that. It belongs with inline scrolling, not instead of it.

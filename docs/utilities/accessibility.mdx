@@ -1,0 +1,130 @@
+---
+title: Accessibility
+description: The helpers a theme can supply
+sidebar_position: 4
+---
+
+# Accessibility
+
+What a theme can supply is narrow: a focus ring you can see, contrast that
+holds in both appearances, and text that exists for a screen reader without
+existing on screen. Everything else - order, labels, roles - belongs to the
+application.
+
+This page is about the narrow part.
+
+## The focus ring
+
+`outline`, 2px, at 1px offset, in the focus colour. It is an
+outline rather than a border for one reason: an outline does not take up space,
+so focusing something does not push the page around.
+
+Tab into the buttons below.
+
+```tsx interactive
+import React from 'react';
+import { Button, Flex, Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={12} style={{ display: 'flex' }}>
+    <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+      Click into this box, then press Tab.
+    </Typography.Text>
+    <Flex gap={8}>
+      <Button type="primary">First</Button>
+      <Button color="primary" variant="filled">Second</Button>
+      <Button type="text">Third</Button>
+      <a href="#the-focus-ring">A link</a>
+    </Flex>
+  </Space>
+);
+```
+
+:::note[One deviation, deliberately not reproduced]
+
+The measured token says 2px; the rendered links and buttons show 3px at 2px
+offset. This follows the token.
+
+The discrepancy affects every focusable element, so choosing the rendering over
+the source would have meant reproducing a contradiction across the whole
+surface. It is recorded as a deviation rather than copied.
+
+:::
+
+## Disabled two ways
+
+A control can be disabled with `disabled` or with `aria-disabled="true"`. They
+look identical and behave differently: the native one leaves the tab order, the
+other stays reachable - which is what you want when the control needs to
+explain *why* it is unavailable.
+
+Ant Design styles only the first. The theme styles both, so the two cannot
+drift apart visually.
+
+```tsx interactive
+import React from 'react';
+import { Flex, Tooltip, Button } from 'antd';
+
+export default () => (
+  <Flex gap={8} align="center">
+    <Button disabled>Native, not reachable</Button>
+    <Tooltip title="Needs a saved query first">
+      <Button aria-disabled="true">Reachable, explains itself</Button>
+    </Tooltip>
+  </Flex>
+);
+```
+
+## Text for screen readers only
+
+Ant Design has no helper for this, and it comes up constantly - an icon-only
+button, a status dot, a sortable column header. The pattern is one style
+object:
+
+```tsx interactive
+import React from 'react';
+import { Button, Flex, Typography } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+
+const onlyForScreenReaders = {
+  position: 'absolute',
+  inlineSize: 1,
+  blockSize: 1,
+  padding: 0,
+  margin: -1,
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+  whiteSpace: 'nowrap',
+  border: 0,
+};
+
+export default () => (
+  <Flex vertical gap={12}>
+    <Flex gap={8}>
+      <Button icon={<EditOutlined />} aria-label="Edit the saved query" />
+      <Button icon={<DeleteOutlined />} aria-label="Delete the saved query" danger />
+    </Flex>
+
+    <Typography.Text>
+      Status: <span style={{ color: 'var(--ant-color-error)' }} aria-hidden="true">●</span>
+      <span style={onlyForScreenReaders}>Failing</span>
+      <span aria-hidden="true"> Failing</span>
+    </Typography.Text>
+
+    <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+      The dot is decoration and says so. The word is announced once, not twice.
+    </Typography.Text>
+  </Flex>
+);
+```
+
+## Colour is never the only signal
+
+Every meaning in the vocabulary carries a text colour and a border colour, not
+only a fill. That is what makes it possible to mark a state with a shape or a
+word as well as a hue - and every example in these pages that shows a status
+shows it twice.
+
+Reduced motion is the same principle in time rather than colour: the skeleton
+stops moving and shows its edge colour flat, the spinner stops turning. A
+loading surface that does not move is still a loading surface.

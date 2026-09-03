@@ -1,0 +1,120 @@
+---
+title: Checkbox
+description: Ant Design Checkbox and Checkbox.Group
+antd_components: [Checkbox]
+sidebar_position: 4
+---
+
+# Checkbox and Checkbox group
+
+Checkboxes suit a short list where several answers may be true at once, or a
+single setting that is on or off.
+
+For a long list they stop working: a reader cannot scan thirty checkboxes, and
+cannot search them either. That is where a dropdown or a combo box belongs.
+
+## Checkbox
+
+Renders a plain `<input type="checkbox">`.
+
+`checked` handles the two ordinary states. The third, `indeterminate`, is for a
+parent whose children are only partly ticked - it says "some", which neither
+ticked nor unticked can say.
+
+Give the checkbox a label and put the checkbox inside it. That makes the label
+part of the target, which matters for a control this small, and gives a screen
+reader something to read.
+
+```tsx interactive
+import React from 'react';
+import { Checkbox, Space } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Checkbox defaultChecked>Checked</Checkbox>
+
+    <Checkbox>Unchecked</Checkbox>
+
+    <Checkbox indeterminate>Indeterminate - some of its children are checked</Checkbox>
+
+    <Checkbox disabled defaultChecked>
+      Disabled
+    </Checkbox>
+  </Space>
+);
+```
+
+## Checkbox group
+
+A group is generated from a list of options rather than written out one by one.
+It keeps the spacing between rows consistent and gives the set a single value.
+
+Where the individual labels do not say enough on their own, the group needs a
+legend. "Logs" and "Metrics" mean one thing under "Data to ship" and another
+under "Data to delete".
+
+```tsx interactive
+import React from 'react';
+import { Checkbox, Space, Switch } from 'antd';
+
+export default () => {
+  const [dense, setDense] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={dense} onChange={setDense} />
+        Compressed
+      </label>
+
+      <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
+        <legend style={{ fontSize: 12, marginBottom: 8 }}>Data to ship</legend>
+        <Checkbox.Group
+          defaultValue={['logs']}
+          style={{ display: 'flex', flexDirection: 'column', gap: dense ? 0 : 8 }}
+          options={[
+            { value: 'logs', label: 'Logs' },
+            { value: 'metrics', label: 'Metrics' },
+            { value: 'traces', label: 'Traces' },
+          ]}
+        />
+      </fieldset>
+    </Space>
+  );
+};
+```
+
+## Usage
+
+### Labels
+
+Keep a label to one or two descriptive words, so the set can be scanned rather
+than read.
+
+| Do | Do not |
+| --- | --- |
+| Canceled, In progress, On hold, Resolved | Case is canceled, Case is in progress, Case is on hold |
+| Use logs, Use metrics | Do not include logs, Do not include metrics |
+| Read access, Write access, Create access | Read Access, Write Access, Create Access |
+
+Repeating the same phrase in every option buries the difference at the end of
+each line, which is the worst place for it.
+
+Word them positively. "Do not include logs", ticked, means logs are excluded -
+a double negative the reader has to unpick every time.
+
+Use sentence case, and keep one structure across a group: all fragments, or all
+sentences, never a mix.
+
+### Legends
+
+A legend gives the options their meaning, and reads like a title. Use a noun
+that names the choice being made.
+
+| Do | Do not |
+| --- | --- |
+| **Data to ship** - Logs, Metrics | **Select logs or metrics to ship** - Logs, Metrics |
+
+Not an instruction, and not a repetition of the options beneath it: "Logs" and
+"Metrics" mean one thing under "Data to ship" and another under "Data to
+delete", which is exactly what the legend is there to settle.

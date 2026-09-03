@@ -1,0 +1,493 @@
+---
+title: Popover
+description: Ant Design Popover
+antd_components: [Popover]
+---
+
+# Popover
+
+A popover hides controls or options behind something clickable. It is temporary,
+so what it holds should be simple and narrowly focused.
+
+Three things it must get right:
+
+- The thing that opens it has to be reachable by keyboard.
+- It may contain interactive elements, and then it must be opened by a click.
+- It must not open on hover or on focus.
+
+Visibility stays with the surrounding application, and a popover closes when
+something outside it is clicked. Anything done inside one should therefore save
+itself.
+
+Avoid a popover that opens another popover. Swap the panel's contents instead.
+
+In Ant Design this is `Popover`.
+
+```tsx interactive
+import React from 'react';
+import { Button, Popover, Typography } from 'antd';
+
+export default () => (
+  <Popover
+    trigger="click"
+    content={
+      <Typography style={{ maxInlineSize: 300 }}>
+        <p style={{ marginBottom: 0 }}>
+          Popover content that&rsquo;s wider than the default width.
+        </p>
+      </Typography>
+    }
+  >
+    <Button type="text" data-audit-open>How it works</Button>
+  </Popover>
+);
+```
+
+## Anchor position
+
+Where the popover appears is set with `placement`. The value has two parts: the
+first says on which side of the trigger it sits, the second where it lines up
+along that side. Positions adjust themselves when there is not enough room.
+
+```tsx interactive
+import React from 'react';
+import { Button, Popover } from 'antd';
+
+const content = <div style={{ inlineSize: 200 }}>Popover content</div>;
+
+const places = [
+  'topLeft', 'top', 'topRight',
+  'rightTop', 'right', 'rightBottom',
+  'bottomRight', 'bottom', 'bottomLeft',
+  'leftBottom', 'left', 'leftTop',
+];
+
+export default () => (
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(3, max-content)',
+      gap: 16,
+      justifyContent: 'center',
+      padding: 80,
+    }}
+  >
+    <Popover trigger="click" placement="topLeft" content={content}>
+      <Button>topLeft</Button>
+    </Popover>
+    <Popover trigger="click" placement="top" content={content}>
+      <Button>top</Button>
+    </Popover>
+    <Popover trigger="click" placement="topRight" content={content}>
+      <Button>topRight</Button>
+    </Popover>
+
+    <Popover trigger="click" placement="rightTop" content={content}>
+      <Button>rightTop</Button>
+    </Popover>
+    <Popover trigger="click" placement="right" content={content}>
+      <Button>right</Button>
+    </Popover>
+    <Popover trigger="click" placement="rightBottom" content={content}>
+      <Button>rightBottom</Button>
+    </Popover>
+
+    <Popover trigger="click" placement="bottomRight" content={content}>
+      <Button>bottomRight</Button>
+    </Popover>
+    <Popover trigger="click" placement="bottom" content={content}>
+      <Button>bottom</Button>
+    </Popover>
+    <Popover trigger="click" placement="bottomLeft" content={content}>
+      <Button>bottomLeft</Button>
+    </Popover>
+
+    <Popover trigger="click" placement="leftBottom" content={content}>
+      <Button>leftBottom</Button>
+    </Popover>
+    <Popover trigger="click" placement="left" content={content}>
+      <Button>left</Button>
+    </Popover>
+    <Popover trigger="click" placement="leftTop" content={content}>
+      <Button>leftTop</Button>
+    </Popover>
+  </div>
+);
+```
+
+## Popover titles and footers
+
+A popover often needs a title. Ant Design takes it as a prop, so it cannot be
+placed anywhere else by accident.
+
+A footer of the same kind - for a caption or a call to action - is part of the
+content, separated by a rule.
+
+```tsx interactive
+import React from 'react';
+import { Button, Divider, Popover, Typography } from 'antd';
+
+const text = (
+  <Typography style={{ maxInlineSize: 300 }}>
+    <p style={{ marginBottom: 0 }}>
+      Popover content that&rsquo;s wider than the default width.
+    </p>
+  </Typography>
+);
+
+export default () => (
+  <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+    <Popover trigger="click" title="Hello, I&rsquo;m a popover title" content={text}>
+      <Button>Show title</Button>
+    </Popover>
+
+    <Popover
+      trigger="click"
+      content={
+        <>
+          {text}
+          <Divider style={{ marginBlock: 12 }} />
+          <Button size="small">Manage this thing</Button>
+        </>
+      }
+    >
+      <Button>Show footer</Button>
+    </Popover>
+
+    <Popover
+      trigger="click"
+      title="Hello, I&rsquo;m a popover title"
+      content={
+        <>
+          {text}
+          <Divider style={{ marginBlock: 12 }} />
+          <Typography.Text type="secondary">Last updated 3 hours ago</Typography.Text>
+        </>
+      }
+    >
+      <Button>Show both</Button>
+    </Popover>
+  </div>
+);
+```
+
+## Popover padding sizes
+
+The panel's padding can be adjusted, and where there are a title and a footer,
+the setting carries through to them - a panel with tight content and a roomy
+title looks unfinished.
+
+```tsx interactive
+import React from 'react';
+import { Button, Popover, Typography } from 'antd';
+
+const text = (
+  <Typography style={{ maxInlineSize: 300 }}>
+    <p style={{ marginBottom: 0 }}>
+      Popover content that&rsquo;s wider than the default width.
+    </p>
+  </Typography>
+);
+
+const withPadding = (n) => ({ body: { padding: n } });
+
+export default () => (
+  <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+    <Popover trigger="click" content={text} styles={withPadding(0)}>
+      <Button>padding none</Button>
+    </Popover>
+
+    <Popover trigger="click" content={text} styles={withPadding(8)}>
+      <Button>padding small</Button>
+    </Popover>
+
+    <Popover trigger="click" content={text} styles={withPadding(12)}>
+      <Button>padding medium (default)</Button>
+    </Popover>
+
+    <Popover trigger="click" content={text} styles={withPadding(24)}>
+      <Button>padding large</Button>
+    </Popover>
+
+    <Popover
+      trigger="click"
+      title="Hello, I&rsquo;m a popover title"
+      content={text}
+      styles={withPadding(0)}
+    >
+      <Button>padding none with title</Button>
+    </Popover>
+
+    <Popover
+      trigger="click"
+      title="Hello, I&rsquo;m a popover title"
+      content={text}
+      styles={{ body: { padding: 24 }, header: { padding: 24 } }}
+    >
+      <Button>padding large with title</Button>
+    </Popover>
+  </div>
+);
+```
+
+## Popover with block level display
+
+A popover's anchor is inline by default, so it does not force a display on an
+inline trigger. Where the trigger should fill its line, the anchor has to be
+told.
+
+```tsx interactive
+import React from 'react';
+import { Button, Popover } from 'antd';
+
+export default () => (
+  <Popover
+    trigger="click"
+    content={<div>This popover scrolls with the button element!</div>}
+    style={{ display: 'block' }}
+  >
+    <Button block>This button is block</Button>
+  </Popover>
+);
+```
+
+## Popover on a fixed element
+
+A popover works on a fixed element too. It has to be told to realign while the
+page scrolls, or it stays where the trigger used to be.
+
+```tsx interactive
+import React from 'react';
+import { Button, Popover } from 'antd';
+
+export default () => (
+  <div style={{ blockSize: 120, overflow: 'auto', padding: 16, border: '1px solid var(--ant-color-border)' }}>
+    <div style={{ position: 'sticky', insetBlockStart: 0 }}>
+      <Popover
+        trigger="click"
+        content={<div>This popover scrolls with the button element!</div>}
+      >
+        <Button>Show fixed popover</Button>
+      </Popover>
+    </div>
+    <div style={{ blockSize: 400 }}>Scroll this area to see the popover follow.</div>
+  </div>
+);
+```
+
+## Constraining a popover inside a container
+
+A popover can be told which container it must stay inside, so that it does not
+overflow it.
+
+```tsx interactive
+import React from 'react';
+import { Button, Popover } from 'antd';
+
+export default () => {
+  const container = React.useRef(null);
+
+  return (
+    <div
+      ref={container}
+      style={{
+        position: 'relative',
+        padding: 16,
+        overflow: 'hidden',
+        border: '1px solid var(--ant-color-border)',
+      }}
+    >
+      <Popover
+        trigger="click"
+        content={<div style={{ inlineSize: 200 }}>Popover content</div>}
+        getPopupContainer={() => container.current}
+      >
+        <Button>Show constrained popover</Button>
+      </Popover>
+    </div>
+  );
+};
+```
+
+## Popover attached to input element
+
+A popover can attach itself to a form field: the panel reads as part of the
+input rather than as something floating above it, and it takes the input's
+width.
+
+Which events open and close it is up to the caller. A text field can sensibly
+open on the down key; a number field cannot, because the down key already means
+something there.
+
+```tsx interactive
+import React from 'react';
+import { Input, Popover, Typography } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+  const [secondOpen, setSecondOpen] = React.useState(false);
+
+  return (
+    <div style={{ display: 'flex', gap: 16, maxInlineSize: 600 }}>
+      <Popover
+        open={open}
+        onOpenChange={setOpen}
+        trigger="click"
+        placement="bottomLeft"
+        arrow={false}
+        content={
+          <Typography style={{ inlineSize: 240 }}>
+            <p style={{ marginBottom: 0 }}>Popover attached to the input above.</p>
+          </Typography>
+        }
+      >
+        <Input
+          placeholder="Click to open"
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowDown') setOpen(true);
+          }}
+        />
+      </Popover>
+
+      <Popover
+        open={secondOpen}
+        onOpenChange={setSecondOpen}
+        trigger="click"
+        placement="bottomLeft"
+        arrow={false}
+        content={
+          <Typography style={{ inlineSize: 240 }}>
+            <p style={{ marginBottom: 0 }}>
+              This one keeps its own width rather than matching the input.
+            </p>
+          </Typography>
+        }
+      >
+        <Input placeholder="Click to open" />
+      </Popover>
+    </div>
+  );
+};
+```
+
+## Setting an initial focus
+
+A particular element inside the popover can take focus as soon as it opens.
+
+Landing on a control with no context around it is disorienting for keyboard and
+screen-reader users. Only do it where that control is plainly the point of the
+popover.
+
+```tsx interactive
+import React from 'react';
+import { Button, Form, Input, Popover } from 'antd';
+
+export default () => (
+  <Popover
+    trigger="click"
+    title="Hello, I&rsquo;m a popover title"
+    content={
+      <Form layout="vertical" style={{ inlineSize: 240 }}>
+        <Form.Item label="Enter name" style={{ marginBottom: 0 }}>
+          <Input autoFocus placeholder="The field that takes focus" />
+        </Form.Item>
+      </Form>
+    }
+  >
+    <Button>Show popover with initial focus</Button>
+  </Popover>
+);
+```
+
+## Custom outside click behavior
+
+A popover closes when something outside it is clicked. Where that would lose
+work, the closing can be intercepted - here by asking first.
+
+```tsx interactive
+import React from 'react';
+import { Button, Modal, Popover, Typography } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+  const [asking, setAsking] = React.useState(false);
+
+  return (
+    <>
+      <Popover
+        open={open}
+        trigger="click"
+        onOpenChange={(fresh) => {
+          if (!fresh) setAsking(true);
+          else setOpen(true);
+        }}
+        content={
+          <Typography style={{ inlineSize: 240 }}>
+            <p style={{ marginBottom: 0 }}>
+              Clicking outside asks before it closes.
+            </p>
+          </Typography>
+        }
+      >
+        <Button>Show popover</Button>
+      </Popover>
+
+      <Modal
+        open={asking}
+        title="You have unsaved work"
+        okText="Yes"
+        cancelText="No"
+        onOk={() => {
+          setAsking(false);
+          setOpen(false);
+        }}
+        onCancel={() => setAsking(false)}
+      >
+        <p>Any unsaved work in the popover will be lost.</p>
+      </Modal>
+    </>
+  );
+};
+```
+
+## Removing the focus trap
+
+A popover can be told not to keep focus inside itself.
+
+Doing so makes it hard for keyboard-only and screen-reader users to get to the
+popover and back out again. Ant Design does not trap focus by default, so the
+absence here is the default rather than a setting.
+
+```tsx interactive
+import React from 'react';
+import { Button, Popover, Typography } from 'antd';
+
+export default () => (
+  <Popover
+    trigger="click"
+    content={
+      <Typography style={{ inlineSize: 240 }}>
+        <p style={{ marginBottom: 0 }}>
+          Focus is not trapped: tabbing moves on through the page.
+        </p>
+      </Typography>
+    }
+  >
+    <Button>Show popover without a focus trap</Button>
+  </Popover>
+);
+```
+
+## Popover using an HTMLElement as the anchor
+
+:::note[Omitted: anchoring to an existing element]
+
+**Affects:** 0 specimens - a different component, not a popover.
+
+A second component could take any existing DOM element as its trigger, for
+cases where the markup cannot be changed. Ant Design's popover
+always wraps its trigger, so there is nothing to map it onto.
+
+Building it would be component work rather than theming.
+
+:::

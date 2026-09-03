@@ -1,0 +1,500 @@
+---
+title: Range sliders
+description: Ant Design Slider, single and range
+antd_components: [Slider]
+sidebar_position: 2
+---
+
+# Range sliders
+
+:::tip[Understanding precision]
+
+A slider is for when the exact value does not matter. The reader drags until it
+looks right, and "looks right" is the answer.
+
+Where the exact value does matter, pair the slider with a number field, or drop
+the slider and use the number field alone.
+
+:::
+
+## Single range
+
+### Required
+
+- `min`, `max`: the ends of the range.
+- `step`: not strictly required - the default is `1`.
+- `value`, `onChange`.
+
+### Optional
+
+- marks at the ends: state the range explicitly rather than leaving the reader
+  to guess where the track starts and stops.
+- the tooltip: shows the value being chosen while the handle is dragged. It can
+  be given a prefix or a suffix, which is where a unit belongs.
+- the filled track: the part from the minimum to the handle, drawn thicker.
+  Ant Design draws it always; there is nothing to turn on.
+
+```tsx interactive
+import React from 'react';
+import { Slider, Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={24} style={{ display: 'flex', maxInlineSize: 400 }}>
+    <div>
+      <Typography.Text type="secondary">Marks at the ends</Typography.Text>
+      <Slider
+        min={0}
+        max={100}
+        defaultValue={42}
+        marks={{ 0: '0', 100: '100' }}
+        aria-label="A range with labelled ends"
+      />
+    </div>
+
+    <div>
+      <Typography.Text type="secondary">A tooltip with a unit</Typography.Text>
+      <Slider
+        min={0}
+        max={100}
+        defaultValue={42}
+        tooltip={{ open: true, formatter: (v) => `${v} px` }}
+        aria-label="A range showing its value"
+      />
+    </div>
+
+    <div>
+      <Typography.Text type="secondary">The filled track</Typography.Text>
+      <Slider min={0} max={100} defaultValue={42} aria-label="A range with a filled track" />
+    </div>
+  </Space>
+);
+```
+
+## Dual range
+
+A dual range takes almost everything the single one does. Two things differ:
+the filled track is the point of it, so it is always drawn; and the tooltip
+belongs to whichever handle is being dragged rather than to the control.
+
+:::info[Retrieving field values]
+
+A two-value `input[type=range]` is not in the HTML specification. Ant Design's
+range slider is therefore not a native form control, and its value does not
+appear in a form submission.
+
+Read it through `onChange` and keep it in state - or, where a plain form
+submission is needed, write the two ends into hidden inputs.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Slider, Space, Typography } from 'antd';
+
+export default () => {
+  const [value, setValue] = React.useState([20, 80]);
+
+  return (
+    <Space orientation="vertical" size={24} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <div>
+        <Typography.Text type="secondary">Two handles on one track</Typography.Text>
+        <Slider
+          range
+          min={0}
+          max={100}
+          value={value}
+          onChange={setValue}
+          marks={{ 0: '0', 100: '100' }}
+          aria-label="A dual range"
+        />
+        <Typography.Text type="secondary">
+          From {value[0]} to {value[1]}
+        </Typography.Text>
+      </div>
+
+      <div>
+        <Typography.Text type="secondary">With a minimum distance between the ends</Typography.Text>
+        <Slider
+          range={{ draggableTrack: true, minCount: 2 }}
+          min={0}
+          max={100}
+          defaultValue={[30, 70]}
+          aria-label="A dual range with a draggable track"
+        />
+      </div>
+    </Space>
+  );
+};
+```
+
+## Inputs
+
+A number field beside the slider gives the reader both: the drag for the rough
+answer, the field for the exact one. It is the answer to the tip at the top of
+this page - you do not have to choose.
+
+Leave the field blank and the handle rests at the minimum. That is a display
+decision, not a value: blank still means no value chosen.
+
+```tsx interactive
+import React from 'react';
+import { InputNumber, Slider, Space, Typography } from 'antd';
+
+export default () => {
+  const [single, setSingle] = React.useState(42);
+  const [pair, setPair] = React.useState([20, 80]);
+
+  return (
+    <Space orientation="vertical" size={24} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <div>
+        <Typography.Text type="secondary">A single value</Typography.Text>
+        <Space size={16} style={{ display: 'flex' }}>
+          <Slider
+            min={0}
+            max={100}
+            value={single}
+            onChange={setSingle}
+            style={{ flex: 1 }}
+            aria-label="A range with a number field"
+          />
+          <InputNumber
+            min={0}
+            max={100}
+            value={single}
+            onChange={setSingle}
+            aria-label="The value of the range"
+            style={{ inlineSize: 80 }}
+          />
+        </Space>
+      </div>
+
+      <div>
+        <Typography.Text type="secondary">Both ends</Typography.Text>
+        <Space size={16} style={{ display: 'flex' }}>
+          <InputNumber
+            min={0}
+            max={pair[1]}
+            value={pair[0]}
+            onChange={(v) => setPair([v ?? 0, pair[1]])}
+            aria-label="Lower bound"
+            style={{ inlineSize: 80 }}
+          />
+          <Slider
+            range
+            min={0}
+            max={100}
+            value={pair}
+            onChange={setPair}
+            style={{ flex: 1 }}
+            aria-label="A dual range with number fields"
+          />
+          <InputNumber
+            min={pair[0]}
+            max={100}
+            value={pair[1]}
+            onChange={(v) => setPair([pair[0], v ?? 100])}
+            aria-label="Upper bound"
+            style={{ inlineSize: 80 }}
+          />
+        </Space>
+      </div>
+    </Space>
+  );
+};
+```
+
+## Tick marks
+
+Ticks mark places on the track and can be clicked. By default they follow the
+step; where the step is fine, that is far too many, so set the interval
+yourself.
+
+Custom ticks are a list of positions with labels. The label may say anything -
+a date, a size, a word - as long as the position is a real value in the range.
+
+A tick label is read out alongside the value, so a good label improves the
+control for a screen reader as well as for the eye.
+
+:::warning[At least 5px per tick]
+
+Below about five pixels a tick has nowhere to be drawn and nothing to be
+clicked. Check your ranges at a narrow window, and thin the ticks out where the
+room runs out.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Slider, Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={24} style={{ display: 'flex', maxInlineSize: 400 }}>
+    <div>
+      <Typography.Text type="secondary">Ticks following the step</Typography.Text>
+      <Slider
+        min={0}
+        max={10}
+        step={1}
+        defaultValue={4}
+        marks={Object.fromEntries(Array.from({ length: 11 }, (_, i) => [i, String(i)]))}
+        aria-label="A range with a tick at every step"
+      />
+    </div>
+
+    <div>
+      <Typography.Text type="secondary">A tick every twenty, with a step of one</Typography.Text>
+      <Slider
+        min={0}
+        max={100}
+        step={1}
+        defaultValue={42}
+        marks={{ 0: '0', 20: '20', 40: '40', 60: '60', 80: '80', 100: '100' }}
+        aria-label="A range with a custom tick interval"
+      />
+    </div>
+
+    <div>
+      <Typography.Text type="secondary">Ticks with labels of their own</Typography.Text>
+      <Slider
+        min={0}
+        max={3}
+        step={1}
+        defaultValue={1}
+        marks={{ 0: 'None', 1: 'Low', 2: 'High', 3: 'All' }}
+        aria-label="A range with named ticks"
+      />
+    </div>
+
+    <div>
+      <Typography.Text type="secondary">A dual range with ticks</Typography.Text>
+      <Slider
+        range
+        min={0}
+        max={100}
+        defaultValue={[20, 80]}
+        marks={{ 0: '0', 50: '50', 100: '100' }}
+        aria-label="A dual range with ticks"
+      />
+    </div>
+
+    <div>
+      <Typography.Text type="secondary">A dual range with named ticks</Typography.Text>
+      <Slider
+        range
+        min={0}
+        max={3}
+        step={1}
+        defaultValue={[1, 2]}
+        marks={{ 0: 'XS', 1: 'S', 2: 'M', 3: 'L' }}
+        aria-label="A dual range with named ticks"
+      />
+    </div>
+  </Space>
+);
+```
+
+## Levels
+
+Levels colour parts of the track to say what the values there mean: this
+stretch is fine, this one is a warning, this one is too much.
+
+The colour is not the message. Give the control an `aria-describedby` pointing
+at a line of help text that says the same thing in words - otherwise the
+meaning exists only for readers who can see the colours.
+
+```tsx interactive
+import React from 'react';
+import { Slider, Space, Typography } from 'antd';
+
+const levels =
+  'linear-gradient(to right,' +
+  ' var(--ant-color-success) 0% 40%,' +
+  ' var(--ant-color-warning) 40% 80%,' +
+  ' var(--ant-color-error) 80% 100%)';
+
+export default () => (
+  <Space orientation="vertical" size={24} style={{ display: 'flex', maxInlineSize: 400 }}>
+    <div>
+      <Typography.Text type="secondary">Three levels</Typography.Text>
+      <Slider
+        min={0}
+        max={100}
+        defaultValue={30}
+        marks={{ 0: '0', 100: '100' }}
+        styles={{ rail: { background: levels }, track: { background: 'transparent' } }}
+        aria-describedby="stackread-levels-help"
+        aria-label="A range with levels"
+      />
+      <Typography.Text id="stackread-levels-help" type="secondary" style={{ fontSize: 12 }}>
+        Up to 40 is healthy, up to 80 is a warning, above that is an error.
+      </Typography.Text>
+    </div>
+
+    <div>
+      <Typography.Text type="secondary">A single level in a colour of its own</Typography.Text>
+      <Slider
+        min={0}
+        max={100}
+        defaultValue={60}
+        styles={{
+          rail: { background: 'linear-gradient(to right, #8144CC 0% 50%, var(--ant-color-fill-secondary) 50% 100%)' },
+          track: { background: 'transparent' },
+        }}
+        aria-label="A range with one coloured level"
+      />
+    </div>
+
+    <div>
+      <Typography.Text type="secondary">A dual range over levels</Typography.Text>
+      <Slider
+        range
+        min={0}
+        max={100}
+        defaultValue={[20, 60]}
+        styles={{ rail: { background: levels }, track: { background: 'transparent' } }}
+        aria-label="A dual range with levels"
+      />
+    </div>
+  </Space>
+);
+```
+
+## Inputs with range in a dropdown
+
+Where the row has no space for both, show the fields and keep the slider out of
+sight until the reader touches one. They get the exact value by typing and the
+rough one by dragging, and the row stays the height of a field.
+
+```tsx interactive
+import React from 'react';
+import { InputNumber, Popover, Slider, Space, Typography } from 'antd';
+
+export default () => {
+  const [single, setSingle] = React.useState(42);
+  const [pair, setPair] = React.useState([20, 80]);
+
+  return (
+    <Space orientation="vertical" size={24} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <div>
+        <Typography.Text type="secondary">A single value</Typography.Text>
+        <div>
+          <Popover
+            trigger="click"
+            placement="bottom"
+            content={
+              <div style={{ inlineSize: 220 }}>
+                <Slider
+                  min={0}
+                  max={100}
+                  value={single}
+                  onChange={setSingle}
+                  aria-label="The range behind the field"
+                />
+              </div>
+            }
+          >
+            <InputNumber
+              min={0}
+              max={100}
+              value={single}
+              onChange={setSingle}
+              aria-label="A value, with a range in a dropdown"
+              style={{ inlineSize: '100%' }}
+            />
+          </Popover>
+        </div>
+      </div>
+
+      <div>
+        <Typography.Text type="secondary">Both ends</Typography.Text>
+        <Popover
+          trigger="click"
+          placement="bottom"
+          content={
+            <div style={{ inlineSize: 220 }}>
+              <Slider
+                range
+                min={0}
+                max={100}
+                value={pair}
+                onChange={setPair}
+                aria-label="The dual range behind the fields"
+              />
+            </div>
+          }
+        >
+          <Space.Compact style={{ inlineSize: '100%' }}>
+            <InputNumber
+              min={0}
+              max={pair[1]}
+              value={pair[0]}
+              onChange={(v) => setPair([v ?? 0, pair[1]])}
+              aria-label="Lower bound, with a range in a dropdown"
+              style={{ inlineSize: '100%' }}
+            />
+            <InputNumber
+              min={pair[0]}
+              max={100}
+              value={pair[1]}
+              onChange={(v) => setPair([pair[0], v ?? 100])}
+              aria-label="Upper bound, with a range in a dropdown"
+              style={{ inlineSize: '100%' }}
+            />
+          </Space.Compact>
+        </Popover>
+      </div>
+    </Space>
+  );
+};
+```
+
+## Kitchen sink
+
+Everything at once, plus the two states every control has: full width, and
+disabled.
+
+```tsx interactive
+import React from 'react';
+import { Slider, Space, Switch, Typography } from 'antd';
+
+export default () => {
+  const [disabled, setDisabled] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={24} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={disabled} onChange={setDisabled} />
+        Disabled
+      </label>
+
+      <div>
+        <Typography.Text type="secondary">A single range at full width</Typography.Text>
+        <Slider
+          min={0}
+          max={100}
+          step={10}
+          defaultValue={40}
+          disabled={disabled}
+          marks={{ 0: '0', 50: '50', 100: '100' }}
+          tooltip={{ formatter: (v) => `${v}%` }}
+          aria-label="A single range with everything"
+        />
+      </div>
+
+      <div>
+        <Typography.Text type="secondary">A dual range at full width</Typography.Text>
+        <Slider
+          range
+          min={0}
+          max={100}
+          step={10}
+          defaultValue={[20, 70]}
+          disabled={disabled}
+          marks={{ 0: '0', 50: '50', 100: '100' }}
+          aria-label="A dual range with everything"
+        />
+      </div>
+    </Space>
+  );
+};
+```

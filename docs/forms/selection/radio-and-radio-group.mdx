@@ -1,0 +1,120 @@
+---
+title: Radio
+description: Ant Design Radio and Radio.Group
+antd_components: [Radio]
+sidebar_position: 5
+---
+
+# Radio and Radio group
+
+Radios are for choosing exactly one option out of a short list - more than two,
+and rarely more than six. Below three, a switch or a single checkbox usually
+says it better; above six, a dropdown.
+
+The defining property is that one is always chosen. A radio group with nothing
+selected is a group the reader cannot return to its original state.
+
+## Radio
+
+Renders a plain `<input type="radio">`.
+
+Every radio in a set needs the same `name`. That is what makes them one group -
+without it they are separate controls that happen to look alike, and ticking
+one will not clear the others.
+
+Give each one a label with the radio inside it, so the label is part of the
+target and a screen reader has something to read.
+
+```tsx interactive
+import React from 'react';
+import { Radio, Space } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Radio name="stackread-radio" defaultChecked>
+      Selected
+    </Radio>
+
+    <Radio name="stackread-radio">Unselected</Radio>
+
+    <Radio name="stackread-radio-disabled" disabled defaultChecked>
+      Disabled
+    </Radio>
+  </Space>
+);
+```
+
+## Radio group
+
+A group is generated from a list of options and given one `name`, so the
+grouping is stated once rather than repeated on each item.
+
+Where the individual labels do not say enough on their own, the group needs a
+legend above them.
+
+```tsx interactive
+import React from 'react';
+import { Radio, Space, Switch } from 'antd';
+
+export default () => {
+  const [dense, setDense] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={dense} onChange={setDense} />
+        Compressed
+      </label>
+
+      <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
+        <legend style={{ fontSize: 12, marginBottom: 8 }}>Data to ship</legend>
+        <Radio.Group
+          name="stackread-radio-group"
+          defaultValue="logs"
+          style={{ display: 'flex', flexDirection: 'column', gap: dense ? 0 : 8 }}
+          options={[
+            { value: 'logs', label: 'Logs' },
+            { value: 'metrics', label: 'Metrics' },
+            { value: 'traces', label: 'Traces' },
+          ]}
+        />
+      </fieldset>
+    </Space>
+  );
+};
+```
+
+## Usage
+
+### Labels
+
+Keep a label to one or two descriptive words, so the set can be scanned rather
+than read.
+
+| Do | Do not |
+| --- | --- |
+| Canceled, In progress, On hold, Resolved | Case is canceled, Case is in progress, Case is on hold |
+| Use logs, Use metrics | Do not include logs, Do not include metrics |
+| Read access, Write access, Create access | Read Access, Write Access, Create Access |
+
+Repeating the same phrase in every option buries the difference at the end of
+each line, which is the worst place for it.
+
+Word them positively. A negative option, selected, means the negative is in
+force - a double negative the reader has to unpick every time.
+
+Use sentence case, and keep one structure across a group: all fragments, or all
+sentences, never a mix.
+
+### Legends
+
+A legend gives the options their meaning, and reads like a title. Use a noun
+that names the choice being made.
+
+| Do | Do not |
+| --- | --- |
+| **Data to ship** - Logs, Metrics | **Select logs or metrics to ship** - Logs, Metrics |
+
+Not an instruction, and not a repetition of the options beneath it: "Logs" and
+"Metrics" mean one thing under "Data to ship" and another under "Data to
+delete", which is exactly what the legend is there to settle.

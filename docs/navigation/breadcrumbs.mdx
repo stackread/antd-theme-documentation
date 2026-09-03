@@ -1,0 +1,378 @@
+---
+title: Breadcrumbs
+description: Ant Design Breadcrumb
+antd_components: [Breadcrumb]
+---
+
+# Breadcrumbs
+
+Breadcrumbs say where the reader is and how to get back out. They belong to a
+flow inside a page - a folder, a nested record, a wizard - rather than to the
+application as a whole, which is what a header is for.
+
+The trail is a list of items, each with a destination. The last one is where
+the reader already is, so it should not be a link: a link to the current page is
+a click that does nothing.
+
+:::note[Accessibility recommendation]
+
+Give each set of breadcrumbs an `aria-label` saying which trail it is. On a
+page with more than one, "Breadcrumbs" three times over says nothing.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Breadcrumb } from 'antd';
+
+export default () => (
+  <Breadcrumb
+    aria-label="Data management breadcrumbs"
+    items={[
+      { title: <a href="#">Management</a> },
+      { title: <a href="#">Data</a> },
+      { title: <a href="#">Index patterns</a> },
+      { title: 'Create index pattern' },
+    ]}
+  />
+);
+```
+
+## Limit the number of breadcrumbs
+
+Past a certain length a trail stops being readable. Collapse the middle into a
+single item and let the reader open it - the first item and the last are what
+they actually use.
+
+```tsx interactive
+import React from 'react';
+import { Breadcrumb, Dropdown, Space } from 'antd';
+
+const everything = [
+  { title: 'Animals', target: '#' },
+  { title: 'Metazoans', target: '#' },
+  { title: 'Chordates', target: '#' },
+  { title: 'Vertebrates', target: '#' },
+  { title: 'Tetrapods', target: '#' },
+  { title: 'Reptiles', target: '#' },
+  { title: 'Boa constrictor', target: null },
+];
+
+export default () => {
+  const [limit, setLimit] = React.useState(4);
+
+  const shortened = () => {
+    if (everything.length <= limit) return everything.map((e) => ({ title: e.target ? <a href={e.target}>{e.title}</a> : e.title }));
+
+    const leading = everything.slice(0, Math.ceil((limit - 1) / 2));
+    const trailing = everything.slice(everything.length - Math.floor((limit - 1) / 2));
+    const middle = everything.slice(leading.length, everything.length - trailing.length);
+
+    return [
+      ...leading.map((e) => ({ title: <a href={e.target}>{e.title}</a> })),
+      {
+        title: (
+          <Dropdown
+            trigger={['click']}
+            menu={{ items: middle.map((e, i) => ({ key: String(i), label: e.title })) }}
+          >
+            <a href="#" onClick={(ev) => ev.preventDefault()} aria-label={`${middle.length} more levels`}>
+              &hellip;
+            </a>
+          </Dropdown>
+        ),
+      },
+      ...trailing.map((e) => ({ title: e.target ? <a href={e.target}>{e.title}</a> : e.title })),
+    ];
+  };
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={8}>
+        {[3, 4, 5, 7].map((n) => (
+          <a key={n} href="#" onClick={(e) => { e.preventDefault(); setLimit(n); }}>
+            max {n}
+          </a>
+        ))}
+      </Space>
+
+      <Breadcrumb aria-label="Collapsed breadcrumbs" items={shortened()} />
+    </Space>
+  );
+};
+```
+
+## Truncate each breadcrumb
+
+By default the whole trail is held to one line, with everything but the last
+item allowed to shorten. That keeps the current page readable, which is the one
+item the reader is most likely to need.
+
+Turning truncation off lets the trail wrap instead - better where the names are
+long and all of them matter.
+
+```tsx interactive
+import React from 'react';
+import { Breadcrumb, Space, Switch } from 'antd';
+
+const names = [
+  'Management',
+  'A very long section name that will not fit',
+  'Another long name in the middle of the trail',
+  'Create index pattern',
+];
+
+export default () => {
+  const [truncate, setTruncate] = React.useState(true);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 480 }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={truncate} onChange={setTruncate} />
+        Truncate
+      </label>
+
+      <Breadcrumb
+        aria-label="Truncated breadcrumbs"
+        style={truncate ? { whiteSpace: 'nowrap', display: 'flex' } : undefined}
+        items={names.map((n, i) => ({
+          title:
+            i === names.length - 1 ? (
+              n
+            ) : (
+              <a
+                href="#"
+                style={
+                  truncate
+                    ? {
+                        display: 'inline-block',
+                        maxInlineSize: 100,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        verticalAlign: 'bottom',
+                      }
+                    : undefined
+                }
+              >
+                {n}
+              </a>
+            ),
+        }))}
+      />
+    </Space>
+  );
+};
+```
+
+A single item can also be shortened on its own, where one name in the trail is
+long and the rest are not.
+
+```tsx interactive
+import React from 'react';
+import { Breadcrumb } from 'antd';
+
+const truncated = {
+  display: 'inline-block',
+  maxInlineSize: 120,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  verticalAlign: 'bottom',
+};
+
+export default () => (
+  <Breadcrumb
+    aria-label="Breadcrumbs with one truncated item"
+    items={[
+      { title: <a href="#">Management</a> },
+      {
+        title: (
+          <a href="#" style={truncated} title="A single very long breadcrumb that is shortened">
+            A single very long breadcrumb that is shortened
+          </a>
+        ),
+      },
+      { title: 'Create index pattern' },
+    ]}
+  />
+);
+```
+
+## Responsive
+
+On a narrow screen the trail collapses on its own, keeping the ends and hiding
+the middle. Turning that off keeps every item visible at every width - which
+means the trail will wrap or scroll, and one of those has to be acceptable.
+
+```tsx interactive
+import React from 'react';
+import { Breadcrumb, Space, Switch } from 'antd';
+
+const everything = ['Animals', 'Metazoans', 'Chordates', 'Vertebrates', 'Boa constrictor'];
+
+export default () => {
+  const [responsive, setResponsive] = React.useState(true);
+  const [narrow, setNarrow] = React.useState(true);
+
+  const visible = responsive && narrow ? [everything[0], '…', everything[everything.length - 1]] : everything;
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={16} wrap>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={responsive} onChange={setResponsive} />
+          Responsive
+        </label>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={narrow} onChange={setNarrow} />
+          Narrow screen
+        </label>
+      </Space>
+
+      <div style={{ inlineSize: narrow ? 280 : '100%', outline: '1px dashed var(--ant-color-border)', padding: 8 }}>
+        <Breadcrumb
+          aria-label="Responsive breadcrumbs"
+          items={visible.map((n, i) => ({
+            title: i === visible.length - 1 ? n : <a href="#">{n}</a>,
+          }))}
+        />
+      </div>
+    </Space>
+  );
+};
+```
+
+How many items survive at each width is a choice, not a constant. A trail of
+three short names can stay whole on a phone; a trail of seven cannot stay whole
+anywhere.
+
+```tsx interactive
+import React from 'react';
+import { Breadcrumb, Segmented, Space } from 'antd';
+
+const everything = ['Animals', 'Metazoans', 'Chordates', 'Vertebrates', 'Boa constrictor'];
+
+export default () => {
+  const [width, setWidth] = React.useState('m');
+  const count = { s: 2, m: 3, l: 5 }[width];
+
+  const visible =
+    everything.length <= count ? everything : [everything[0], '…', ...everything.slice(everything.length - (count - 1))];
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Segmented
+        value={width}
+        onChange={setWidth}
+        aria-label="Breakpoint"
+        options={[
+          { value: 's', label: 'small: 2' },
+          { value: 'm', label: 'medium: 3' },
+          { value: 'l', label: 'large: 5' },
+        ]}
+      />
+
+      <Breadcrumb
+        aria-label="Breadcrumbs with a custom responsive setting"
+        items={visible.map((n, i) => ({
+          title: i === visible.length - 1 ? n : <a href="#">{n}</a>,
+        }))}
+      />
+    </Space>
+  );
+};
+```
+
+## Popover content
+
+A breadcrumb can open a menu instead of going somewhere - an account switcher,
+a list of sibling records.
+
+Where it does, it is a toggle and nothing else. Giving it a destination as well
+leaves the reader with a control that does two different things depending on
+where they click it.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Breadcrumb, Dropdown, Space, Typography } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
+export default () => {
+  const [account, setAccount] = React.useState('stackread Cloud');
+  const [deployment, setDeployment] = React.useState('production-eu');
+
+  return (
+    <Breadcrumb
+      aria-label="Account breadcrumbs"
+      items={[
+        {
+          title: (
+            <Dropdown
+              trigger={['click']}
+              menu={{
+                selectable: true,
+                selectedKeys: [account],
+                onClick: ({ key }) => setAccount(key),
+                items: ['stackread Cloud', 'stackread Serverless'].map((k) => ({
+                  key: k,
+                  label: (
+                    <Space size={8}>
+                      <Avatar size={20}>{k[0]}</Avatar>
+                      {k}
+                    </Space>
+                  ),
+                })),
+              }}
+            >
+              <a href="#" onClick={(e) => e.preventDefault()}>
+                {account} <DownOutlined />
+              </a>
+            </Dropdown>
+          ),
+        },
+        {
+          title: (
+            <Dropdown
+              trigger={['click']}
+              popupRender={() => (
+                <div
+                  style={{
+                    background: 'var(--ant-color-bg-elevated)',
+                    borderRadius: 4,
+                    boxShadow: 'var(--stackread-shadow-m)',
+                    padding: 8,
+                    inlineSize: 220,
+                  }}
+                >
+                  <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                    Deployments
+                  </Typography.Text>
+                  {['production-eu', 'production-us', 'staging'].map((d) => (
+                    <div key={d}>
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setDeployment(d);
+                        }}
+                      >
+                        {d}
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              )}
+            >
+              <a href="#" onClick={(e) => e.preventDefault()}>
+                {deployment} <DownOutlined />
+              </a>
+            </Dropdown>
+          ),
+        },
+        { title: 'Overview' },
+      ]}
+    />
+  );
+};
+```

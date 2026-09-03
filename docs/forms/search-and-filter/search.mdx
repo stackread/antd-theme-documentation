@@ -1,0 +1,131 @@
+---
+title: Search
+description: Ant Design Input.Search
+antd_components: [Input]
+---
+
+import FormRowCallout from '../_partials/_form-row-callout.mdx';
+import FormUsage from '../_partials/_form-usage.mdx';
+
+# Basic search field
+
+For entering a search query. It renders `<input type="search">`, which is what
+gives the field its clear control and tells a phone to show a keyboard with a
+search key.
+
+<FormRowCallout />
+
+```tsx interactive
+import React from 'react';
+import { Input, Space, Switch } from 'antd';
+
+export default () => {
+  const [compressed, setCompressed] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <Space size={16} wrap>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={compressed} onChange={setCompressed} />
+          Compressed
+        </label>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={disabled} onChange={setDisabled} />
+          Disabled
+        </label>
+      </Space>
+
+      <Input.Search
+        aria-label="A search field"
+        placeholder="Find apps and content. Ex: Discover"
+        allowClear
+        size={compressed ? 'small' : 'middle'}
+        disabled={disabled}
+      />
+    </Space>
+  );
+};
+```
+
+## Searching on enter key
+
+The usual arrangement: the reader types, and the search runs when they press
+enter or press the button.
+
+This is the right default for a search that costs something - a request, a page
+of results, a change of context. Nothing happens until the reader says so.
+
+```tsx interactive
+import React from 'react';
+import { Form, Input, Typography } from 'antd';
+
+export default () => {
+  const [searched, setSearched] = React.useState('');
+
+  return (
+    <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+      <Form.Item label="Search" style={{ marginBottom: 8 }}>
+        <Input.Search
+          placeholder="Type and press enter"
+          allowClear
+          enterButton="Search"
+          onSearch={setSearched}
+        />
+      </Form.Item>
+
+      <Typography.Text type="secondary">
+        {searched ? `Searched for: ${searched}` : 'Nothing searched for yet.'}
+      </Typography.Text>
+    </Form>
+  );
+};
+```
+
+## Incremental search
+
+The field can also search as the reader types, so the results narrow with each
+keystroke.
+
+Use it where the search is cheap and the results are on screen - filtering a
+list that is already loaded. On anything slower it means a request per
+character, and results that arrive for a query the reader has already changed.
+
+```tsx interactive
+import React from 'react';
+import { Form, Input, Typography } from 'antd';
+
+const everything = ['Titan', 'Enceladus', 'Mimas', 'Dione', 'Iapetus', 'Phoebe', 'Rhea'];
+
+export default () => {
+  const [text, setText] = React.useState('');
+  const matches = everything.filter((o) => o.toLowerCase().includes(text.toLowerCase()));
+
+  return (
+    <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+      <Form.Item label="Filter" style={{ marginBottom: 8 }}>
+        <Input.Search
+          placeholder="Narrows as you type"
+          allowClear
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+      </Form.Item>
+
+      <div aria-live="polite">
+        {matches.length ? (
+          <ul style={{ margin: 0, paddingInlineStart: 20 }}>
+            {matches.map((o) => (
+              <li key={o}>{o}</li>
+            ))}
+          </ul>
+        ) : (
+          <Typography.Text type="secondary">No matches</Typography.Text>
+        )}
+      </div>
+    </Form>
+  );
+};
+```
+
+<FormUsage />

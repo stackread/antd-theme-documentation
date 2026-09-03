@@ -1,0 +1,208 @@
+---
+title: Color palette
+description: The whole vocabulary, read from the running document
+sidebar_position: 2
+---
+
+# Color palette
+
+Every colour the theme carries, grouped the way the vocabulary is grouped and
+read from the page you are looking at. Switch the appearance and every value
+below changes with it.
+
+Nothing here is transcribed. Each swatch calls
+`getComputedStyle(document.documentElement)` for its own variable, which is the
+only reading that cannot fall out of date.
+
+```tsx interactive
+import React from 'react';
+import { Flex, Input, Typography } from 'antd';
+
+const groups = [
+  {
+    title: 'Meanings',
+    note: 'Rule A: BASE for a large surface, LIGHT for a small one, FILLED for a mark.',
+    rows: [
+      ['Primary', ['--ant-color-primary-bg', '--stackread-light-primary', '--ant-color-primary', '--ant-color-primary-text', '--ant-color-primary-border', '--stackread-border-strong-primary']],
+      ['Success', ['--ant-color-success-bg', '--stackread-light-success', '--ant-color-success', '--ant-color-success-text', '--ant-color-success-border', '--stackread-border-strong-success']],
+      ['Warning', ['--ant-color-warning-bg', '--stackread-light-warning', '--ant-color-warning', '--ant-color-warning-text', '--ant-color-warning-border', '--stackread-border-strong-warning']],
+      ['Risk', ['--stackread-risk-bg', '--stackread-risk-light', '--stackread-risk-filled', '--stackread-risk-text', '--stackread-risk-border', '--stackread-risk-border-strong']],
+      ['Danger', ['--ant-color-error-bg', '--stackread-light-error', '--ant-color-error', '--ant-color-error-text', '--ant-color-error-border', '--stackread-border-strong-error']],
+      ['Neutral', ['--ant-color-info-bg', '--ant-color-info-bg', '--ant-color-info', '--ant-color-info-text', '--ant-color-info-border', '--ant-color-info']],
+    ],
+    columns: ['BASE', 'LIGHT', 'FILLED', 'text', 'border', 'borderStrong'],
+  },
+  {
+    title: 'Surfaces',
+    note: 'Four of them, and the mask that sits over all four.',
+    rows: [['', ['--ant-color-bg-layout', '--ant-color-bg-container', '--ant-color-bg-elevated', '--ant-color-bg-spotlight', '--ant-color-bg-mask']]],
+    columns: ['page', 'container', 'elevated', 'inverse', 'mask'],
+  },
+  {
+    title: 'Text',
+    note: 'A ramp, not a set. Each step is one degree quieter than the last.',
+    rows: [['', ['--ant-color-text-heading', '--ant-color-text', '--ant-color-text-secondary', '--ant-color-text-tertiary', '--ant-color-text-disabled', '--ant-color-text-light-solid']]],
+    columns: ['heading', 'body', 'secondary', 'tertiary', 'disabled', 'on inverse'],
+  },
+  {
+    title: 'Borders',
+    note: 'A checkbox does not take a card’s border - see Borders under Getting started.',
+    rows: [['', ['--ant-color-border', '--ant-color-border-secondary', '--ant-color-split', '--ant-color-border-disabled']]],
+    columns: ['surface', 'inside a surface', 'divider', 'disabled'],
+  },
+  {
+    title: 'Form states',
+    note: 'Four states the value audit cannot reach on its own - they need a pointer, a browser that autofills, or an appearance setting.',
+    rows: [['', ['--stackread-form-bg-autofilled', '--stackread-form-border-autofilled', '--stackread-form-border-autofilled-hover', '--stackread-form-border-invalid-hover']]],
+    columns: ['autofilled', 'autofilled border', 'and on hover', 'invalid on hover'],
+  },
+  {
+    title: 'Overlays',
+    note: 'The tint a surface takes when the pointer is over it. Tinted with the meaning, never black.',
+    rows: [['', ['--stackread-hover-text', '--stackread-hover-primary', '--stackread-hover-success', '--stackread-hover-warning', '--stackread-hover-error', '--stackread-risk-overlay-hover']]],
+    columns: ['text', 'primary', 'success', 'warning', 'danger', 'risk'],
+  },
+  {
+    title: 'Fills',
+    note: 'Ant Design’s fill ramp, replaced. Its own is four steps of black at decreasing alpha.',
+    rows: [['', ['--ant-color-fill', '--ant-color-fill-secondary', '--ant-color-fill-tertiary', '--ant-color-fill-quaternary']]],
+    columns: ['fill', 'secondary', 'tertiary', 'quaternary'],
+  },
+];
+
+/*
+ * Read from the ELEMENT, not from the root.
+ *
+ * Ant Design does not put its variables on `:root` but on a `css-var-*`
+ * element per component. A field here inherits them and colours correctly -
+ * `getComputedStyle(document.documentElement)` sees none of that and returned
+ * an empty string for every `--ant-*`. The surface was right, the label
+ * beneath it was empty.
+ */
+const useValue = (name) => {
+  const ref = React.useRef(null);
+  const [value, setValue] = React.useState('');
+
+  React.useEffect(() => {
+    const read = () => {
+      if (!ref.current) return;
+      setValue(getComputedStyle(ref.current).getPropertyValue(name).trim());
+    };
+    read();
+    const watcher = new MutationObserver(read);
+    watcher.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => watcher.disconnect();
+  }, [name]);
+
+  return [ref, value];
+};
+
+const Swatch = ({ name, column }) => {
+  const [ref, value] = useValue(name);
+  return (
+    <Flex vertical gap={4} style={{ inlineSize: 148 }}>
+      <div
+        ref={ref}
+        style={{
+          blockSize: 36,
+          borderRadius: 4,
+          background: `var(${name})`,
+          border: '1px solid var(--ant-color-border)',
+        }}
+      />
+      <Typography.Text style={{ fontSize: 11 }}>{column}</Typography.Text>
+      <Typography.Text
+        type="secondary"
+        style={{ fontSize: 11, fontFamily: 'var(--ant-font-family-code)' }}
+      >
+        {value || '-'}
+      </Typography.Text>
+      <Typography.Text type="secondary" style={{ fontSize: 10, wordBreak: 'break-all' }}>
+        {name.replace('--ant-color-', 'ant/').replace('--stackread-', 'ours/')}
+      </Typography.Text>
+    </Flex>
+  );
+};
+
+export default () => {
+  const [filter, setFilter] = React.useState('');
+  const needle = filter.trim().toLowerCase();
+
+  const matching = (name) => !needle || name.toLowerCase().includes(needle);
+
+  return (
+    <Flex vertical gap={28}>
+      <Input
+        placeholder="Filter by variable name, e.g. warning"
+        value={filter}
+        onChange={(event) => setFilter(event.target.value)}
+        allowClear
+        style={{ maxInlineSize: 380 }}
+      />
+
+      {groups.map((group) => {
+        /*
+         * Column and variable stay together.
+         *
+         * The column label used to live in a second list and was looked up
+         * with `indexOf` - which fails as soon as a row names the same
+         * variable twice. That is exactly what `Neutral` does: BASE and LIGHT
+         * are the same value there, because the meaning has no LIGHT level of
+         * its own.
+         */
+        const rows = group.rows
+          .map(([label, names]) => [
+            label,
+            names
+              .map((name, i) => ({ name, column: group.columns[i] }))
+              .filter((feld) => matching(feld.name)),
+          ])
+          .filter(([, felder]) => felder.length > 0);
+        if (rows.length === 0) return null;
+
+        return (
+          <Flex key={group.title} vertical gap={12}>
+            <Flex vertical gap={2}>
+              <Typography.Title level={4} style={{ marginBlock: 0 }}>
+                {group.title}
+              </Typography.Title>
+              <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                {group.note}
+              </Typography.Text>
+            </Flex>
+
+            {rows.map(([label, felder]) => (
+              <Flex key={label || group.title} gap={12} align="flex-start" wrap>
+                {label ? (
+                  <Typography.Text strong style={{ inlineSize: 80, paddingBlockStart: 8 }}>
+                    {label}
+                  </Typography.Text>
+                ) : null}
+                {felder.map(({ column, name }) => (
+                  <Swatch key={column} name={name} column={column} />
+                ))}
+              </Flex>
+            ))}
+          </Flex>
+        );
+      })}
+    </Flex>
+  );
+};
+```
+
+## What the palette does not show
+
+**Sizes, shadows, durations.** They are values too, and they belong on their
+own pages under Getting started - a swatch of `24px` is not a swatch.
+
+**Every variable.** 83 `--ant-color-*` plus 53 `--stackread-*` is more than a
+page can show without becoming a wall. What is above is the vocabulary as it is
+organised; the rest are hover and active steps of the meanings already there.
+
+## Why every colour here is ours
+
+The audit's fourth check walks a page and reports any painted colour that is
+not in our vocabulary. This page paints more colours than any other, and the
+count it contributes is zero - which is the strongest evidence that check has
+ever produced.

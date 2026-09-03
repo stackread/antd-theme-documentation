@@ -1,0 +1,131 @@
+## Usage
+
+### Labels
+
+Avoid long labels, but do not sacrifice clarity for brevity. Where more is
+needed, it belongs in help text or a tooltip - not in the label.
+
+A label is scanned, not read. Everything a reader has to parse before finding
+the next field is a cost paid on every field in the form.
+
+```tsx interactive
+import React from 'react';
+import { Card, Form, Input, Space, Typography } from 'antd';
+
+const Guideline = ({ kind, text, children }) => (
+  <Card
+    size="small"
+    style={{ flex: '1 1 260px' }}
+    styles={{ body: { display: 'flex', flexDirection: 'column', gap: 12 } }}
+  >
+    {children}
+    <Typography.Text
+      style={{ color: kind === 'do' ? 'var(--ant-color-success-text)' : 'var(--ant-color-error-text)' }}
+    >
+      <strong>{kind === 'do' ? 'Do. ' : 'Do not. '}</strong>
+      {text}
+    </Typography.Text>
+  </Card>
+);
+
+export default () => (
+  <Space size={16} align="start" wrap style={{ display: 'flex' }}>
+    <Guideline kind="do" text="Say what the field is in the label. Use help text for the rest.">
+      <Form layout="vertical">
+        <Form.Item
+          label="Version"
+          extra="Use the major.minor format. Wildcards span several versions."
+          style={{ marginBottom: 0 }}
+        >
+          <Input placeholder="2.*" />
+        </Form.Item>
+      </Form>
+    </Guideline>
+
+    <Guideline kind="dont" text="Put everything in the label. It is hard to scan.">
+      <Form layout="vertical">
+        <Form.Item label="Numeric version (e.g. 2.*)" style={{ marginBottom: 0 }}>
+          <Input />
+        </Form.Item>
+      </Form>
+    </Guideline>
+  </Space>
+);
+```
+
+### Hint text
+
+Put hints and instructions outside the field, where they stay visible while the
+reader types. Keep them to two sentences at most. Use hint text to:
+
+- explain **why you are asking**: "We will only email you if there is a problem
+  with your order."
+- give **clarifying detail** on what to type: "Enter the full 32-character ID."
+- say **where to find** the information: "The cluster ID is on the main
+  administration page of your deployment."
+
+Write them as complete sentences, with a full stop.
+
+### Placeholder text
+
+#### In fields
+
+A placeholder describes the expected value or gives an example. It disappears
+the moment the reader starts typing, which is exactly when they might need it -
+so nothing essential may live there.
+
+Do not open with "for example" or "e.g."; the placeholder already reads as one.
+
+```tsx interactive
+import React from 'react';
+import { Card, Form, Input, Space, Typography } from 'antd';
+
+const Guideline = ({ kind, text, children }) => (
+  <Card
+    size="small"
+    style={{ flex: '1 1 260px' }}
+    styles={{ body: { display: 'flex', flexDirection: 'column', gap: 12 } }}
+  >
+    {children}
+    <Typography.Text
+      style={{ color: kind === 'do' ? 'var(--ant-color-success-text)' : 'var(--ant-color-error-text)' }}
+    >
+      <strong>{kind === 'do' ? 'Do. ' : 'Do not. '}</strong>
+      {text}
+    </Typography.Text>
+  </Card>
+);
+
+export default () => (
+  <Space size={16} align="start" wrap style={{ display: 'flex' }}>
+    <Guideline kind="do" text="Give a simple example that shows the expected syntax.">
+      <Form layout="vertical">
+        <Form.Item
+          label="Phone number"
+          extra="Include the international call prefix."
+          style={{ marginBottom: 0 }}
+        >
+          <Input placeholder="+33600000000" />
+        </Form.Item>
+      </Form>
+    </Guideline>
+
+    <Guideline kind="dont" text="Use text that adds nothing, such as “Type here”.">
+      <Form layout="vertical">
+        <Form.Item label="Source" extra="Enter a CIDR block or an IP address." style={{ marginBottom: 0 }}>
+          <Input placeholder="Type here" />
+        </Form.Item>
+      </Form>
+    </Guideline>
+  </Space>
+);
+```
+
+Where space is very tight and the form is very simple, a label may live in the
+placeholder instead. That is an exception, and it costs the reader the label as
+soon as they type into the field.
+
+#### In search bars
+
+In a search bar, say what can be searched for, and name the action the reader
+performs - "Find apps and content", not "Jump to". An ellipsis adds nothing.

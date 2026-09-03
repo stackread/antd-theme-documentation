@@ -1,0 +1,109 @@
+---
+title: Text
+description: Ant Design Input and Input.TextArea
+antd_components: [Input]
+sidebar_position: 1
+---
+
+import FormRowCallout from '../_partials/_form-row-callout.mdx';
+import FormUsage from '../_partials/_form-usage.mdx';
+
+# Basic text controls
+
+<FormRowCallout />
+
+## Text field
+
+For entering or editing a single line of text. It renders a plain
+`<input type="text">`, which is worth remembering: everything the browser does
+for that element - autofill, spellcheck, the software keyboard it chooses on a
+phone - still applies.
+
+```tsx interactive
+import React from 'react';
+import { Input, Space, Switch } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+
+export default () => {
+  const [compressed, setCompressed] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(false);
+  const [invalid, setInvalid] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+
+  const toggles = [
+    ['Compressed', compressed, setCompressed],
+    ['Disabled', disabled, setDisabled],
+    ['Invalid', invalid, setInvalid],
+    ['Loading', loading, setLoading],
+  ];
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <Space size={16} wrap>
+        {toggles.map(([name, value, setIt]) => (
+          <label key={name} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <Switch size="small" checked={value} onChange={setIt} />
+            {name}
+          </label>
+        ))}
+      </Space>
+
+      <Input
+        aria-label="A text field"
+        placeholder="Placeholder text"
+        size={compressed ? 'small' : 'middle'}
+        disabled={disabled}
+        status={invalid ? 'error' : undefined}
+        prefix={loading ? <LoadingOutlined /> : undefined}
+      />
+    </Space>
+  );
+};
+```
+
+## Textarea
+
+For text over several lines. Give it enough rows to show what a typical answer
+looks like - a one-row textarea asks for a sentence while looking like it wants
+a word.
+
+```tsx interactive
+import React from 'react';
+import { Input, Space, Switch } from 'antd';
+
+export default () => {
+  const [compressed, setCompressed] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(false);
+  const [invalid, setInvalid] = React.useState(false);
+
+  const toggles = [
+    ['Compressed', compressed, setCompressed],
+    ['Disabled', disabled, setDisabled],
+    ['Invalid', invalid, setInvalid],
+  ];
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <Space size={16} wrap>
+        {toggles.map(([name, value, setIt]) => (
+          <label key={name} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <Switch size="small" checked={value} onChange={setIt} />
+            {name}
+          </label>
+        ))}
+      </Space>
+
+      <Input.TextArea
+        aria-label="A textarea"
+        placeholder="Placeholder text"
+        rows={4}
+        size={compressed ? 'small' : 'middle'}
+        disabled={disabled}
+        status={invalid ? 'error' : undefined}
+      />
+    </Space>
+  );
+};
+```
+
+<FormUsage />

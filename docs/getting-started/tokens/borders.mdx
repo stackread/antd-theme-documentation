@@ -1,0 +1,81 @@
+---
+title: Borders
+description: One radius, two widths, four colours
+sidebar_position: 4
+---
+
+# Borders
+
+## One radius
+
+4px. Not a scale - the small radius and the normal radius are both 4px, so a
+card, a button, a tag and an input all share one corner.
+
+Ant Design ships three (`borderRadiusSM`, `borderRadius`, `borderRadiusLG`) and
+would draw 4, 6 and 8. All three are set to 4 here. That is worth stating
+plainly, because a component that quietly took `borderRadiusLG` used to be the
+one visibly wrong thing on a page.
+
+## Two widths
+
+1px for a border, 2px for an emphasized one. The focus ring is a third case and
+is not a border at all - see below.
+
+## Four border colours
+
+| token | where |
+|---|---|
+| `border` | a surface: card, panel, table |
+| `borderSecondary` | a divider inside a surface |
+| `formBorderControl` | a checkbox, a radio |
+| `*BorderStrong` | a meaning drawn as a line |
+
+The third row is the one Ant Design gets wrong by default. It uses `colorBorder`
+for a checkbox, which is the border of a *card* - and a 16px square drawn with a
+card's border disappears. The measured value is darker: `#A2B1C9`.
+
+```tsx interactive
+import React from 'react';
+import { Card, Flex, Typography } from 'antd';
+
+const rows = [
+  ['border', 'var(--ant-color-border)', 'card, panel, table'],
+  ['borderSecondary', 'var(--ant-color-border-secondary)', 'divider inside a surface'],
+  ['formBorderControl', 'var(--ant-checkbox-color-border, #A2B1C9)', 'checkbox, radio'],
+  ['borderStrong (primary)', 'var(--stackread-border-strong-primary)', 'a meaning as a line'],
+];
+
+export default () => (
+  <Flex vertical gap={12}>
+    {rows.map(([name, value, where]) => (
+      <Flex key={name} align="center" gap={16}>
+        <div
+          style={{
+            inlineSize: 64,
+            blockSize: 32,
+            borderRadius: 4,
+            border: `1px solid ${value}`,
+          }}
+        />
+        <Typography.Text strong style={{ inlineSize: 200, fontSize: 13 }}>
+          {name}
+        </Typography.Text>
+        <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+          {where}
+        </Typography.Text>
+      </Flex>
+    ))}
+  </Flex>
+);
+```
+
+## The focus ring
+
+`outline`, not `border` - 2px at 2px offset, in the primary colour. It sits
+outside the element, so turning it on does not move anything.
+
+The measured token states 2px while the rendered links and buttons show 3px at
+2px offset. This follows the token rather than the rendering, and the
+discrepancy is recorded rather than reproduced - it affects every focusable
+element, and copying a value that contradicts its own source is the one kind of
+fidelity that is not worth having.

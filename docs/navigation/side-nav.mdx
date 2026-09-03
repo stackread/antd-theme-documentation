@@ -1,0 +1,249 @@
+---
+title: Side nav
+description: Ant Design Menu as a side navigation
+antd_components: [Menu]
+---
+
+# Side nav
+
+A menu down the left of a page layout. It takes the width of what contains it,
+so the column decides how wide it is rather than the other way round.
+
+The content is a tree of items rather than markup, which is what lets the same
+navigation be rendered from a route table.
+
+:::note[On a narrow screen it becomes a button]
+
+Below a breakpoint the list collapses behind a single control, so it does not
+take a screen's worth of height before the page begins.
+
+That control needs a label of its own - the nav has no visible title once it is
+collapsed.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Menu } from 'antd';
+
+export default () => (
+  <Menu
+    mode="inline"
+    aria-label="Product navigation"
+    defaultOpenKeys={['dashboards']}
+    defaultSelectedKeys={['advanced']}
+    style={{ inlineSize: 240, borderInlineEnd: 0 }}
+    items={[
+      {
+        key: 'dashboards',
+        label: 'Dashboards',
+        type: 'group',
+        children: [
+          { key: 'advanced', label: 'Advanced settings' },
+          { key: 'index', label: 'Index patterns' },
+          { key: 'objects', label: 'Saved objects' },
+          { key: 'reporting', label: 'Reporting' },
+        ],
+      },
+    ]}
+  />
+);
+```
+
+## Side nav heading
+
+The nav is a `<nav>` element, and a landmark with no name is a landmark a
+screen reader user cannot choose between. Give it a heading.
+
+Where the heading would be visual clutter - the column's purpose is obvious
+from the layout - keep it for assistive technology only. Hidden is fine;
+missing is not.
+
+```tsx interactive
+import React from 'react';
+import { Menu, Typography } from 'antd';
+
+export default () => (
+  <nav aria-labelledby="stackread-nav-title" style={{ inlineSize: 240 }}>
+    <Typography.Title
+      level={5}
+      id="stackread-nav-title"
+      style={{ marginBlockStart: 0, paddingInline: 16 }}
+    >
+      stackread
+    </Typography.Title>
+
+    <Menu
+      mode="inline"
+      defaultSelectedKeys={['advanced']}
+      style={{ borderInlineEnd: 0 }}
+      items={[
+        { key: 'advanced', label: 'Advanced settings' },
+        { key: 'index', label: 'Index patterns' },
+        { key: 'objects', label: 'Saved objects' },
+      ]}
+    />
+  </nav>
+);
+```
+
+## Complex side nav
+
+The nav takes several top-level sections and nesting to whatever depth the
+structure has.
+
+Be consistent about whether a top-level item is a link or only a label.
+Intermixing the two means the reader has to try each one to find out - which is
+exactly the cost navigation exists to remove.
+
+```tsx interactive
+import React from 'react';
+import { Menu } from 'antd';
+import { BarChartOutlined, DatabaseOutlined, SyncOutlined } from '@ant-design/icons';
+
+const glyph = (g) => <span aria-hidden>{g}</span>;
+
+export default () => (
+  <Menu
+    mode="inline"
+    aria-label="Complex navigation"
+    defaultOpenKeys={['search', 'analytics']}
+    defaultSelectedKeys={['data-streams']}
+    style={{ inlineSize: 260, borderInlineEnd: 0 }}
+    items={[
+      {
+        key: 'search',
+        label: 'Search',
+        icon: glyph(<DatabaseOutlined />),
+        children: [
+          { key: 'data-streams', label: 'Data streams' },
+          { key: 'indices', label: 'Indices' },
+          {
+            key: 'ilm',
+            label: 'Index lifecycle policies',
+            children: [
+              { key: 'ilm-hot', label: 'Hot phase' },
+              { key: 'ilm-warm', label: 'Warm phase' },
+            ],
+          },
+        ],
+      },
+      {
+        key: 'analytics',
+        label: 'Dashboards',
+        icon: glyph(<BarChartOutlined />),
+        children: [
+          { key: 'dashboards', label: 'Dashboards' },
+          { key: 'visualisations', label: 'Visualizations' },
+        ],
+      },
+      {
+        key: 'pipelines-group',
+        label: 'Pipelines',
+        icon: glyph(<SyncOutlined />),
+        children: [{ key: 'pipelines', label: 'Pipelines' }],
+      },
+    ]}
+  />
+);
+```
+
+## Nested item options
+
+Children usually appear as the reader moves through the pages themselves - the
+section they are in opens, the rest stay shut.
+
+A section can be forced open where its contents are the point of the page.
+
+The arrow that toggles a section only appears where the item has children and no
+destination of its own. An item that is both a link and a toggle needs two
+targets, and a reader will hit the wrong one.
+
+```tsx interactive
+import React from 'react';
+import { Menu, Space, Switch } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(true);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={open} onChange={setOpen} />
+        Force the section open
+      </label>
+
+      <Menu
+        mode="inline"
+        aria-label="Navigation with a forced-open section"
+        openKeys={open ? ['settings'] : []}
+        onOpenChange={(k) => setOpen(k.includes('settings'))}
+        defaultSelectedKeys={['general']}
+        style={{ inlineSize: 240, borderInlineEnd: 0 }}
+        items={[
+          { key: 'overview', label: 'Overview' },
+          {
+            key: 'settings',
+            label: 'Settings',
+            children: [
+              { key: 'general', label: 'General' },
+              { key: 'security', label: 'Security' },
+              { key: 'billing', label: 'Billing' },
+            ],
+          },
+          { key: 'help', label: 'Help' },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+## Emphasized side nav sections
+
+A section can be given a surface of its own, to mark it out from the rest -
+typically something the reader made, rather than something the application
+ships.
+
+:::note[Extra style needed]
+
+The emphasised background runs past the horizontal bounds of the nav so that it
+can reach the edges of the column. Whatever should stop it needs
+`overflow: hidden`.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Menu } from 'antd';
+
+export default () => (
+  <div style={{ inlineSize: 240, overflow: 'hidden' }}>
+    <Menu
+      mode="inline"
+      aria-label="Navigation with an emphasized section"
+      defaultOpenKeys={['deployment']}
+      defaultSelectedKeys={['metrics']}
+      style={{ borderInlineEnd: 0 }}
+      items={[
+        { key: 'home', label: 'Home' },
+        {
+          key: 'deployment',
+          label: 'production-eu',
+          style: {
+            background: 'var(--ant-color-fill-alter)',
+            marginInline: -16,
+            paddingInline: 16,
+          },
+          children: [
+            { key: 'metrics', label: 'Metrics' },
+            { key: 'logs', label: 'Logs' },
+            { key: 'traces', label: 'Traces' },
+          ],
+        },
+        { key: 'account', label: 'Account' },
+      ]}
+    />
+  </div>
+);
+```

@@ -1,0 +1,59 @@
+/*
+ * The preview area is exempt. There the component decides, and the theme's link-hover rule
+ * holds unchanged: no line at rest, one on hover.
+ *
+ * `:not(:hover)` is why this rule looks the way it does. Without it the rule
+ * also wins on hover - five classes against three - and takes from the example
+ * exactly the feedback the link-hover rule gave it. An exception has to say WHAT it
+ * exempts from; here: from the resting state.
+ */
+.theme-doc-markdown [class*="preview"] a:not(.anchor):not(.ant-btn):not(.card):not(:hover) {
+  text-decoration: none;
+}
+
+/*
+ * The Props section.
+ *
+ * One card per component, with its name and a link. Colours and radius come
+ * from the shell as everywhere else - `--ifm-*` and `--stackread-*` sit on the
+ * root, `--ant-*` does not (see the note at the search field).
+ */
+.props-section {
+  margin-block-start: 3rem;
+  padding-block-start: 1.5rem;
+  border-block-start: 1px solid var(--ifm-toc-border-color);
+}
+.props-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.props-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 200px;
+  padding: 12px 16px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 4px;
+  text-decoration: none;
+  transition: border-color var(--stackread-duration-fast, 150ms) ease;
+}
+.props-card:hover {
+  border-color: var(--ifm-link-color);
+  text-decoration: none;
+}
+.props-card__name {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ifm-link-color);
+}
+.props-card__hint {
+  font-size: 12px;
+  color: var(--ifm-color-content-secondary);
+}
+.props-card:focus-visible {
+  outline: var(--stackread-focus-width, 2px) solid var(--stackread-focus-color);
+  outline-offset: 1px;
+}

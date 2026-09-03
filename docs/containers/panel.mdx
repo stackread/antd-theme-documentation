@@ -1,0 +1,257 @@
+---
+title: Panel
+description: Ant Design Card (plain)
+antd_components: [Card]
+---
+
+# Panel
+
+A panel is a building block. It contains content and gives it a surface, and it
+sits underneath larger components - a page, a popover, a card are all built on
+one.
+
+In Ant Design there is no separate panel; a plain `Card` is the same thing. The
+examples below use it without a header.
+
+## Component
+
+### Default
+
+Panels can combine colour, border and shadow. Use the combinations sparingly and
+favour the default.
+
+```tsx interactive
+import React from 'react';
+import { Card } from 'antd';
+
+export default () => <Card>Default panel</Card>;
+```
+
+### Split
+
+A split panel is one outer surface holding several inner ones. The inner panels
+keep their own colour, and the group has two directions: stacked by default, or
+side by side.
+
+Ant Design has no split panel. It is composed here from an outer `Card` with no
+padding and inner `Card`s without borders.
+
+```tsx interactive
+import React from 'react';
+import { Card, Space, Typography } from 'antd';
+
+const inner = { borderRadius: 0 };
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+      <Card styles={{ body: { padding: 0 } }} style={{ flex: 1 }}>
+        <Card variant="borderless" style={inner}>
+          <Typography>
+            <p style={{ marginBottom: 0 }}>Top panel</p>
+          </Typography>
+        </Card>
+        <Card data-variante="surface"
+          variant="borderless"
+          style={{ ...inner, background: 'var(--ant-color-bg-layout)' }}
+        >
+          <Typography>
+            <p style={{ marginBottom: 0 }}>Bottom panel does not grow</p>
+          </Typography>
+        </Card>
+      </Card>
+
+      <Card styles={{ body: { padding: 0 } }} style={{ flex: 1, alignSelf: 'flex-start' }}>
+        <Card variant="borderless" style={inner}>
+          <Typography>
+            <p style={{ marginBottom: 0 }}>Outer panel does not grow</p>
+          </Typography>
+        </Card>
+        <Card data-variante="surface"
+          variant="borderless"
+          style={{ ...inner, background: 'var(--ant-color-bg-layout)' }}
+        >
+          <Typography>
+            <p style={{ marginBottom: 0 }}>Bottom panel</p>
+          </Typography>
+        </Card>
+      </Card>
+
+      <Card styles={{ body: { padding: 0 } }} style={{ flex: 1 }}>
+        <Card variant="borderless" style={inner}>
+          <Typography>
+            <p style={{ marginBottom: 0 }}>Top panel</p>
+          </Typography>
+        </Card>
+        <Card data-variante="surface"
+          variant="borderless"
+          style={{ ...inner, background: 'var(--ant-color-bg-layout)' }}
+        >
+          <Typography>
+            <p style={{ marginBottom: 0 }}>Middle panel</p>
+          </Typography>
+        </Card>
+        <Card data-variante="surface"
+          variant="borderless"
+          style={{ ...inner, background: 'var(--ant-color-error-bg)' }}
+        >
+          <Typography>
+            <p style={{ marginBottom: 0 }}>Danger panel</p>
+          </Typography>
+        </Card>
+      </Card>
+    </div>
+
+    <Card styles={{ body: { padding: 0, display: 'flex' } }}>
+      <Card variant="borderless" style={{ ...inner, flex: 1 }}>
+        <Typography>
+          <p>Left panel</p>
+          <p style={{ marginBottom: 0 }}>Has more content</p>
+        </Typography>
+      </Card>
+      <Card data-variante="surface"
+        variant="borderless"
+        style={{ ...inner, flex: 1, background: 'var(--ant-color-bg-layout)' }}
+      >
+        <Typography>
+          <p style={{ marginBottom: 0 }}>Right panel</p>
+        </Typography>
+      </Card>
+    </Card>
+  </Space>
+);
+```
+
+:::note[Omitted: responsive stacking]
+
+**Affects:** 0 specimens - a prop, not a panel.
+
+A row-direction split panel could stack at chosen breakpoints. Ant Design has
+nothing for it; the row above stays a
+row. Whether we want breakpoint-aware containers belongs to our own design work.
+
+:::
+
+## Usage
+
+### Padding
+
+The most basic use is padding around content.
+
+```tsx interactive
+import React from 'react';
+import { Card, Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={24} style={{ display: 'flex' }}>
+    <Card styles={{ body: { padding: 0 } }}>
+      <Typography.Text code>padding none</Typography.Text>
+    </Card>
+
+    <Card size="small">
+      <Typography.Text code>padding small</Typography.Text>
+    </Card>
+
+    <Card>
+      <Typography.Text code>padding medium (default)</Typography.Text>
+    </Card>
+
+    <Card styles={{ body: { padding: 24 } }}>
+      <Typography.Text code>padding large</Typography.Text>
+    </Card>
+  </Space>
+);
+```
+
+### Shadow and border
+
+A shadow gives the container depth, a border gives it containment. Which
+combinations are allowed depends on the theme - in this one, only plain or
+transparent panels take a border or a shadow, and the two are not combined.
+
+```tsx interactive
+import React from 'react';
+import { Card, Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Card variant="borderless">
+      <Typography.Text code>no shadow</Typography.Text>
+    </Card>
+
+    <Card>
+      <Typography.Text code>has border</Typography.Text>
+    </Card>
+  </Space>
+);
+```
+
+### Colors and corners
+
+A background shade places the panel in its context. Use colour sparingly. The
+rounded corners can be removed where the panel meets an edge, and a transparent
+panel gives a quick box that only adds padding.
+
+```tsx interactive
+import React from 'react';
+import { Card, Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Card data-variante="surface"
+      variant="borderless"
+      style={{ background: 'var(--ant-color-bg-layout)', borderRadius: 0 }}
+    >
+      <Typography>
+        <p style={{ marginBottom: 0 }}>I am a simple shaded box</p>
+      </Typography>
+    </Card>
+
+    <Card data-variante="surface" variant="borderless" style={{ background: 'transparent' }}>
+      <Typography>
+        <p style={{ marginBottom: 0 }}>I am a transparent box simply for padding</p>
+      </Typography>
+    </Card>
+  </Space>
+);
+```
+
+### Growing height
+
+In a row, a panel grows to the height of its tallest neighbour. That is what
+makes rows of panels line up - and it can be turned off where it is not wanted.
+
+```tsx interactive
+import React from 'react';
+import { Card, Typography } from 'antd';
+
+export default () => (
+  <div style={{ display: 'flex', gap: 24, alignItems: 'stretch' }}>
+    <Card style={{ flex: 1 }}>
+      <Typography>
+        <p style={{ marginBottom: 0 }}>
+          I am some panel content...
+          <br /> ... <br /> ... <br />
+          whose content is tall
+        </p>
+      </Typography>
+    </Card>
+
+    <Card style={{ flex: 1 }}>
+      <Typography>
+        <p style={{ marginBottom: 0 }}>
+          I am some panel content... whose content will grow
+        </p>
+      </Typography>
+    </Card>
+
+    <Card style={{ flex: 1, alignSelf: 'flex-start' }}>
+      <Typography>
+        <p style={{ marginBottom: 0 }}>
+          I am some panel content... whose content did not grow
+        </p>
+      </Typography>
+    </Card>
+  </div>
+);
+```

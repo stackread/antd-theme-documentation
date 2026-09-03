@@ -1,0 +1,82 @@
+---
+title: Sizing
+description: One scale, and where it is broken
+sidebar_position: 2
+---
+
+# Sizing
+
+One scale, seven steps, base 16.
+
+| name | value |
+|---|---|
+| XS | 4px |
+| S | 8px |
+| M | 12px |
+| base | 16px |
+| L | 24px |
+| XL | 32px |
+| XXL | 40px |
+
+Not a doubling and not a modular scale - 4, 8, 12, 16, 24, 32, 40 is base/4,
+base/2, base·¾, base, base·1.5, base·2, base·2.5. Every step lands on a
+multiple of four, which is what makes it possible to sit two components on the
+same line without a half pixel anywhere.
+
+```tsx interactive
+import React from 'react';
+import { Flex, Typography } from 'antd';
+
+const steps = [
+  ['XS', 4],
+  ['S', 8],
+  ['M', 12],
+  ['base', 16],
+  ['L', 24],
+  ['XL', 32],
+  ['XXL', 40],
+];
+
+export default () => (
+  <Flex vertical gap={8}>
+    {steps.map(([name, size]) => (
+      <Flex key={name} align="center" gap={12}>
+        <Typography.Text style={{ inlineSize: 48, fontSize: 12 }}>{name}</Typography.Text>
+        <div
+          style={{
+            inlineSize: size,
+            blockSize: 16,
+            background: 'var(--ant-color-primary)',
+            borderRadius: 2,
+          }}
+        />
+        <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+          {size}px
+        </Typography.Text>
+      </Flex>
+    ))}
+  </Flex>
+);
+```
+
+## Control heights are not on the scale
+
+A control is 40px tall, small is 32, extra small is 24, large is 40. Those are
+measured, not derived - and the last two being equal is what the measurement
+says, not a transcription error.
+
+This matters when composing: a 40px control next to a 32px one is not a
+spacing decision that a gap can fix.
+
+## Where the scale is broken
+
+Three places, each recorded as a deviation:
+
+- **The step number.** Ant Design derives it from the control height and would
+  draw 40px. Measured, it is 32 × 32.
+- **The switch.** Its track and thumb are measured, not Ant Design's ratio of
+  the control height.
+- **The checkbox and radio.** Sized from the measurement directly.
+
+A broken scale that is written down is a measurement. One that is not is a
+bug waiting to be re-derived.

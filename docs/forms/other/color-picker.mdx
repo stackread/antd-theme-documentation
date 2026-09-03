@@ -1,0 +1,378 @@
+---
+title: Color picker
+description: Ant Design ColorPicker
+antd_components: [ColorPicker]
+sidebar_position: 2
+---
+
+# Color picker
+
+A colour input with several ways in: type a value, drag on the gradient, or
+pick a swatch.
+
+Typed input takes hex and RGB(a). Dragging works in HSV and is converted, which
+is why a value can come back written differently from how it went in - the same
+colour, a different notation.
+
+Swatches are for the colours you want chosen: a brand set, a palette a chart
+already uses. They are a shortlist, not a limit.
+
+```tsx interactive
+import React from 'react';
+import { ColorPicker, Form } from 'antd';
+
+export default () => {
+  const [color, setColor] = React.useState('#0B64DD');
+
+  return (
+    <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+      <Form.Item label="Pick a color" style={{ marginBottom: 0 }}>
+        <ColorPicker
+          value={color}
+          onChange={(c) => setColor(c.toHexString())}
+          showText
+        />
+      </Form.Item>
+    </Form>
+  );
+};
+```
+
+## Color palette picker
+
+:::note[Omitted: choosing a whole palette]
+
+**Affects:** 2 specimens - a component with no counterpart.
+
+A control could pick an entire palette rather than a single colour - a set of
+categorical colours, or a gradient with stops - for applying to a chart or a
+map.
+
+Ant Design has no such component. Building one means a `Select` whose options
+render the palettes, which is a chart concern rather than a form control, and
+would document a component this theme does not have.
+
+:::
+
+The distinction is worth keeping in mind even without the component: a colour
+and a palette are different questions. One asks what this thing looks like; the
+other asks how a whole set of things will be told apart.
+
+## Color palette display
+
+:::note[Omitted: showing the palette in use]
+
+**Affects:** 5 specimens - a display component with no counterpart.
+
+Alongside the picker there could be a bar showing the palette a visualisation
+is currently using - fixed for categorical data, gradient for
+continuous, optionally with the stops marked.
+
+There is nothing to translate it to. A gradient bar is a `div` with a
+background, and dressing that up as a component here would document the div.
+
+:::
+
+## Format selection
+
+Choosing a format does not restrict what may be typed - it decides what the
+control writes back, and keeps the notation steady while the reader drags.
+
+Watch the hue and saturation behave differently between them: the same drag
+lands on a different value depending on which space the value is being kept in.
+
+```tsx interactive
+import React from 'react';
+import { ColorPicker, Form } from 'antd';
+
+export default () => (
+  <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+    <Form.Item label="Hex">
+      <ColorPicker defaultValue="#0B64DD" format="hex" showText />
+    </Form.Item>
+
+    <Form.Item label="RGB">
+      <ColorPicker defaultValue="#0B64DD" format="rgb" showText />
+    </Form.Item>
+
+    <Form.Item label="HSB" style={{ marginBottom: 0 }}>
+      <ColorPicker defaultValue="#0B64DD" format="hsb" showText />
+    </Form.Item>
+  </Form>
+);
+```
+
+## Alpha channel (opacity) selection
+
+Opacity is off unless asked for. Turning it on adds a slider and lets the value
+carry an alpha channel.
+
+Leave it off where the colour will be composited over something unknown - a
+half-transparent colour on an unknown background is a colour nobody chose.
+
+```tsx interactive
+import React from 'react';
+import { ColorPicker, Form } from 'antd';
+
+export default () => (
+  <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+    <Form.Item label="Opaque only">
+      <ColorPicker defaultValue="#0B64DD" disabledAlpha format="rgb" showText />
+    </Form.Item>
+
+    <Form.Item label="With opacity" style={{ marginBottom: 0 }}>
+      <ColorPicker defaultValue="rgba(11, 100, 221, 0.5)" format="rgb" showText />
+    </Form.Item>
+  </Form>
+);
+```
+
+## Custom color swatches
+
+The default swatches are a general-purpose set. Replace them with your own
+where the choice is meant to be from a known list - the colours a chart already
+uses, the ones a brand allows.
+
+Grouping them under headings helps once there are more than a handful.
+
+```tsx interactive
+import React from 'react';
+import { ColorPicker, Form } from 'antd';
+
+export default () => (
+  <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+    <Form.Item label="From a fixed set" style={{ marginBottom: 0 }}>
+      <ColorPicker
+        defaultValue="#0B64DD"
+        showText
+        presets={[
+          {
+            label: 'Semantic',
+            colors: ['#0B64DD', '#00BFB3', '#FACB3D', '#BD271E'],
+          },
+          {
+            label: 'Neutral',
+            colors: ['#1D1E24', '#535966', '#98A2B3', '#CAD3E2', '#F1F4FA'],
+          },
+        ]}
+      />
+    </Form.Item>
+  </Form>
+);
+```
+
+## Limited selection modes
+
+Both the swatches and the gradient map are shown by default. Either can stand
+alone.
+
+Swatches only, where the answer must come from a known set. The gradient only,
+where any colour is allowed and a shortlist would just be in the way.
+
+```tsx interactive
+import React from 'react';
+import { ColorPicker, Form } from 'antd';
+
+const choice = ['#0B64DD', '#00BFB3', '#FACB3D', '#BD271E', '#8144CC'];
+
+export default () => (
+  <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+    <Form.Item label="Swatches only">
+      <ColorPicker
+        defaultValue="#0B64DD"
+        showText
+        presets={[{ label: 'Choose one', colors: choice }]}
+        panelRender={(_, { components: { Presets } }) => <Presets />}
+      />
+    </Form.Item>
+
+    <Form.Item label="Gradient only" style={{ marginBottom: 0 }}>
+      <ColorPicker defaultValue="#0B64DD" showText />
+    </Form.Item>
+  </Form>
+);
+```
+
+## Custom button
+
+The trigger can be anything. Give it proper button markup and a label - a
+coloured square with no name is unreachable by keyboard and unannounceable by a
+screen reader.
+
+The value can also be shown a second time inside the panel, above or below the
+gradient, which helps where the trigger itself has no room for text.
+
+```tsx interactive
+import React from 'react';
+import { Button, ColorPicker, Space, Tag } from 'antd';
+
+export default () => {
+  const [color, setColor] = React.useState('#8144CC');
+
+  return (
+    <Space size={24} align="center">
+      <ColorPicker value={color} onChange={(c) => setColor(c.toHexString())}>
+        <Button aria-label={`Change color, currently ${color}`}>
+          <span
+            aria-hidden
+            style={{
+              display: 'inline-block',
+              inlineSize: 12,
+              blockSize: 12,
+              borderRadius: 2,
+              background: color,
+              marginInlineEnd: 8,
+            }}
+          />
+          {color}
+        </Button>
+      </ColorPicker>
+
+      <ColorPicker value={color} onChange={(c) => setColor(c.toHexString())}>
+        <Tag color={color} style={{ cursor: 'pointer' }} role="button" aria-label="Change color">
+          A badge as the trigger
+        </Tag>
+      </ColorPicker>
+    </Space>
+  );
+};
+```
+
+## Empty state
+
+Where "no colour" means something other than transparent, say so with a
+placeholder, and let the reader get back to it.
+
+Without a way to clear, the first click on the gradient is irreversible: there
+is no gesture for "actually, none".
+
+```tsx interactive
+import React from 'react';
+import { ColorPicker, Form } from 'antd';
+
+export default () => {
+  const [color, setColor] = React.useState(null);
+
+  return (
+    <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+      <Form.Item
+        label="Color"
+        extra={color ? 'A color is set.' : 'No color set - the default will be used.'}
+        style={{ marginBottom: 0 }}
+      >
+        <ColorPicker
+          allowClear
+          value={color}
+          onChange={(c) => setColor(c?.toHexString() ?? null)}
+          onClear={() => setColor(null)}
+          showText={() => (color ? color : 'Select a color')}
+        />
+      </Form.Item>
+    </Form>
+  );
+};
+```
+
+## Inline
+
+The panel can sit on the page with no field and no popover, for a screen where
+choosing the colour is the task.
+
+```tsx interactive
+import React from 'react';
+import { ColorPicker, Space, Typography } from 'antd';
+
+export default () => {
+  const [color, setColor] = React.useState('#0B64DD');
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <div style={{ position: 'relative' }}>
+        <ColorPicker
+          open
+          value={color}
+          onChange={(c) => setColor(c.toHexString())}
+          getPopupContainer={(k) => k.parentElement}
+          style={{ visibility: 'hidden', blockSize: 0, padding: 0, border: 0 }}
+        />
+      </div>
+
+      <Typography.Text type="secondary">{color}</Typography.Text>
+    </Space>
+  );
+};
+```
+
+## Containers
+
+The panel is rendered in a layer of its own, so it escapes a container that
+clips its children. That is worth checking inside anything else that does the
+same - a modal, a popover, a flyout.
+
+```tsx interactive
+import React from 'react';
+import { Button, ColorPicker, Modal, Popover, Space } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+  const heading = 'A color picker in a modal';
+
+  const field = <ColorPicker defaultValue="#0B64DD" showText />;
+
+  return (
+    <Space size={8}>
+      <Button onClick={() => setOpen(true)}>Open a modal</Button>
+
+      <Popover trigger="click" content={<div style={{ inlineSize: 200 }}>{field}</div>}>
+        <Button>Open a popover</Button>
+      </Popover>
+
+      <Modal
+        open={open}
+        onCancel={() => setOpen(false)}
+        onOk={() => setOpen(false)}
+        title={heading}
+      >
+        {field}
+      </Modal>
+    </Space>
+  );
+};
+```
+
+## Option toggling
+
+The states the control shares with every other one: compressed, disabled,
+read only.
+
+```tsx interactive
+import React from 'react';
+import { ColorPicker, Space, Switch } from 'antd';
+
+export default () => {
+  const [compressed, setCompressed] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={16} wrap>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={compressed} onChange={setCompressed} />
+          Compressed
+        </label>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={disabled} onChange={setDisabled} />
+          Disabled
+        </label>
+      </Space>
+
+      <ColorPicker
+        defaultValue="#0B64DD"
+        showText
+        size={compressed ? 'small' : 'middle'}
+        disabled={disabled}
+      />
+    </Space>
+  );
+};
+```

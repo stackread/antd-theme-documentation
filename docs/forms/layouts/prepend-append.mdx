@@ -1,0 +1,219 @@
+---
+title: Prepends and appends
+description: Ant Design Space.Compact around a control
+antd_components: [Space]
+sidebar_position: 5
+---
+
+# Prepends and appends
+
+A prepend or an append is content fixed to the edge of a control: a unit like
+`px` or `ms`, a label that names what the field holds, a small button that acts
+on it.
+
+That content could be passed to the control as a prop. Ant Design v6 takes the
+other route: `Space.Compact` joins neighbouring elements into one frame, so
+the addon is a **sibling** of the control rather than something inside it.
+
+That is why the examples below define two small components, `Prepend` and
+`Append` - what other systems ship as a component, Ant Design leaves to the
+page.
+
+:::warning[One interaction each]
+
+A prepend or an append holds a single interactive thing. Two buttons in one
+addon give the reader no way to tell them apart by position, and give a
+keyboard user two stops where the design implies one.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Badge, Input, Popover, Space, Switch, Tooltip } from 'antd';
+import { BorderOutlined, CalendarOutlined, DownOutlined, SettingOutlined } from '@ant-design/icons';
+
+const edge = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  padding: '0 11px',
+  background: 'var(--ant-color-fill-alter)',
+  border: '1px solid var(--ant-color-border)',
+  color: 'var(--ant-color-text)',
+  whiteSpace: 'nowrap',
+  font: 'inherit',
+};
+
+const Addon = React.forwardRef(
+  ({ label, iconLeft, iconRight, children, onClick, page, ...rest }, ref) => {
+    const Element = onClick ? 'button' : 'span';
+    const corners =
+      page === 'vor'
+        ? { borderStartEndRadius: 0, borderEndEndRadius: 0, borderInlineEnd: 0 }
+        : { borderStartStartRadius: 0, borderEndStartRadius: 0, borderInlineStart: 0 };
+
+    return (
+      <Element
+        ref={ref}
+        type={onClick ? 'button' : undefined}
+        onClick={onClick}
+        style={{ ...edge, ...corners, cursor: onClick ? 'pointer' : undefined }}
+        {...rest}
+      >
+        {iconLeft ? <span aria-hidden>{iconLeft}</span> : null}
+        {label}
+        {children}
+        {iconRight ? <span aria-hidden>{iconRight}</span> : null}
+      </Element>
+    );
+  }
+);
+
+const Prepend = (props) => <Addon page="vor" {...props} />;
+const Append = (props) => <Addon page="nach" {...props} />;
+
+export default () => {
+  const [compressed, setCompressed] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(false);
+  const hint = 'What the addon is for';
+
+  const shared = {
+    placeholder: 'Text field',
+    size: compressed ? 'small' : 'middle',
+    disabled: disabled,
+  };
+
+  const group = { style: { inlineSize: '100%' }, size: compressed ? 'small' : 'middle' };
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 460 }}>
+      <Space size={16}>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={compressed} onChange={setCompressed} />
+          Compressed
+        </label>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={disabled} onChange={setDisabled} />
+          Disabled
+        </label>
+      </Space>
+
+      <Space.Compact {...group}>
+        <span style={{ ...edge, borderInlineEnd: 0, borderStartEndRadius: 0, borderEndEndRadius: 0 }}>
+          String
+        </span>
+        <Input {...shared} aria-label="A plain string as the prepend" />
+        <Append label="String" iconLeft={<SettingOutlined />} />
+      </Space.Compact>
+
+      <Space.Compact {...group}>
+        <Prepend label="String" iconRight={<SettingOutlined />} />
+        <Input {...shared} aria-label="Icon after the label" />
+        <Append label="String" iconRight={<SettingOutlined />} />
+      </Space.Compact>
+
+      <Space.Compact {...group}>
+        <Prepend label="String" iconLeft={<BorderOutlined />} iconRight={<SettingOutlined />} />
+        <Input {...shared} aria-label="Icons either side of the label" />
+        <Append label="String" iconLeft={<BorderOutlined />} iconRight={<SettingOutlined />} />
+      </Space.Compact>
+
+      <Space.Compact {...group}>
+        <Prepend label="String" iconLeft={<BorderOutlined />}>
+          <Badge count={1} size="small" />
+        </Prepend>
+        <Input {...shared} aria-label="Addon with its own content" />
+        <Append label="String" iconRight={<SettingOutlined />} onClick={() => {}}>
+          <Badge count={1} size="small" />
+        </Append>
+      </Space.Compact>
+
+      <Space.Compact {...group}>
+        <Tooltip title={hint}>
+          <Prepend label="Tooltip" />
+        </Tooltip>
+        <Input {...shared} aria-label="Addons wrapped in tooltips" />
+        <Tooltip title={hint}>
+          <Append label="Tooltip" onClick={() => {}} />
+        </Tooltip>
+      </Space.Compact>
+
+      <Space.Compact {...group}>
+        <Popover trigger="click" content="Opened from the prepend">
+          <Prepend iconLeft={<CalendarOutlined />} iconRight={<DownOutlined />} onClick={() => {}} />
+        </Popover>
+        <Input {...shared} aria-label="Addons that open popovers" />
+        <Popover trigger="click" content="Opened from the append">
+          <Append iconRight={<DownOutlined />} onClick={() => {}} />
+        </Popover>
+      </Space.Compact>
+
+      <Space.Compact {...group}>
+        <Prepend iconLeft={<BorderOutlined />} />
+        <Input {...shared} aria-label="Icon-only addons" />
+        <Append iconRight={<SettingOutlined />} />
+      </Space.Compact>
+    </Space>
+  );
+};
+```
+
+## Semantic label relations
+
+:::note[A control needs a label]
+
+An `<input>` needs a label for accessibility. Inside a `Form.Item` with a
+`label`, the row does that for you.
+
+A standalone control has no row, so its label has to be arranged by hand.
+
+:::
+
+Non-interactive addon content reads like a label, and often is one. Where that
+is so, make the relationship real: give the addon an `id` and point the control
+at it with `aria-labelledby`. Then the text on screen and the name announced
+are the same text, and they cannot drift apart.
+
+Where the addon is a unit rather than a name - `px`, `ms` - it is not the
+label, and the control needs an `aria-label` of its own.
+
+```tsx interactive
+import React from 'react';
+import { Input, Space } from 'antd';
+
+const edge = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  padding: '0 11px',
+  background: 'var(--ant-color-fill-alter)',
+  border: '1px solid var(--ant-color-border)',
+};
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 460 }}>
+    <Space.Compact style={{ inlineSize: '100%' }}>
+      <span
+        id="stackread-addon-label"
+        style={{ ...edge, borderInlineEnd: 0, borderStartEndRadius: 0, borderEndEndRadius: 0 }}
+      >
+        Linked label
+      </span>
+      <Input placeholder="Text field" aria-labelledby="stackread-addon-label" />
+    </Space.Compact>
+
+    <Space.Compact style={{ inlineSize: '100%' }}>
+      <Input placeholder="Text field" aria-label="Width in pixels" />
+      <span
+        aria-hidden
+        style={{ ...edge, borderInlineStart: 0, borderStartStartRadius: 0, borderEndStartRadius: 0 }}
+      >
+        px
+      </span>
+    </Space.Compact>
+  </Space>
+);
+```
+
+An addon that is a button is never the label: it has a name of its own, and a
+control whose accessible name is "Clear" tells the reader nothing about what
+they are typing into.

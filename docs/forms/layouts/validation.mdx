@@ -1,0 +1,161 @@
+---
+title: Validation
+description: Ant Design Form.Item validateStatus and help
+antd_components: [Form]
+sidebar_position: 7
+---
+
+# Form validation
+
+A row becomes invalid when it is told it is, and says why. The message belongs
+to the row, so it appears under the field it is about rather than in a list at
+the top - a list at the top makes the reader match errors to fields themselves.
+
+A form-level message is for what no single field can say: the submission
+failed, the combination is not allowed.
+
+In Ant Design a row carries `validateStatus` and `help`; several messages for
+one row are one `help` node with several lines.
+
+```tsx interactive
+import React from 'react';
+import { Alert, Button, Form, Input, Select, Space } from 'antd';
+
+export default () => {
+  const [showErrors, setShowErrors] = React.useState(true);
+  const summaryMessage = 'Please address the highlighted errors.';
+
+  const status = showErrors ? 'error' : undefined;
+  const messages = showErrors ? (
+    <>
+      <div>Your username is not valid.</div>
+      <div>You must include a lowercase letter.</div>
+    </>
+  ) : null;
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <input
+          type="checkbox"
+          checked={showErrors}
+          onChange={(e) => setShowErrors(e.target.checked)}
+        />
+        Show errors
+      </label>
+
+      {showErrors ? (
+        <Alert
+          type="error"
+          title={summaryMessage}
+          showIcon
+        />
+      ) : null}
+
+      <Form layout="vertical">
+        <Form.Item label="Validation only" validateStatus={status}>
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          label="Validation with help text and errors"
+          validateStatus={status}
+          extra="I am some friendly help text."
+          help={messages}
+        >
+          <Input />
+        </Form.Item>
+
+        <Form.Item label="Text area" validateStatus={status}>
+          <Input.TextArea rows={3} />
+        </Form.Item>
+
+        <Form.Item label="Select" validateStatus={status} style={{ marginBottom: 16 }}>
+          <Select
+            options={[
+              { value: 'one', label: 'Option one' },
+              { value: 'two', label: 'Option two' },
+            ]}
+          />
+        </Form.Item>
+
+        <Button type="primary" htmlType="submit">
+          Save form
+        </Button>
+      </Form>
+    </Space>
+  );
+};
+```
+
+## Usage
+
+### Validation error text
+
+A validation message is needed when what the reader typed is not what the
+system will accept:
+
+- a required field left blank,
+- a value that is invalid - a forbidden character, the wrong format, a
+  duplicate.
+
+Write it so the reader knows what to do next. "Invalid input" says only that
+something is wrong; it does not say which part, or what would be right.
+
+```tsx interactive
+import React from 'react';
+import { Input, Space, Typography } from 'antd';
+
+const Message = ({ text }) => (
+  <Typography.Text type="danger" style={{ fontSize: 12 }}>
+    {text}
+  </Typography.Text>
+);
+
+const Warning = ({ text }) => (
+  <Typography.Text style={{ fontSize: 12, color: 'var(--ant-color-warning-text)' }}>
+    {text}
+  </Typography.Text>
+);
+
+const Line = ({ label, message, hint, kind = 'error' }) => (
+  <div style={{ flex: '1 1 220px' }}>
+    <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+      {hint}
+    </Typography.Text>
+    <div style={{ marginBlock: 8 }}>
+      <label style={{ display: 'block', fontSize: 12, marginBottom: 4 }}>
+        {label}
+      </label>
+      <Input status={kind} aria-label={label} />
+    </div>
+    {kind === 'warning' ? <Warning text={message} /> : <Message text={message} />}
+  </div>
+);
+
+export default () => (
+  <Space size={24} align="start" wrap style={{ display: 'flex' }}>
+    <Line
+      hint="A simple, minimalist format for a required field."
+      label="Name"
+      message="Name is required."
+    />
+    <Line
+      hint="Tell users what happened and how to fix it."
+      label="Email"
+      message="This address is already used. Enter a different one."
+    />
+    <Line
+      hint="Be as precise as possible about the problem."
+      label="Key"
+      message="The key cannot contain the : character."
+    />
+    <Line
+      kind="warning"
+      hint="Where the value is allowed but unusual, warn rather than block."
+      label="Source"
+      message="This allows traffic from anywhere."
+    />
+  </Space>
+);
+```

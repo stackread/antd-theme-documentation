@@ -1,0 +1,171 @@
+---
+title: Super select
+description: Ant Design Select with rendered options
+antd_components: [Select]
+sidebar_position: 2
+---
+
+import FormRowCallout from '../_partials/_form-row-callout.mdx';
+import FormUsage from '../_partials/_form-usage.mdx';
+
+# Super select
+
+A select whose options are drawn rather than listed. Each option carries:
+
+- a `value`, unique within the list,
+- a `label`, which is what appears in the field once chosen,
+- optionally a richer node for the dropdown - two lines, a description, a
+  status dot.
+
+This is often a separate component, because a native `<select>` cannot hold
+markup. Ant Design's `Select` is not native to begin
+with, so the same component does both jobs: give it plain labels and it is a
+basic select; give it nodes and it is this.
+
+```tsx interactive
+import React from 'react';
+import { Select, Space } from 'antd';
+
+const dot = (color) => (
+  <span
+    aria-hidden
+    style={{
+      display: 'inline-block',
+      inlineSize: 8,
+      blockSize: 8,
+      borderRadius: '50%',
+      background: color,
+      marginInlineEnd: 8,
+    }}
+  />
+);
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+    <Select
+      aria-label="A select with status dots"
+      defaultValue="warning"
+      style={{ inlineSize: '100%' }}
+      options={[
+        { value: 'warning', label: <>{dot('var(--ant-color-warning)')}Warning</> },
+        { value: 'minor', label: <>{dot('var(--ant-color-info)')}Minor</> },
+        { value: 'major', label: <>{dot('var(--ant-color-error)')}Major</> },
+        { value: 'critical', label: <>{dot('var(--ant-color-error-active)')}Critical</> },
+      ]}
+    />
+  </Space>
+);
+```
+
+<FormRowCallout />
+
+## More complex
+
+Where the option needs a second line, the field and the dropdown can differ:
+the dropdown shows the name and its explanation, the field shows only the name.
+
+That difference is the point. An explanation is useful while choosing and only
+in the way afterwards.
+
+A placeholder may be markup too, so an empty field can match the shape of a
+filled one. It shows only while nothing is selected.
+
+```tsx interactive
+import React from 'react';
+import { Select, Space, Typography } from 'antd';
+
+const entry = (title, text) => (
+  <div style={{ paddingBlock: 4 }}>
+    <div>{title}</div>
+    <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+      {text}
+    </Typography.Text>
+  </div>
+);
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+    <Select
+      aria-label="A select with two-line options"
+      placeholder="Select an option"
+      style={{ inlineSize: '100%' }}
+      optionLabelProp="label"
+      options={[
+        {
+          value: 'option_one',
+          label: 'Option one',
+          title: 'Option one',
+          children: entry('Option one', 'Has a short description that fits on one line.'),
+        },
+        {
+          value: 'option_two',
+          label: 'Option two',
+          title: 'Option two',
+          children: entry('Option two', 'Has a longer description, which is why the dropdown shows more than the field does.'),
+        },
+        {
+          value: 'option_three',
+          label: 'Option three',
+          title: 'Option three',
+          children: entry('Option three', 'Has a description too.'),
+        },
+      ]}
+      optionRender={(option) => option.data.children}
+    />
+  </Space>
+);
+```
+
+## States
+
+The same states as any other control: compressed, disabled, invalid, loading.
+They are props on the control, not variants of it.
+
+```tsx interactive
+import React from 'react';
+import { Select, Space, Switch } from 'antd';
+
+export default () => {
+  const [compressed, setCompressed] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(false);
+  const [invalid, setInvalid] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+
+  const toggles = [
+    ['Compressed', compressed, setCompressed],
+    ['Disabled', disabled, setDisabled],
+    ['Invalid', invalid, setInvalid],
+    ['Loading', loading, setLoading],
+  ];
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <Space size={16} wrap>
+        {toggles.map(([name, value, setIt]) => (
+          <label key={name} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <Switch size="small" checked={value} onChange={setIt} />
+            {name}
+          </label>
+        ))}
+      </Space>
+
+      <Select
+        aria-label="A rich select in its various states"
+        defaultValue="option_one"
+        size={compressed ? 'small' : 'middle'}
+        disabled={disabled}
+        status={invalid ? 'error' : undefined}
+        loading={loading}
+        style={{ inlineSize: '100%' }}
+        options={[
+          { value: 'option_one', label: 'Option one' },
+          { value: 'option_two', label: 'Option two' },
+          { value: 'option_three', label: 'Option three' },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+<FormUsage />

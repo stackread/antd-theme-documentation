@@ -1,0 +1,92 @@
+---
+title: CSS utility classes
+description: What the variables give you directly
+sidebar_position: 3
+---
+
+# CSS utility classes
+
+Some design systems ship utility classes for truncation, scrolling and a
+couple of dozen other one-liners. This one ships none.
+
+That is a decision, not an omission. A utility class is a second way to say
+what a token already says, and it has to be kept in step with the first. What
+we ship instead is the variables themselves, which is what those classes were
+wrapping anyway.
+
+## Two families
+
+| prefix | what it holds | count |
+|---|---|---|
+| `--ant-*` | everything Ant Design has a token for | ~370 |
+| `--stackread-*` | what Ant Design has no token for | 53 |
+
+The second family exists only where the first cannot reach. Four reasons keep
+recurring:
+
+**A level Ant Design does not have.** `--ant-color-*-bg` is the BASE level;
+the LIGHT level has no Ant Design name, so `--stackread-light-warning` carries
+it.
+
+**A family Ant Design would break up.** `--stackread-border-strong-*` has four
+members even though three of them equal an existing `--ant-color-*`. Writing
+three Ant Design variables plus one exception would disguise the exception as a
+trick rather than a value.
+
+**A shape, not a colour.** `--stackread-skeleton-angle` is `137deg`;
+`--stackread-spinner-duration` is `0.6s`. Ant Design has no token for the angle of a
+gradient or the period of a rotation.
+
+**A glyph.** `--stackread-icon-warning` is an inline SVG. The callout's icon is
+a triangle, not Ant Design's circle, and a path is not a colour.
+
+## Reading them
+
+Any of them works in any style, on any element:
+
+```tsx interactive
+import React from 'react';
+import { Card, Flex, Typography } from 'antd';
+
+export default () => (
+  <Card style={{ maxInlineSize: 520 }}>
+    <Flex vertical gap={12}>
+      <div
+        style={{
+          padding: 12,
+          borderRadius: 4,
+          background: 'var(--stackread-light-warning)',
+          border: '1px solid var(--stackread-border-strong-warning)',
+          color: 'var(--ant-color-warning-text)',
+        }}
+      >
+        A surface at the LIGHT level, bordered with the strong one.
+      </div>
+
+      <div
+        style={{
+          padding: 12,
+          borderRadius: 4,
+          background: 'var(--stackread-risk-bg)',
+          border: '1px solid var(--stackread-risk-border)',
+          color: 'var(--stackread-risk-text)',
+        }}
+      >
+        The same shape at BASE, in a meaning Ant Design does not have.
+      </div>
+
+      <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+        Both boxes follow the appearance switch. Neither contains a colour.
+      </Typography.Text>
+    </Flex>
+  </Card>
+);
+```
+
+## What is not a variable
+
+Anything that needs a selector. The autofilled field's background, the loading
+ring, the skeleton's animation - those are rules in `theme.css`,
+because they need `:-webkit-autofill`, a pseudo-element, or a keyframe. A
+variable cannot carry a selector, and pretending otherwise is how a theme grows
+a second, undocumented layer.

@@ -1,0 +1,509 @@
+---
+title: Flyout
+description: Ant Design Drawer
+antd_components: [Drawer]
+---
+
+# Flyout
+
+A flyout is a fixed panel that comes in from the side of the window. It shows
+more detail, or a complex form, without losing where the reader was.
+
+It is the better container when the action is not transient - a modal that has
+to be scrolled has outgrown its form, and a flyout has not.
+
+Visibility stays with the surrounding application, but the flyout needs a way to
+report that it was dismissed.
+
+In Ant Design this is `Drawer`. Rather than composing it from a header, a body
+and a footer, Ant Design takes them as props.
+
+## Component
+
+```tsx interactive
+import React from 'react';
+import { Button, Drawer, Typography } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <>
+      <Button color="primary" variant="filled" onClick={() => setOpen(true)}>
+        Show flyout
+      </Button>
+
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        title="A typical flyout"
+      >
+        <Typography>
+          <p>
+            For consistency across the many flyouts, please utilise the
+            following code for implementing the flyout with a header.
+          </p>
+        </Typography>
+      </Drawer>
+    </>
+  );
+};
+```
+
+## Usage
+
+### More complicated flyout
+
+A flyout can hold a whole working surface: a header that names it, a body with
+tabs or a form, and a footer with the actions that close it.
+
+```tsx interactive
+import React from 'react';
+import { Button, Drawer, Space, Tabs, Typography } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <>
+      <Button color="primary" variant="filled" onClick={() => setOpen(true)}>
+        Show flyout
+      </Button>
+
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        size={640}
+        title={
+          <div>
+            <Typography.Title level={4} style={{ marginBottom: 4 }}>
+              Flyout with padding and tabs
+            </Typography.Title>
+            <Tabs
+              defaultActiveKey="1"
+              items={[
+                { key: '1', label: 'Tab 1' },
+                { key: '2', label: 'Tab 2' },
+              ]}
+              tabBarStyle={{ marginBottom: -24, borderBottom: 'none' }}
+            />
+          </div>
+        }
+        footer={
+          <Space style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Button type="text" onClick={() => setOpen(false)}>
+              Close
+            </Button>
+            <Button type="primary" onClick={() => setOpen(false)}>
+              Save
+            </Button>
+          </Space>
+        }
+      >
+        <Typography>
+          <p>
+            The flyout body scrolls on its own, so the header and the footer
+            stay in place.
+          </p>
+        </Typography>
+      </Drawer>
+    </>
+  );
+};
+```
+
+### Sizing
+
+Flyouts come in three sizes, which set the width **relative to the window** with
+a minimum in pixels. A fixed width can be given instead.
+
+```tsx interactive
+import React from 'react';
+import { Button, Drawer, Radio, Space, Typography } from 'antd';
+
+const widths = { s: '25%', m: '50%', l: '75%' };
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+  const [size, setSize] = React.useState('m');
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Radio.Group
+        value={size}
+        onChange={(e) => setSize(e.target.value)}
+        optionType="button"
+        options={[
+          { value: 's', label: 'small' },
+          { value: 'm', label: 'medium' },
+          { value: 'l', label: 'large' },
+        ]}
+      />
+
+      <Button color="primary" variant="filled" onClick={() => setOpen(true)}>
+        Show {size} flyout
+      </Button>
+
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        size={widths[size]}
+        title={`A ${size} flyout`}
+      >
+        <Typography>
+          <p>The width follows the window; the minimum is set in pixels.</p>
+        </Typography>
+      </Drawer>
+    </Space>
+  );
+};
+```
+
+### Padding
+
+The inner parts take their padding from the flyout, so that the horizontal
+edges line up whatever the setting. With no padding at all, the content has to
+create that distance itself.
+
+```tsx interactive
+import React from 'react';
+import { Button, Drawer, Radio, Space, Typography } from 'antd';
+
+const padded = { none: 0, s: 8, m: 16, l: 24 };
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+  const [size, setSize] = React.useState('l');
+  const p = padded[size];
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Radio.Group
+        value={size}
+        onChange={(e) => setSize(e.target.value)}
+        optionType="button"
+        options={[
+          { value: 'none', label: 'none' },
+          { value: 's', label: 'small' },
+          { value: 'm', label: 'medium' },
+          { value: 'l', label: 'large' },
+        ]}
+      />
+
+      <Button color="primary" variant="filled" onClick={() => setOpen(true)}>
+        Show flyout to test padding
+      </Button>
+
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        title={`A flyout with a ${size} padding`}
+        styles={{ body: { padding: p }, header: { padding: p }, footer: { padding: p } }}
+        footer={
+          <Button type="text" onClick={() => setOpen(false)}>
+            Close
+          </Button>
+        }
+      >
+        <Typography>
+          <p>The edges of header, body and footer line up at every setting.</p>
+        </Typography>
+      </Drawer>
+    </Space>
+  );
+};
+```
+
+### Banners
+
+To lift something to the top of a flyout, a callout can sit above the body and
+the layout adjusts around it.
+
+```tsx interactive
+import React from 'react';
+import { Alert, Button, Drawer, Typography } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <>
+      <Button color="primary" variant="filled" onClick={() => setOpen(true)}>
+        Show flyout with banner
+      </Button>
+
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        title="A flyout with a banner"
+        styles={{ body: { padding: 0 } }}
+      >
+        <Alert
+          showIcon
+          type="warning"
+          title="Please make sure the flyout is scrolled to the bottom."
+          style={{ borderRadius: 0, borderInline: 'none', borderBlockStart: 'none' }}
+        />
+        <Typography style={{ padding: 24 }}>
+          <p>The banner keeps its place while the body scrolls beneath it.</p>
+        </Typography>
+      </Drawer>
+    </>
+  );
+};
+```
+
+### Without ownFocus
+
+A flyout usually obscures the page beneath it. Where it presents information or
+controls that are meant to be used **alongside** the page, the mask can go and
+the content underneath stays visible and clickable.
+
+```tsx interactive
+import React from 'react';
+import { Button, Drawer, Typography } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <>
+      <Button color="primary" variant="filled" onClick={() => setOpen(true)}>
+        Show flyout without mask
+      </Button>
+
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        mask={false}
+        title="A flyout without ownFocus"
+      >
+        <Typography>
+          <p>The page behind this flyout stays usable.</p>
+        </Typography>
+      </Drawer>
+    </>
+  );
+};
+```
+
+### Understanding max-width
+
+A flyout keeps growing with the window unless it is told where to stop.
+
+A maximum smaller than the minimum is a contradiction, and the minimum wins -
+worth remembering before setting a small one.
+
+```tsx interactive
+import React from 'react';
+import { Button, Drawer, Radio, Space, Typography } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+  const [kind, setKind] = React.useState('Default');
+
+  const limit =
+    kind === 'Default' ? 800 : kind === 'No' ? undefined : 400;
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Radio.Group
+        value={kind}
+        onChange={(e) => setKind(e.target.value)}
+        optionType="button"
+        options={[
+          { value: 'Default', label: 'Default' },
+          { value: 'No', label: 'No' },
+          { value: 'Custom', label: 'Custom' },
+        ]}
+      />
+
+      <Button color="primary" variant="filled" onClick={() => setOpen(true)}>
+        Show flyout to test maxWidth
+      </Button>
+
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        size="75%"
+        styles={{ wrapper: { maxInlineSize: limit } }}
+        title={`${kind} maxWidth`}
+      >
+        <Typography>
+          <p>
+            This flyout grows with the window. The maximum above decides where
+            it stops.
+          </p>
+        </Typography>
+      </Drawer>
+    </Space>
+  );
+};
+```
+
+### Focus management
+
+A flyout moves focus into itself when it opens, keeps it there while it is open,
+and returns it to whatever opened it when it closes.
+
+#### Manual return focus control
+
+Where the element that opened the flyout is gone by the time it closes, focus
+would be lost to the page body. It has to be returned by hand.
+
+```tsx
+<Drawer
+  open={open}
+  afterOpenChange={(offen) => {
+    if (!offen) andereStelle.current?.focus();
+  }}
+/>
+```
+
+### Push flyout
+
+A pushed flyout does not lie over the page - it moves the page aside and stays
+next to it. That suits a panel meant to be used together with the content.
+
+```tsx interactive
+import React from 'react';
+import { Button, Drawer, Typography } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <>
+      <Button color="primary" variant="filled" onClick={() => setOpen(true)}>
+        Show push flyout
+      </Button>
+
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        mask={false}
+        push={{ distance: 0 }}
+        title="Push flyout"
+      >
+        <Typography>
+          <p>
+            A pushed flyout is meant to be used alongside the page rather than
+            on top of it.
+          </p>
+        </Typography>
+      </Drawer>
+    </>
+  );
+};
+```
+
+:::note[Omitted: pushing the page aside]
+
+**Affects:** 0 specimens - a layout behaviour, not a flyout.
+
+A push flyout shifts the page content sideways so that nothing is covered. Ant
+Design's drawer only pushes *nested* drawers, never the page. The example above
+therefore drops the mask but leaves the page where it is.
+
+Making the page move would be layout work in the surrounding application rather
+than theming.
+
+:::
+
+### Resizable flyout
+
+A flyout can be given a handle so the reader can set its width themselves.
+
+Ant Design has no resize handle. The one below is set by hand, on the drawer's
+own edge.
+
+```tsx interactive
+import React from 'react';
+import { Button, Drawer, Typography } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+  const [width, setWidth] = React.useState(480);
+
+  const dragging = (e) => {
+    const start = e.clientX;
+    const first = width;
+    const onMove = (ev) => setWidth(Math.max(320, first + (start - ev.clientX)));
+    const onRelease = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onRelease);
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onRelease);
+  };
+
+  return (
+    <>
+      <Button color="primary" variant="filled" onClick={() => setOpen(true)}>
+        Show resizable flyout
+      </Button>
+
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        size={width}
+        title="Resizable flyout"
+      >
+        <div
+          role="separator"
+          aria-label="Resize this flyout"
+          onMouseDown={dragging}
+          style={{
+            position: 'absolute',
+            insetBlock: 0,
+            insetInlineStart: 0,
+            inlineSize: 4,
+            cursor: 'col-resize',
+            background: 'var(--ant-color-border)',
+          }}
+        />
+        <Typography>
+          <p>Drag the left edge to set the width. The minimum is 320px.</p>
+        </Typography>
+      </Drawer>
+    </>
+  );
+};
+```
+
+### Container-relative positioning
+
+A flyout is positioned against the window by default. It can instead be scoped
+to a region of the page, so that it does not cover the application's own chrome
+- a side navigation, a toolbar.
+
+The flyout stays where it is in the document; only its position is computed
+against the container's bounds.
+
+#### Child flyout inheritance
+
+A flyout opened from inside another one inherits its container, so the two stay
+in the same region.
+
+```tsx
+<Drawer
+  open={open}
+  onClose={close}
+  getContainer={() => behaelter.current}
+  rootStyle={{ position: 'absolute' }}
+/>
+```
+
+### Flyout menu
+
+:::note[Omitted: the flyout menu]
+
+**Affects:** 1 specimen - a component still in beta.
+
+A menu that lives inside a flyout and manages a stack of panels is a component
+in its own right. Ant Design has nothing equivalent.
+
+Building it would be component work rather than theming, and beta means it may
+change shape before it settles.
+
+:::

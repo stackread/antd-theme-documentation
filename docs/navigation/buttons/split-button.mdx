@@ -1,0 +1,146 @@
+---
+title: Split button
+description: A primary action and its alternatives in one control
+antd_components: [Button, Space]
+sidebar_position: 3
+---
+
+# Split button
+
+A split button joins a primary action and its alternatives into one control.
+The larger part does the thing readers do most often; the smaller part opens
+the rest.
+
+It is the right shape where there is a clear favourite with related variants -
+Save, and Save as; Run, and Run with options. Where the actions are equals, it
+is the wrong shape: it says one of them is the answer when none is.
+
+Ant Design has no component for it. `Space.Compact` joins two buttons into one
+frame, and a `Dropdown` on the second opens the menu - which is the same
+arrangement, written out.
+
+```tsx interactive
+import React from 'react';
+import { Button, Dropdown, Space, Switch } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
+export default () => {
+  const [disabled, setDisabled] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [compressed, setCompressed] = React.useState(false);
+
+  const toggles = [
+    ['Compressed', compressed, setCompressed],
+    ['Disabled', disabled, setDisabled],
+    ['Loading', loading, setLoading],
+  ];
+
+  const shared = {
+    type: 'primary',
+    size: compressed ? 'small' : 'middle',
+    disabled: disabled,
+  };
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={16} wrap>
+        {toggles.map(([name, value, setIt]) => (
+          <label key={name} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <Switch size="small" checked={value} onChange={setIt} />
+            {name}
+          </label>
+        ))}
+      </Space>
+
+      <Space.Compact>
+        <Button {...shared} loading={loading}>
+          Save
+        </Button>
+
+        <Dropdown
+          trigger={['click']}
+          disabled={disabled}
+          menu={{
+            items: [
+              { key: 'as', label: 'Save as...' },
+              { key: 'copy', label: 'Save a copy' },
+            ],
+          }}
+        >
+          <Button {...shared} aria-label="More save options">
+            <DownOutlined />
+          </Button>
+        </Dropdown>
+      </Space.Compact>
+    </Space>
+  );
+};
+```
+
+Both halves share the things that must match - size, colour, disabled - and
+differ only in what they do. Letting them drift apart is how a split button
+stops reading as one control.
+
+## Tooltips and popovers
+
+Either half can carry a tooltip. The second half almost always needs one, since
+it is an arrow with no words.
+
+```tsx interactive
+import React from 'react';
+import { Button, Dropdown, Space, Tooltip } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
+export default () => {
+  const mainLabel = 'Run the query as written';
+  const moreLabel = 'More run options';
+
+  return (
+    <Space.Compact>
+      <Tooltip title={mainLabel}>
+        <Button type="primary">Run</Button>
+      </Tooltip>
+
+      <Dropdown
+        trigger={['click']}
+        menu={{
+          items: [
+            { key: 'profile', label: 'Run and profile' },
+            { key: 'explain', label: 'Explain' },
+            { type: 'divider' },
+            { key: 'cancel', label: 'Cancel running queries', danger: true },
+          ],
+        }}
+      >
+        <Tooltip title={moreLabel}>
+          <Button type="primary" aria-label={moreLabel}>
+            <DownOutlined />
+          </Button>
+        </Tooltip>
+      </Dropdown>
+    </Space.Compact>
+  );
+};
+```
+
+## Usage
+
+:::note[Accessibility]
+
+The second half has no text, so it needs an `aria-label`. "More options" is not
+enough on a page with several split buttons - say which options: "More save
+options".
+
+:::
+
+### Single primary and secondary action
+
+Where there is exactly one alternative, skip the menu: give the second button
+its own handler and its own label. A menu with one item is a click the reader
+did not need.
+
+### Multiple secondary actions
+
+Where there are several, the second button opens a menu. Keep it short - a
+split button whose menu has grown to a dozen entries has become a toolbar with
+a favourite, and the favourite is doing less work than the arrow.

@@ -1,0 +1,333 @@
+---
+title: Steps
+description: Ant Design Steps
+antd_components: [Steps]
+---
+
+# Steps
+
+Steps present a procedure as a numbered outline. Use them where the order
+actually matters - where doing the third thing before the second will not work.
+
+Where the order does not matter, numbering it implies a constraint that is not
+there, and the reader will follow it anyway.
+
+## Component
+
+### Default
+
+Each step needs a title and something under it. The numbers are worked out from
+the list, so inserting one in the middle does not mean renumbering the rest.
+
+```tsx interactive
+import React from 'react';
+import { Space, Steps, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={24} style={{ display: 'flex', maxInlineSize: 520 }}>
+    <Steps
+      orientation="vertical"
+      current={-1}
+      items={[
+        {
+          title: 'Inspect me',
+          content: (
+            <Typography.Text type="secondary">
+              Increase logging levels by adding the following to your configuration file.
+            </Typography.Text>
+          ),
+        },
+        {
+          title: 'Go to my computer',
+          content: (
+            <Typography.Text type="secondary">
+              Open a terminal and change to the directory the file lives in.
+            </Typography.Text>
+          ),
+        },
+        {
+          title: 'Restart the service',
+          content: (
+            <Typography.Text type="secondary">
+              The new settings are read on start, not while running.
+            </Typography.Text>
+          ),
+        },
+      ]}
+    />
+
+    <Steps
+      orientation="vertical"
+      current={-1}
+      initial={3}
+      items={[
+        {
+          title: 'A list that starts at four',
+          content: (
+            <Typography.Text type="secondary">
+              Useful where the procedure is split across pages.
+            </Typography.Text>
+          ),
+        },
+        {
+          title: 'And continues from there',
+          content: (
+            <Typography.Text type="secondary">
+              The numbering is a property of the list, not of each step.
+            </Typography.Text>
+          ),
+        },
+      ]}
+    />
+  </Space>
+);
+```
+
+### Horizontal Steps
+
+Horizontal steps are for a procedure split across pages - a setup wizard, a
+multi-page form. Each step is a page, and the status says where the reader has
+got to.
+
+Unlike the vertical form, nothing is filled in by default: the filled marker is
+reserved for the current step, so that "where am I" is answerable at a glance.
+
+```tsx interactive
+import React from 'react';
+import { Segmented, Space, Steps } from 'antd';
+
+export default () => {
+  const [compressed, setCompressed] = React.useState('medium');
+  const [current, setCurrent] = React.useState(1);
+
+  return (
+    <Space orientation="vertical" size={24} style={{ display: 'flex' }}>
+      <Segmented
+        value={compressed}
+        onChange={setCompressed}
+        aria-label="Size"
+        options={[
+          { value: 'medium', label: 'Default' },
+          { value: 'small', label: 'Small' },
+        ]}
+      />
+
+      <Steps
+        size={compressed}
+        current={current}
+        onChange={setCurrent}
+        items={[
+          { title: 'Create index pattern' },
+          { title: 'Configure settings' },
+          { title: 'Review' },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+## Usage
+
+### Complex steps
+
+Where a step contains a sequence of its own, that sequence needs to be visibly
+subordinate - an indented, differently marked block - or the reader loses track
+of which level they are on.
+
+Code inside a step is the common case, and it does not need the substep
+treatment: a code block is already visibly a block.
+
+```tsx interactive
+import React from 'react';
+import { Steps, Typography } from 'antd';
+
+const block = (content) => (
+  <pre
+    style={{
+      margin: '8px 0 0',
+      padding: 12,
+      background: 'var(--ant-color-bg-layout)',
+      border: '1px solid var(--ant-color-border)',
+      borderRadius: 4,
+      fontFamily: 'var(--ant-font-family-code)',
+      fontSize: 13,
+      overflowX: 'auto',
+    }}
+  >
+    <code>{content}</code>
+  </pre>
+);
+
+export default () => (
+  <Steps
+    orientation="vertical"
+    current={-1}
+    style={{ maxInlineSize: 520 }}
+    items={[
+      {
+        title: 'Add the setting',
+          content: (
+          <>
+            <Typography.Text type="secondary">
+              Put the following into your configuration file.
+            </Typography.Text>
+            {block('logging.level: debug')}
+          </>
+        ),
+      },
+      {
+        title: 'Then, in order',
+          content: (
+          <div style={{ borderInlineStart: '2px solid var(--ant-color-border)', paddingInlineStart: 16 }}>
+            <Typography.Text type="secondary">
+              These have to happen in this order:
+            </Typography.Text>
+            <ol style={{ marginBlock: 8, paddingInlineStart: 20 }}>
+              <li>Stop the service.</li>
+              <li>Move the old log file aside.</li>
+              <li>Start the service again.</li>
+            </ol>
+          </div>
+        ),
+      },
+    ]}
+  />
+);
+```
+
+### Heading elements
+
+Step titles are headings, and should be marked up as such. Choose the level
+from where the list sits in the page - usually `h2` or `h3` - so that the
+document outline a screen reader builds matches the one on screen.
+
+The level changes the semantics, not the appearance. A step title looks like a
+step title whatever element carries it.
+
+```tsx interactive
+import React from 'react';
+import { Steps, Typography } from 'antd';
+
+export default () => (
+  <>
+    <Typography.Title level={2} style={{ marginBlockStart: 0 }}>
+      Set up your deployment
+    </Typography.Title>
+
+    <Steps
+      orientation="vertical"
+      current={-1}
+      style={{ maxInlineSize: 520 }}
+      items={[
+        {
+          title: <h3 style={{ margin: 0, font: 'inherit' }}>Create a deployment</h3>,
+          content: (
+            <Typography.Text type="secondary">
+              The step titles here are h3 elements under the h2 above.
+            </Typography.Text>
+          ),
+        },
+        {
+          title: <h3 style={{ margin: 0, font: 'inherit' }}>Add your data</h3>,
+          content: (
+            <Typography.Text type="secondary">
+              Which is what a screen reader will report as the outline.
+            </Typography.Text>
+          ),
+        },
+      ]}
+    />
+  </>
+);
+```
+
+### Conveying status
+
+A step can say where it stands: waiting, done, running, failed. The marker
+changes with it, so the state is visible without reading the text.
+
+Colour is not enough on its own. A failed step and a finished one differ by
+more than red and green - the marker shape differs too, and the text should say
+so as well.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Steps } from 'antd';
+
+const states = ['wait', 'process', 'finish', 'error'];
+
+export default () => {
+  const [state, setState] = React.useState('process');
+
+  return (
+    <Space orientation="vertical" size={24} style={{ display: 'flex', maxInlineSize: 520 }}>
+      <Space size={8} wrap>
+        {states.map((z) => (
+          <Button
+            key={z}
+            size="small"
+            type={z === state ? 'primary' : 'default'}
+            onClick={() => setState(z)}
+          >
+            {z}
+          </Button>
+        ))}
+      </Space>
+
+      <Steps
+        orientation="vertical"
+        current={2}
+        status={state}
+        items={[
+          { title: 'Create the index', content: 'Done.' },
+          { title: 'Load the data', content: 'Done.' },
+          { title: 'Verify the mapping', content: 'The step whose status changes above.' },
+          { title: 'Publish', content: 'Not started.' },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+### Custom title sizes
+
+The title size can be set for the whole list or for one step, and the smaller
+sizes shrink the markers with them.
+
+Use a smaller size where the steps are a supporting detail rather than the main
+content of the page - inside a panel, a flyout, a card.
+
+```tsx interactive
+import React from 'react';
+import { Segmented, Space, Steps } from 'antd';
+
+export default () => {
+  const [size, setSize] = React.useState('medium');
+
+  return (
+    <Space orientation="vertical" size={24} style={{ display: 'flex', maxInlineSize: 520 }}>
+      <Segmented
+        value={size}
+        onChange={setSize}
+        aria-label="Title size"
+        options={[
+          { value: 'medium', label: 'Default' },
+          { value: 'small', label: 'Small' },
+        ]}
+      />
+
+      <Steps
+        orientation="vertical"
+        size={size}
+        current={-1}
+        items={[
+          { title: 'Create the index', content: 'The marker shrinks with the title.' },
+          { title: 'Load the data', content: 'And the spacing follows both.' },
+        ]}
+      />
+    </Space>
+  );
+};
+```

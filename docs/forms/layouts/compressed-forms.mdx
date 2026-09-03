@@ -1,0 +1,402 @@
+---
+title: Compressed forms
+description: Ant Design forms at size="small"
+antd_components: [Form]
+sidebar_position: 3
+---
+
+# Compressed forms
+
+Also known as **editor-style controls**. They exist for the case where space is
+scarce - a sidebar of settings next to the thing being edited, a panel inside a
+popover. They are not for a page whose purpose is the form.
+
+The difference is not only size. A compressed control says "this is a knob on
+something else"; a full-size one says "this is the work". Using the small one
+for the main form makes the main task look incidental.
+
+:::danger
+
+Do not mix compressed and full-size controls in the same form. The two sizes
+read as two levels of importance, and a form has only one.
+
+:::
+
+In Ant Design the whole form is set at once - `size="small"` on the `Form` - so
+there is nothing to pass to each control and nothing to forget.
+
+```tsx interactive
+import React from 'react';
+import { Button, Card, Checkbox, Form, Input, Select, Slider, Switch, Upload } from 'antd';
+
+export default () => (
+  <Card size="small" style={{ maxInlineSize: 400 }}>
+    <Form layout="vertical" size="small">
+      <Form.Item label="Text field" extra="I am some friendly help text.">
+        <Input />
+      </Form.Item>
+
+      <Form.Item label="Select">
+        <Select
+          options={[
+            { value: 'one', label: 'Option one' },
+            { value: 'two', label: 'Option two' },
+            { value: 'drei', label: 'Option three' },
+          ]}
+        />
+      </Form.Item>
+
+      <Form.Item label="File picker">
+        <Upload beforeUpload={() => false}>
+          <Button size="small">Select a file</Button>
+        </Upload>
+      </Form.Item>
+
+      <Form.Item label="Combobox">
+        <Select
+          mode="multiple"
+          options={[
+            { value: 'one', label: 'Option one' },
+            { value: 'two', label: 'Option two' },
+          ]}
+        />
+      </Form.Item>
+
+      <Form.Item label="Range">
+        <Slider min={0} max={100} defaultValue={42} />
+      </Form.Item>
+
+      <Form.Item label="Switch">
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" />
+          Setting name
+        </label>
+      </Form.Item>
+
+      <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
+        <legend style={{ fontSize: 12, marginBottom: 8 }}>Checkbox group</legend>
+        <Checkbox.Group
+          options={[
+            { value: 'one', label: 'Option one' },
+            { value: 'two', label: 'Option two' },
+          ]}
+        />
+      </fieldset>
+    </Form>
+  </Card>
+);
+```
+
+## Column layout
+
+In two columns the label sits beside its control rather than above it. That
+halves the height of the form, which is the whole point where the form is a
+panel of settings.
+
+It costs something: the labels have to be short, or the columns fight. A label
+long enough to wrap in the left column is a sign the row wants a full-size
+layout instead.
+
+```tsx interactive
+import React from 'react';
+import { Button, Card, Form, Input, Select, Slider, Switch, Upload } from 'antd';
+
+export default () => (
+  <Card size="small" style={{ maxInlineSize: 400 }}>
+    <Form
+      layout="horizontal"
+      size="small"
+      labelCol={{ flex: '120px' }}
+      wrapperCol={{ flex: 1 }}
+      labelAlign="left"
+    >
+      <Form.Item label="Text field" extra="I am some friendly help text.">
+        <Input />
+      </Form.Item>
+
+      <Form.Item label="Select">
+        <Select
+          options={[
+            { value: 'one', label: 'Option one' },
+            { value: 'two', label: 'Option two' },
+          ]}
+        />
+      </Form.Item>
+
+      <Form.Item label="File picker">
+        <Upload beforeUpload={() => false}>
+          <Button size="small">Select a file</Button>
+        </Upload>
+      </Form.Item>
+
+      <Form.Item label="Comboboxwithalonglabelname">
+        <Select
+          mode="multiple"
+          options={[
+            { value: 'one', label: 'Option one' },
+            { value: 'two', label: 'Option two' },
+          ]}
+        />
+      </Form.Item>
+
+      <Form.Item label="Range">
+        <Slider min={0} max={100} defaultValue={42} />
+      </Form.Item>
+
+      <Form.Item label="Switch" style={{ marginBottom: 0 }}>
+        <Switch size="small" />
+      </Form.Item>
+    </Form>
+  </Card>
+);
+```
+
+## Contextual help
+
+In a two-column form, help text is expensive: every line of it undoes some of
+the height the layout just saved.
+
+So keep help text for what belongs to validation - short, and about what the
+reader typed. Where the text explains what the control *is*, put it on the
+label instead, behind a question mark the reader can hover.
+
+```tsx interactive
+import React from 'react';
+import { Card, Form, Input, Select, Tooltip } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+
+export default () => (
+  <Card size="small" style={{ maxInlineSize: 400 }}>
+    <Form
+      layout="horizontal"
+      size="small"
+      labelCol={{ flex: '120px' }}
+      wrapperCol={{ flex: 1 }}
+      labelAlign="left"
+    >
+      <Form.Item label="Text field" extra="Show validation help text only.">
+        <Input />
+      </Form.Item>
+
+      <Form.Item
+        style={{ marginBottom: 0 }}
+        label={
+          <Tooltip title="Otherwise use a tooltip on the label to explain what the control does.">
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              Label
+              <QuestionCircleOutlined />
+            </span>
+          </Tooltip>
+        }
+      >
+        <Select
+          options={[
+            { value: 'one', label: 'Option one' },
+            { value: 'two', label: 'Option two' },
+          ]}
+        />
+      </Form.Item>
+    </Form>
+  </Card>
+);
+```
+
+## In a popover
+
+A popover is space at a premium by definition, so the form inside one is always
+the compressed kind.
+
+```tsx interactive
+import React from 'react';
+import { Button, Form, Input, Popover, Radio, Select } from 'antd';
+
+export default () => (
+  <Popover
+    trigger="click"
+    placement="bottomLeft"
+    content={
+      <Form
+        layout="horizontal"
+        size="small"
+        labelCol={{ flex: '100px' }}
+        wrapperCol={{ flex: 1 }}
+        labelAlign="left"
+        style={{ inlineSize: 280 }}
+      >
+        <Form.Item label="Button group">
+          <Radio.Group
+            size="small"
+            optionType="button"
+            defaultValue="m"
+            aria-label="Granularity of zoom levels"
+            options={[
+              { value: 's', label: 'Small' },
+              { value: 'm', label: 'Medium' },
+              { value: 'l', label: 'Large' },
+            ]}
+          />
+        </Form.Item>
+
+        <Form.Item label="Text field">
+          <Input />
+        </Form.Item>
+
+        <Form.Item label="Select" style={{ marginBottom: 0 }}>
+          <Select
+            options={[
+              { value: 'one', label: 'Option one' },
+              { value: 'two', label: 'Option two' },
+            ]}
+          />
+        </Form.Item>
+      </Form>
+    }
+  >
+    <Button color="primary" variant="filled">
+      Open form in popover
+    </Button>
+  </Popover>
+);
+```
+
+## Complex example
+
+A panel of settings of the kind the compressed layout was made for: labels,
+prepends and appends, colour swatches and small groups, all in two columns.
+
+:::note[Accessibility recommendation]
+
+Watch the labels. Every control that is not inside a row of its own needs an
+`aria-label`, and a row that holds two controls needs a name for each - the
+row's label can only name one of them.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+import {
+  Card,
+  ColorPicker,
+  Form,
+  Input,
+  InputNumber,
+  Radio,
+  Select,
+  Slider,
+  Space,
+  Switch,
+} from 'antd';
+
+export default () => (
+  <Card size="small" style={{ maxInlineSize: 420 }}>
+    <Form
+      layout="horizontal"
+      size="small"
+      labelCol={{ flex: '110px' }}
+      wrapperCol={{ flex: 1 }}
+      labelAlign="left"
+    >
+      <Form.Item label="Name">
+        <Input defaultValue="My layer" />
+      </Form.Item>
+
+      <Form.Item label="Visibility">
+        <Slider
+          range
+          defaultValue={[0, 14]}
+          min={0}
+          max={20}
+          aria-label="Visible zoom levels"
+        />
+      </Form.Item>
+
+      <Form.Item label="Opacity">
+        <Slider defaultValue={80} min={0} max={100} aria-label="Opacity" />
+      </Form.Item>
+
+      <Form.Item
+        label={
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            Blend
+            <QuestionCircleOutlined />
+          </span>
+        }
+      >
+        <Select
+          aria-label="Blend mode"
+          defaultValue="normal"
+          options={[
+            { value: 'normal', label: 'Normal' },
+            { value: 'multiply', label: 'Multiply' },
+          ]}
+        />
+      </Form.Item>
+
+      <Form.Item label="Granularity">
+        <Radio.Group
+          size="small"
+          optionType="button"
+          defaultValue="m"
+          aria-label="Granularity of zoom levels"
+          options={[
+            { value: 's', label: 'Fine' },
+            { value: 'm', label: 'Medium' },
+            { value: 'l', label: 'Coarse' },
+          ]}
+        />
+      </Form.Item>
+
+      <Form.Item label="Fill">
+        <ColorPicker defaultValue="#0B64DD" aria-label="Fill color" />
+      </Form.Item>
+
+      <Form.Item label="Select one">
+        <Select
+          aria-label="Symbol"
+          defaultValue="kreis"
+          options={[
+            { value: 'kreis', label: 'Circle' },
+            { value: 'quadrat', label: 'Square' },
+          ]}
+        />
+      </Form.Item>
+
+      <Form.Item label="With button">
+        <Space size={8} align="center">
+          <Switch size="small" defaultChecked aria-label="Dynamic toggle" />
+          <span>sample_ecommerce_data</span>
+        </Space>
+      </Form.Item>
+
+      <Form.Item label="Container">
+        <Space.Compact style={{ inlineSize: '100%' }}>
+          <ColorPicker defaultValue="#F1F4FA" aria-label="Container color" title="Container color" />
+          <InputNumber
+            defaultValue={8}
+            min={0}
+            aria-label="Container padding in pixels"
+            suffix="px"
+            style={{ inlineSize: '100%' }}
+          />
+        </Space.Compact>
+      </Form.Item>
+
+      <Form.Item label="Border" style={{ marginBottom: 0 }}>
+        <Space.Compact style={{ inlineSize: '100%' }}>
+          <Select
+            aria-label="Border style"
+            defaultValue="solid"
+            options={[
+              { value: 'solid', label: 'Solid' },
+              { value: 'dashed', label: 'Dashed' },
+            ]}
+            style={{ inlineSize: '100%' }}
+          />
+          <ColorPicker defaultValue="#CAD3E2" aria-label="Border color" title="Border color" />
+        </Space.Compact>
+      </Form.Item>
+    </Form>
+  </Card>
+);
+```

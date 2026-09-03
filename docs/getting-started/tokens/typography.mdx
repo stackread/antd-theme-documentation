@@ -1,0 +1,76 @@
+---
+title: Typography
+description: Six headings, one body size, five weights
+sidebar_position: 3
+---
+
+# Typography
+
+## The heading scale
+
+Six steps. All six are weight 600 - the scale changes size, never weight.
+
+| | size | line height |
+|---|---|---|
+| XXXS | 12px | 1.1429rem |
+| XXS | 14px | 1.4286rem |
+| XS | 16px | 1.7143rem |
+| S | 20px | 1.7143rem |
+| M | 24px | 2rem |
+| L | 30px | 2.5714rem |
+
+Two of the steps share a line height (16px and 20px, both 1.7143rem). That is
+measured, and it is deliberate: a heading that grows by four points inside the
+same line box does not move the paragraph after it.
+
+```tsx interactive
+import React from 'react';
+import { Flex, Typography } from 'antd';
+
+const steps = [
+  ['XXXS', 12, '1.1429rem'],
+  ['XXS', 14, '1.4286rem'],
+  ['XS', 16, '1.7143rem'],
+  ['S', 20, '1.7143rem'],
+  ['M', 24, '2rem'],
+  ['L', 30, '2.5714rem'],
+];
+
+export default () => (
+  <Flex vertical gap={16}>
+    {steps.map(([name, size, lineHeight]) => (
+      <Flex key={name} align="baseline" gap={16}>
+        <Typography.Text type="secondary" style={{ inlineSize: 56, fontSize: 12 }}>
+          {name}
+        </Typography.Text>
+        <span style={{ fontSize: size, lineHeight, fontWeight: 600, color: 'var(--ant-color-text-heading)' }}>
+          The quick brown fox
+        </span>
+        <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+          {size}px / {lineHeight}
+        </Typography.Text>
+      </Flex>
+    ))}
+  </Flex>
+);
+```
+
+## Body text
+
+14px is the interface size; the documentation reads at 16px, because a page of
+prose and a dense table want different things. That difference is set once, on
+the shell, and is itself recorded as a deviation.
+
+## Weights
+
+Five: 300, 400, 500, 600, 700. Headings take 600, body takes 400, and 500 is
+the emphasis inside a sentence. 300 and 700 exist in the package and are
+unused - noted rather than dropped, because the extraction copies what is
+there.
+
+## The families
+
+Two are in use - an interface sans and a monospace for code. A serif family is
+extracted and unused; it is the most likely display face when this theme
+diverges into its own design, which is why it stays in the vocabulary rather
+than being trimmed out.

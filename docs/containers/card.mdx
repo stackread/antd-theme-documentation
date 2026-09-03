@@ -1,0 +1,539 @@
+---
+title: Card
+description: Ant Design Card
+antd_components: [Card]
+---
+
+# Card
+
+A card is content-oriented: it carries a title, a description and usually an
+icon, and the whole of it can be made clickable.
+
+In Ant Design this is `Card`. It is built from the same surface as the panel, so
+the guidance about not nesting panels applies here too.
+
+## Component
+
+At its core a card holds a `title`, a description and an icon. Giving it an
+`onClick` or wrapping it in a link makes the whole card clickable.
+
+```tsx interactive
+import React from 'react';
+import { Card, Space, Typography } from 'antd';
+import { MinusOutlined } from '@ant-design/icons';
+
+const components = ['Metrics', 'Cloud', 'Dashboards'];
+
+export default () => (
+  <Space size={24} align="start" style={{ display: 'flex' }}>
+    {components.map((name) => {
+      const isDisabled = name === 'Dashboards';
+      return (
+        <Card
+          key={name}
+          hoverable={!isDisabled}
+          style={{ flex: 1, textAlign: 'center', opacity: isDisabled ? 0.5 : 1 }}
+          onClick={isDisabled ? undefined : () => {}}
+        >
+          <div style={{ fontSize: 32, lineHeight: '40px' }} aria-hidden>
+            <MinusOutlined />
+          </div>
+          <Typography.Title level={4} style={{ marginTop: 12 }}>
+            {name}
+          </Typography.Title>
+          <Typography.Text type="secondary">
+            Example of a card's description. Stick to one or two sentences.
+          </Typography.Text>
+        </Card>
+      );
+    })}
+  </Space>
+);
+```
+
+:::note[Omitted: the icon set]
+
+**Affects:** 0 specimens - icons, not cards.
+
+Product logos are artwork, not a design decision, so none are reproduced here.
+A neutral placeholder stands in their place; the card itself is unchanged.
+
+:::
+
+## Usage
+
+### Images
+
+An image can stand in place of an icon, or beside it. It expands to the edges of
+the card - in Ant Design through `cover`.
+
+```tsx interactive
+import React from 'react';
+import { Button, Card, Space, Typography } from 'antd';
+
+export default () => (
+  <Space size={24} align="start" style={{ display: 'flex' }}>
+    <Card
+      style={{ flex: 1 }}
+      cover={<img src="https://picsum.photos/id/13/400/200" alt="Nature" />}
+      actions={[<Button key="go" type="primary">Go for it</Button>]}
+    >
+      <Card.Meta
+        title="Nature"
+        description="Example of a card's description. Stick to one or two sentences."
+      />
+    </Card>
+
+    <Card
+      style={{ flex: 1, opacity: 0.5 }}
+      cover={<img src="https://picsum.photos/400/200" alt="" />}
+    >
+      <Card.Meta
+        title="Water"
+        description="Example of a card's description. Stick to one or two sentences."
+      />
+    </Card>
+
+    <Card
+      hoverable
+      style={{ flex: 1 }}
+      cover={<img src="https://picsum.photos/id/57/400/200" alt="City" />}
+      onClick={() => {}}
+    >
+      <Card.Meta
+        title="Beats in the City"
+        description="This card has an href and should be a link."
+      />
+    </Card>
+  </Space>
+);
+```
+
+### Footer
+
+A footer can hold any number of elements and always sits at the bottom of the
+card, so that a row of cards keeps its footers aligned however long the
+descriptions are.
+
+A footer button needs a label that refers back to the card's title - on its own,
+"Go for it" says nothing about where it goes.
+
+```tsx interactive
+import React from 'react';
+import { Button, Card, Space, Typography } from 'antd';
+
+const footer = (title) => (
+  <div style={{ marginTop: 'auto', paddingTop: 16 }}>
+    <Button type="primary" aria-label={`Go to ${title}`}>
+      Go for it
+    </Button>
+    <Typography.Paragraph style={{ marginTop: 8, marginBottom: 0 }}>
+      Or try <Typography.Link href="http://google.com">this</Typography.Link>
+    </Typography.Paragraph>
+  </div>
+);
+
+const column = {
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+};
+
+export default () => (
+  <Space size={24} align="stretch" style={{ display: 'flex' }}>
+    <Card style={column} styles={{ body: column }}>
+      <Typography.Title level={4}>Developers Tools</Typography.Title>
+      <Typography.Text type="secondary">
+        Example of a short card description.
+      </Typography.Text>
+      {footer('Developers Tools')}
+    </Card>
+
+    <Card style={column} styles={{ body: column }}>
+      <Typography.Title level={4}>Dashboards</Typography.Title>
+      <Typography.Text type="secondary">
+        Example of a longer card description. See how the footers stay lined up.
+      </Typography.Text>
+      {footer('Dashboards')}
+    </Card>
+
+    <Card style={column} styles={{ body: column }}>
+      <Typography.Title level={4}>Save Objects</Typography.Title>
+      <Typography.Text type="secondary">
+        Example of a short card description.
+      </Typography.Text>
+      {footer('Save Objects')}
+    </Card>
+  </Space>
+);
+```
+
+### Beta badge
+
+A card that points at something not yet generally available carries a badge in
+its top edge. The badge can take a colour of its own, and it stays clickable
+even when the card itself is disabled.
+
+```tsx interactive
+import React from 'react';
+import { Card, Tag, Tooltip, Typography } from 'antd';
+
+const badgeFor = (text, color, hint) => (
+  <Tooltip title={hint}>
+    <Tag color={color} style={{ marginInlineEnd: 0 }}>
+      {text}
+    </Tag>
+  </Tooltip>
+);
+
+export default () => (
+  <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+    <Card
+      hoverable
+      style={{ flex: 1 }}
+      extra={badgeFor('Beta', undefined, 'This module is not GA. Please help us by reporting any bugs.')}
+      onClick={() => {}}
+    >
+      <Typography.Title level={4}>Dashboards</Typography.Title>
+      <Typography.Text type="secondary">
+        Example of a card's description. Stick to one or two sentences.
+      </Typography.Text>
+    </Card>
+
+    <Card
+      hoverable
+      style={{ flex: 1 }}
+      extra={badgeFor('Accent', 'magenta', 'You can change the badge colour.')}
+      onClick={() => {}}
+    >
+      <Typography.Title level={4}>Monitoring</Typography.Title>
+      <Typography.Text type="secondary">
+        Example of a card's description. Stick to one or two sentences.
+      </Typography.Text>
+    </Card>
+
+    <Card
+      style={{ flex: 1, opacity: 0.5 }}
+      extra={badgeFor('Basic', undefined, 'Disabled cards with still clickable badges will stay hollow.')}
+    >
+      <Typography.Title level={4}>Lens</Typography.Title>
+      <Typography.Text type="secondary">
+        Disabled cards can have active links using a badge.
+      </Typography.Text>
+    </Card>
+  </div>
+);
+```
+
+### Selectable
+
+When a list of cards can be selected but leads nowhere, the card carries a
+selection control instead of a link. A selected card changes its own styling as
+well as the control's.
+
+An extra link inside such a card must stop the event, or clicking it would also
+select the card.
+
+```tsx interactive
+import React from 'react';
+import { Button, Card, Typography } from 'antd';
+
+export default () => {
+  const [one, setOne] = React.useState(true);
+  const [two, setTwo] = React.useState(false);
+
+  const details = (e) => e.stopPropagation();
+  const selected = (on) => ({
+    flex: 1,
+    borderColor: on ? 'var(--ant-color-primary)' : undefined,
+  });
+
+  return (
+    <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+      <Card
+        hoverable
+        style={selected(one)}
+        onClick={() => setOne(!one)}
+        actions={[
+          <Button key="d" type="text" size="small" onClick={details}>
+            More details
+          </Button>,
+          <Button key="s" size="small" type={one ? 'primary' : 'default'}>
+            {one ? 'Selected' : 'Select'}
+          </Button>,
+        ]}
+      >
+        <Typography.Title level={4}>Sketch</Typography.Title>
+        <Typography.Text type="secondary">
+          Example of a short card description.
+        </Typography.Text>
+      </Card>
+
+      <Card
+        hoverable
+        style={selected(two)}
+        onClick={() => setTwo(!two)}
+        actions={[
+          <Button key="d" type="text" size="small" onClick={details}>
+            More details
+          </Button>,
+          <Button key="s" size="small" type={two ? 'primary' : 'default'}>
+            {two ? 'Selected' : 'Select'}
+          </Button>,
+        ]}
+      >
+        <Typography.Title level={4}>Google</Typography.Title>
+        <Typography.Text type="secondary">
+          Example of a longer card description. See how the footers stay lined up.
+        </Typography.Text>
+      </Card>
+
+      <Card
+        style={{ flex: 1, opacity: 0.5 }}
+        actions={[
+          <Button key="d" type="text" size="small" disabled>
+            More details
+          </Button>,
+          <Button key="s" size="small" disabled>
+            Select
+          </Button>,
+        ]}
+      >
+        <Typography.Title level={4}>Not Adobe</Typography.Title>
+        <Typography.Text type="secondary">
+          Example of a short card description.
+        </Typography.Text>
+      </Card>
+    </div>
+  );
+};
+```
+
+### Checkable
+
+A checkable card wraps a radio or a checkbox in a more prominent surface, so
+that the whole card is the control. Children can be shown inside it.
+
+Ant Design has no checkable card; it is built here from a `Card` with the
+control as its title.
+
+```tsx interactive
+import React from 'react';
+import { Card, Checkbox } from 'antd';
+
+export default () => {
+  const [selected, setSelected] = React.useState(false);
+
+  return (
+    <Card size="small" style={{ maxInlineSize: 400 }}>
+      <Checkbox checked={selected} onChange={(e) => setSelected(e.target.checked)}>
+        I am a checkbox
+      </Checkbox>
+    </Card>
+  );
+};
+```
+
+Used as a radio group, the set needs a `fieldset` with a `legend` - otherwise a
+screen reader announces three unrelated controls instead of one choice.
+
+```tsx interactive
+import React from 'react';
+import { Card, Radio, Space, Typography } from 'antd';
+
+export default () => {
+  const [choice, setChoice] = React.useState('radio2');
+  const [inner, setInner] = React.useState('nested1');
+
+  const edge = (value) => ({
+    borderColor: choice === value ? 'var(--ant-color-primary)' : undefined,
+  });
+
+  return (
+    <fieldset style={{ border: 0, margin: 0, padding: 0, maxInlineSize: 400 }}>
+      <legend>
+        <Typography.Text strong>
+          Checkable card radio group with legend
+        </Typography.Text>
+      </legend>
+
+      <Space orientation="vertical" size={12} style={{ display: 'flex', marginTop: 12 }}>
+        <Card size="small" style={edge('radio1')}>
+          <Radio
+            value="radio1"
+            checked={choice === 'radio1'}
+            onChange={() => setChoice('radio1')}
+          >
+            Option one
+          </Radio>
+        </Card>
+
+        <Card size="small" style={edge('radio2')}>
+          <Radio
+            value="radio2"
+            checked={choice === 'radio2'}
+            onChange={() => setChoice('radio2')}
+          >
+            Option two
+          </Radio>
+          <Radio.Group
+            style={{ marginTop: 12, marginInlineStart: 24 }}
+            value={inner}
+            disabled={choice !== 'radio2'}
+            onChange={(e) => setInner(e.target.value)}
+            options={[
+              { value: 'nested1', label: 'Nested option one' },
+              { value: 'nested2', label: 'Nested option two' },
+              { value: 'nested3', label: 'Nested option three' },
+            ]}
+          />
+        </Card>
+
+        <Card size="small" style={{ opacity: 0.5 }}>
+          <Radio value="radio3" checked={choice === 'radio3'} disabled>
+            Option three (disabled)
+          </Radio>
+        </Card>
+      </Space>
+    </fieldset>
+  );
+};
+```
+
+### Custom children
+
+When a paragraph is not enough for the description, anything can be placed
+inside the card as children - a list, form controls, a block of code.
+
+```tsx interactive
+import React from 'react';
+import { Button, Card, Radio, Typography } from 'antd';
+
+export default () => (
+  <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+    <Card style={{ flex: 1 }}>
+      <Typography.Title level={4}>Lists</Typography.Title>
+      <Typography.Text type="secondary">
+        Wrap a list in smaller text to match the description.
+      </Typography.Text>
+      <Typography style={{ marginTop: 12 }}>
+        <ul>
+          <li>Bullet 1</li>
+          <li>Bullet 2</li>
+          <li>Bullet 3</li>
+        </ul>
+      </Typography>
+    </Card>
+
+    <Card
+      style={{ flex: 1 }}
+      actions={[
+        <Button key="send" type="primary" size="small">
+          Send
+        </Button>,
+      ]}
+    >
+      <Typography.Title level={4}>Form controls</Typography.Title>
+      <Radio.Group
+        style={{ marginTop: 12 }}
+        defaultValue="one"
+        options={[
+          { value: 'one', label: 'Option one' },
+          { value: 'two', label: 'Option two' },
+          { value: 'drei', label: 'Option three', disabled: true },
+        ]}
+      />
+    </Card>
+
+    <Card style={{ flex: 1 }}>
+      <Typography.Title level={4}>Just about anything</Typography.Title>
+      <Typography.Text type="secondary">
+        Just be sure not to add an <Typography.Text code>onClick</Typography.Text>{' '}
+        handler to the card if the children are also interactive.
+      </Typography.Text>
+      <pre style={{ marginTop: 12, marginBottom: 0 }}>
+        <code>{'<yoda>Hello, young Skywalker</yoda>'}</code>
+      </pre>
+    </Card>
+  </div>
+);
+```
+
+### Plain and other colors
+
+A card without border or shadow avoids a nested-panel look. Adding an
+interaction gives it back its hover styling. For cards that are not interactive,
+the padding can be reduced or removed to suit the layout.
+
+```tsx interactive
+import React from 'react';
+import { Card, Tag, Tooltip, Typography } from 'antd';
+import { MinusOutlined } from '@ant-design/icons';
+
+const dot = (
+  <span style={{ fontSize: 24, lineHeight: '32px' }} aria-hidden>
+    <MinusOutlined />
+  </span>
+);
+
+export default () => (
+  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+    <Card variant="borderless" hoverable onClick={() => {}}>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        {dot}
+        <div>
+          <Typography.Title level={5} style={{ marginBottom: 0 }}>Plain</Typography.Title>
+          <Typography.Text type="secondary">
+            This one still has a solid background color.
+          </Typography.Text>
+        </div>
+      </div>
+    </Card>
+
+    <Card
+      data-variante="surface"
+      variant="borderless"
+      hoverable
+      onClick={() => {}}
+      style={{ background: 'var(--ant-color-bg-layout)', textAlign: 'center' }}
+    >
+      {dot}
+      <Typography.Title level={5} style={{ marginTop: 8 }}>Subdued</Typography.Title>
+      <Typography.Text type="secondary">
+        This one has a subdued background color.
+      </Typography.Text>
+    </Card>
+
+    <Card
+      data-variante="surface"
+      variant="borderless"
+      hoverable
+      onClick={() => {}}
+      style={{ background: 'transparent' }}
+      extra={
+        <Tooltip title="This module is not GA. Please help us by reporting any bugs.">
+          <Tag style={{ marginInlineEnd: 0 }}>Beta</Tag>
+        </Tooltip>
+      }
+    >
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        {dot}
+        <div>
+          <Typography.Title level={5} style={{ marginBottom: 0 }}>Transparent</Typography.Title>
+          <Typography.Text type="secondary">
+            This one doesn't have a background color anymore.
+          </Typography.Text>
+        </div>
+      </div>
+    </Card>
+
+    <Card hoverable onClick={() => {}} style={{ textAlign: 'center' }}>
+      {dot}
+      <Typography.Title level={5} style={{ marginTop: 8 }}>Bordered</Typography.Title>
+      <Typography.Text type="secondary">
+        This one has a plain background color and border.
+      </Typography.Text>
+    </Card>
+  </div>
+);
+```

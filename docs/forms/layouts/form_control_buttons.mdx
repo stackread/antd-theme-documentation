@@ -1,0 +1,126 @@
+---
+title: Form control buttons
+description: A button that looks like a form control
+antd_components: [Button]
+sidebar_position: 8
+---
+
+# Form control buttons
+
+Sometimes a row needs a button that does not look like a button. A field that
+opens a picker, a filter that opens a list - the reader should read it as
+something to fill in, not as something to press.
+
+Ant Design has no such component. A `Button` block-aligned to the left, sitting
+in the same frame as its neighbours, is what produces it - so the styling is
+written where it is used rather than borrowed from a wrapper.
+
+## A button that looks like a control
+
+A button that looks like an input carries the same two pieces an input does: a
+value when there is one, and a placeholder when there is not. The placeholder
+has to read as an invitation - "Select a date", not "Empty".
+
+:::tip[Dropdown styling]
+
+Where the button opens something, a chevron says so. It sits where an input's
+own icons sit, so a row of fields and buttons keeps one edge.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Badge, Button, Form, Menu, Popover, Space, Switch } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
+const fieldButton = (empty) => ({
+  block: true,
+  style: {
+    textAlign: 'start',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    color: empty ? 'var(--ant-color-text-placeholder)' : undefined,
+  },
+});
+
+const chevron = <DownOutlined />;
+
+export default () => {
+  const [compressed, setCompressed] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(false);
+  const [value, setValue] = React.useState('');
+
+  const shared = { size: compressed ? 'small' : 'middle', disabled: disabled };
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <Space size={16}>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={compressed} onChange={setCompressed} />
+          Compressed
+        </label>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={disabled} onChange={setDisabled} />
+          Disabled
+        </label>
+      </Space>
+
+      <Form layout="vertical">
+        <Form.Item label="Placeholder only">
+          <Button {...shared} {...fieldButton(true)}>
+            Select an option
+            {chevron}
+          </Button>
+        </Form.Item>
+
+        <Form.Item label="With a value">
+          <Button {...shared} {...fieldButton(false)}>
+            Option one
+            {chevron}
+          </Button>
+        </Form.Item>
+
+        <Form.Item label="With extra content">
+          <Button {...shared} {...fieldButton(false)}>
+            <span style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}>
+              Selected fields
+              <Badge count={3} size="small" />
+            </span>
+            {chevron}
+          </Button>
+        </Form.Item>
+
+        <Form.Item label="Opening a popover" style={{ marginBottom: 0 }}>
+          <Popover
+            trigger="click"
+            placement="bottomLeft"
+            content={
+              <Menu
+                selectable={false}
+                style={{ inlineSize: 200, border: 0 }}
+                onClick={({ key }) => setValue(key)}
+                items={[
+                  { key: 'Option one', label: 'Option one' },
+                  { key: 'Option two', label: 'Option two' },
+                  { key: 'Option three', label: 'Option three' },
+                ]}
+              />
+            }
+          >
+            <Button {...shared} {...fieldButton(!value)}>
+              {value || 'Search for an option'}
+              {chevron}
+            </Button>
+          </Popover>
+        </Form.Item>
+      </Form>
+    </Space>
+  );
+};
+```
+
+A button that looks like a field still behaves like a button: it takes focus in
+the button order, it responds to space as well as enter, and a screen reader
+announces it as a button. Do not fight that. What the styling buys is where the
+reader's eye goes, not what the control is.

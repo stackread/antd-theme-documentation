@@ -1,0 +1,266 @@
+---
+title: Pagination
+description: Ant Design Pagination
+antd_components: [Pagination]
+---
+
+# Pagination
+
+Some components paginate themselves - a table, for instance. Where a paged
+interface is built by hand, `Pagination` is the control for it.
+
+## Component
+
+Give it a total number of items and a page size, and it works out the pages. It
+shows a window of consecutive pages with shortcuts to the first and last, so
+that the control stays the same width whatever the position in the list.
+
+The current page and the change handler live outside the control, which is what
+lets the page number come from the URL rather than from a state nobody can
+bookmark.
+
+:::note[Accessibility recommendation]
+
+Give each set of pagination an `aria-label` naming what is being paged. "Page
+navigation" on three controls in one page names none of them.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Pagination } from 'antd';
+
+export default () => {
+  const [page, setPage] = React.useState(1);
+
+  return (
+    <Pagination
+      aria-label="Search results pagination"
+      current={page}
+      onChange={setPage}
+      total={220}
+      pageSize={10}
+      showSizeChanger={false}
+    />
+  );
+};
+```
+
+## Usage
+
+### Few pages
+
+With fewer pages than the window would show, the control simplifies: no
+ellipsis, no shortcuts, just the pages.
+
+```tsx interactive
+import React from 'react';
+import { Pagination } from 'antd';
+
+export default () => {
+  const [page, setPage] = React.useState(2);
+
+  return (
+    <Pagination
+      aria-label="Pagination with few pages"
+      current={page}
+      onChange={setPage}
+      total={40}
+      pageSize={10}
+      showSizeChanger={false}
+    />
+  );
+};
+```
+
+### Centered pagination
+
+Pagination usually sits under the list it pages. Centring it there is a layout
+decision, made by whatever contains it rather than by the control.
+
+```tsx interactive
+import React from 'react';
+import { Card, Pagination, Typography } from 'antd';
+
+export default () => {
+  const [page, setPage] = React.useState(1);
+
+  return (
+    <Card size="small">
+      <Typography.Paragraph type="secondary">
+        Results for page {page}
+      </Typography.Paragraph>
+
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <Pagination
+          aria-label="Centered pagination"
+          current={page}
+          onChange={setPage}
+          total={100}
+          pageSize={10}
+          showSizeChanger={false}
+        />
+      </div>
+    </Card>
+  );
+};
+```
+
+### Compressed and responsive
+
+The compressed form drops the numbered buttons and keeps the arrows, with the
+position shown as static text. It is what the control becomes on a narrow
+screen anyway.
+
+Use it deliberately where the space is tight - inside a toolbar, a flyout, a
+card - and not as a default: the numbers are what let a reader jump rather than
+step.
+
+```tsx interactive
+import React from 'react';
+import { Pagination, Space, Switch } from 'antd';
+
+export default () => {
+  const [page, setPage] = React.useState(4);
+  const [dense, setDense] = React.useState(true);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={dense} onChange={setDense} />
+        Compressed
+      </label>
+
+      <Pagination
+        aria-label="Compressed pagination"
+        simple={dense}
+        size="small"
+        current={page}
+        onChange={setPage}
+        total={220}
+        pageSize={10}
+        showSizeChanger={false}
+      />
+    </Space>
+  );
+};
+```
+
+### Indeterminate page count
+
+Where the total is not known - a stream, an expensive count, a search that
+stops looking after the first thousand - there is nothing to number.
+
+Then the arrows are the whole control, and "next" means only that there is more,
+not how much.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Typography } from 'antd';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+
+export default () => {
+  const [page, setPage] = React.useState(1);
+
+  return (
+    <Space size={8} align="center">
+      <Button
+        aria-label="Previous page"
+        disabled={page === 1}
+        onClick={() => setPage((s) => s - 1)}
+      >
+        <LeftOutlined />
+      </Button>
+
+      <Typography.Text aria-live="polite">Page {page}</Typography.Text>
+
+      <Button aria-label="Next page" onClick={() => setPage((s) => s + 1)}>
+        <RightOutlined />
+      </Button>
+    </Space>
+  );
+};
+```
+
+### Table pagination
+
+Under a table, pagination usually comes with a rows-per-page control. The two
+belong together: changing the page size changes what page one means.
+
+An option for "all" removes the pagination entirely - useful for a small result
+set, dangerous for a large one, and worth offering only where you know which of
+the two it is.
+
+```tsx interactive
+import React from 'react';
+import { Pagination, Space } from 'antd';
+
+export default () => {
+  const [page, setPage] = React.useState(1);
+  const [perPage, setPerPage] = React.useState(10);
+
+  return (
+    <Space size={16} style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <Pagination
+        aria-label="Table pagination"
+        current={page}
+        pageSize={perPage}
+        onChange={(s, size) => {
+          setPage(s);
+          setPerPage(size);
+        }}
+        total={220}
+        showSizeChanger
+        pageSizeOptions={[10, 20, 50]}
+        showTotal={(total, [from, to]) => `${from}-${to} of ${total}`}
+      />
+    </Space>
+  );
+};
+```
+
+### Custom pagination
+
+Where the standard arrangement does not fit, the parts can be laid out by hand:
+a menu for the page size, the control for the pages, a count between them.
+
+The parts stay the same; only their arrangement changes. That is the point of
+keeping the page state outside the control.
+
+```tsx interactive
+import React from 'react';
+import { Button, Dropdown, Pagination, Space } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
+export default () => {
+  const [page, setPage] = React.useState(1);
+  const [perPage, setPerPage] = React.useState(20);
+
+  return (
+    <Space size={24} align="center">
+      <Dropdown
+        trigger={['click']}
+        menu={{
+          selectable: true,
+          selectedKeys: [String(perPage)],
+          onClick: ({ key }) => setPerPage(Number(key)),
+          items: [10, 20, 50].map((n) => ({ key: String(n), label: `${n} rows` })),
+        }}
+      >
+        <Button type="text">
+          Rows per page: {perPage} <DownOutlined />
+        </Button>
+      </Dropdown>
+
+      <Pagination
+        aria-label="Custom pagination"
+        current={page}
+        onChange={setPage}
+        total={220}
+        pageSize={perPage}
+        showSizeChanger={false}
+      />
+    </Space>
+  );
+};
+```

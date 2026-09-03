@@ -1,0 +1,74 @@
+---
+title: Spacer
+description: Vertical space through a container's gap
+antd_components: [Space]
+sidebar_position: 4
+---
+
+# Spacer
+
+Vertical space can be a component: an element you drop between two things
+instead of writing `<br />`, in one of six sizes from a scale.
+
+Ant Design has no such element. Space is a property of what contains the items -
+`Space` with a `size`, or a `gap` on a flex container - so it is set once for a
+group rather than inserted between each pair.
+
+The difference is worth stating plainly. A spacer is placed by whoever writes
+the markup and can be forgotten; a gap belongs to the container and applies to
+whatever ends up inside it. The second is harder to get wrong, and harder to
+make an exception to.
+
+The six sizes below are the same scale, expressed as gaps.
+
+```tsx interactive
+import React from 'react';
+import { Space, Typography } from 'antd';
+
+const boxStyle = {
+  padding: '4px 8px',
+  background: 'var(--ant-color-bg-layout)',
+  border: '1px solid var(--ant-color-border)',
+  borderRadius: 4,
+  fontFamily: 'var(--ant-font-family-code)',
+  fontSize: 12,
+};
+
+export default () => (
+  <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+    <Space orientation="vertical" size={4}>
+      <span style={boxStyle}>xs</span>
+      <span style={boxStyle}>4px</span>
+    </Space>
+
+    <Space orientation="vertical" size={8}>
+      <span style={boxStyle}>s</span>
+      <span style={boxStyle}>8px</span>
+    </Space>
+
+    <Space orientation="vertical" size={16}>
+      <span style={boxStyle}>m (default)</span>
+      <span style={boxStyle}>16px</span>
+    </Space>
+
+    <Space orientation="vertical" size={24}>
+      <span style={boxStyle}>l</span>
+      <span style={boxStyle}>24px</span>
+    </Space>
+
+    <Space orientation="vertical" size={32}>
+      <span style={boxStyle}>xl</span>
+      <span style={boxStyle}>32px</span>
+    </Space>
+
+    <Space orientation="vertical" size={40}>
+      <span style={boxStyle}>xxl</span>
+      <span style={boxStyle}>40px</span>
+    </Space>
+  </div>
+);
+```
+
+Where a single one-off gap really is needed - between two things that share no
+container - a margin on one of them says so more directly than an empty element
+between them.

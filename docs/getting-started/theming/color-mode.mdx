@@ -1,0 +1,51 @@
+---
+title: Color mode
+description: Two appearances, and why there is no third
+sidebar_position: 2
+audit: true
+---
+
+# Color mode
+
+Two appearances. `themeFor('light')` and `themeFor('dark')` return two
+different `ThemeConfig` objects, built from two different halves of the same
+extracted package.
+
+```tsx
+const [dark, setDark] = React.useState(false);
+
+<ConfigProvider theme={themeFor(dark ? 'dark' : 'light')}>
+```
+
+## The values are not derived from each other
+
+Nothing here darkens a light colour. Each appearance has its own 125 values,
+and pairs are frequently not related at all:
+
+| | light | dark |
+|---|---|---|
+| `warning` | `#FACB3D` | `#FACB3D` |
+| `warningText` | `#825803` | `#FCD883` |
+| `skeletonEdge` | `rgba(72,89,117, 0.16)` | `rgba(255,255,255, 0.16)` |
+| `formBgAutofilled` | `#F1F6FF` | `#0A2342` |
+
+Yellow stays yellow in both, because it is an exception -
+white text on yellow is unreadable, so a warning surface carries dark text
+whichever appearance is on. That exception is Rule A's one carve-out, and it is
+described on [Colors](../tokens/colors).
+
+## Both appearances are checked
+
+Every one of the 659 expectations runs twice. That matters more than it sounds:
+an expectation written in light and passing in dark by coincidence is a real
+possibility, and one is documented - the invalid field's hover border, where
+Ant Design's own derivation happens to land on the measured value in dark.
+
+Where a check is blind, it says so rather than counting as two.
+
+## There is no high contrast mode
+
+It would mean a third set of written values, and there is no third set, so the
+mode is absent rather than approximated - a
+"high contrast" mode that is merely the normal one with thicker borders would
+be a claim we cannot support.

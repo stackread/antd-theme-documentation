@@ -1,0 +1,534 @@
+---
+title: Accordion
+description: Ant Design Collapse
+antd_components: [Collapse]
+---
+
+# Accordion
+
+An accordion is deliberately plain. Apart from the caret that tells the reader
+the item can be opened, it brings no styling of its own - which leaves room to
+place it inside a panel, a form, or a list without a visual fight.
+
+In Ant Design this is `Collapse`. The clickable area is an item's `label`; the
+content below it is `children`.
+
+One difference in shape: Ant Design's `Collapse` can hold several items at once.
+The examples below keep one `Collapse` per accordion, so that structure and
+spacing stay comparable.
+
+## Component
+
+```tsx interactive
+import React from 'react';
+import { Card, Collapse } from 'antd';
+
+export default () => (
+  <Collapse
+    items={[
+      {
+        key: '1',
+        label: 'Click me to toggle',
+        children: (
+          <Card size="small">
+            Any content inside of <strong>Collapse</strong> will appear here.
+          </Card>
+        ),
+      },
+    ]}
+  />
+);
+```
+
+## Usage
+
+### Arrow display
+
+The arrow shows the current state and points at the label that triggers it. It
+can move to the other side with `expandIconPlacement="end"`, or disappear with
+`showArrow: false` on the item.
+
+```tsx interactive
+import React from 'react';
+import { Card, Collapse } from 'antd';
+
+export default () => (
+  <Collapse
+    expandIconPlacement="end"
+    items={[
+      {
+        key: '1',
+        label: 'This accordion has the arrow on the right',
+        children: (
+          <Card size="small">
+            Any content inside of <strong>Collapse</strong> will appear here.
+          </Card>
+        ),
+      },
+    ]}
+  />
+);
+```
+
+```tsx interactive
+import React from 'react';
+import { Card, Collapse } from 'antd';
+
+export default () => (
+  <Collapse
+    items={[
+      {
+        key: '1',
+        showArrow: false,
+        label: 'This one has it removed entirely',
+        children: (
+          <Card size="small">
+            Any content inside of <strong>Collapse</strong> will appear here.
+          </Card>
+        ),
+      },
+    ]}
+  />
+);
+```
+
+### Multiple accordions
+
+Any number of accordions can stand as a group. Because they carry so little
+styling of their own, a gap between them does the separating work.
+
+```tsx interactive
+import React from 'react';
+import { Card, Collapse, Space, Typography } from 'antd';
+
+const rows = (n) =>
+  Array.from({ length: n }, (_, i) => (
+    <p key={i}>The content inside can be of any height.</p>
+  ));
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Collapse
+      items={[
+        {
+          key: '1',
+          label: 'An accordion with padding applied through props',
+          children: <Typography>{rows(3)}</Typography>,
+        },
+      ]}
+    />
+
+    <Collapse
+      items={[
+        {
+          key: '1',
+          label:
+            'A second accordion with padding and a very long title that should truncate because it runs out of room',
+          children: <Typography>{rows(6)}</Typography>,
+        },
+      ]}
+    />
+
+    <Collapse
+      items={[
+        {
+          key: '1',
+          label: 'A third accordion with a nested accordion',
+          children: (
+            <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+              <Typography>
+                <p style={{ marginBottom: 0 }}>
+                  This content area will grow to accommodate when the accordion
+                  below opens
+                </p>
+              </Typography>
+
+              <Collapse
+                items={[
+                  {
+                    key: '1',
+                    label: 'A fourth nested accordion',
+                    children: (
+                      <Card size="small">
+                        Any content inside of <strong>Collapse</strong> will
+                        appear here.
+                      </Card>
+                    ),
+                  },
+                ]}
+              />
+            </Space>
+          ),
+        },
+      ]}
+    />
+  </Space>
+);
+```
+
+:::note[Omitted: truncation by class]
+
+**Affects:** 0 specimens - a helper class, not an accordion.
+
+A long label could be truncated by a utility class. Ant Design has no such
+helper, and neither does this theme; the label above simply wraps. Whether a
+truncation helper is wanted at all is a design question of its own.
+
+:::
+
+### Extra actions
+
+An item can carry an action on its right, usually a delete or a button. It sits
+outside the click area that expands the accordion - otherwise it could not be
+reached without opening it.
+
+```tsx interactive
+import React from 'react';
+import { Button, Collapse } from 'antd';
+
+export default () => (
+  <Collapse
+    items={[
+      {
+        key: '1',
+        label: 'Click to open',
+        extra: (
+          <Button size="small" onClick={(e) => e.stopPropagation()}>
+            Extra action!
+          </Button>
+        ),
+        children: <strong>Opened content.</strong>,
+      },
+    ]}
+  />
+);
+```
+
+### Opened on initial render
+
+`defaultActiveKey` opens an item when the accordion is first rendered.
+
+```tsx interactive
+import React from 'react';
+import { Card, Collapse } from 'antd';
+
+export default () => (
+  <Collapse
+    defaultActiveKey={['1']}
+    items={[
+      {
+        key: '1',
+        label: 'I am opened by default. Click me to toggle close / open',
+        children: (
+          <Card size="small">
+            Any content inside of <strong>Collapse</strong> will appear here.
+          </Card>
+        ),
+      },
+    ]}
+  />
+);
+```
+
+### Controlling toggled state
+
+Normally the accordion keeps its own open state. It can be controlled from
+outside with `activeKey` and `onChange`.
+
+```tsx interactive
+import React from 'react';
+import { Card, Collapse, Radio, Space } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Radio.Group
+        value={open ? 'open' : 'closed'}
+        onChange={(e) => setOpen(e.target.value === 'open')}
+        options={[
+          { value: 'open', label: 'Open' },
+          { value: 'closed', label: 'Closed' },
+        ]}
+        optionType="button"
+      />
+
+      <Collapse
+        activeKey={open ? ['1'] : []}
+        onChange={(keys) => setOpen(keys.length > 0)}
+        items={[
+          {
+            key: '1',
+            label: 'I am a controlled accordion',
+            children: (
+              <Card size="small">
+                Any content inside of <strong>Collapse</strong> will appear here.
+              </Card>
+            ),
+          },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+### Loading state
+
+When the content is not ready yet, the extra action is replaced by a spinner and
+the content can be swapped for a message.
+
+Ant Design has no loading state on `Collapse`; both parts are set by hand here.
+
+```tsx interactive
+import React from 'react';
+import { Card, Collapse, Radio, Space, Spin } from 'antd';
+
+export default () => {
+  const [message, setMessage] = React.useState('False');
+
+  const content =
+    message === 'False' ? (
+      <Card size="small">Opened content.</Card>
+    ) : message === 'True' ? (
+      <Spin size="small" />
+    ) : (
+      'This is a custom loading message'
+    );
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Radio.Group
+        size="small"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        options={[
+          { value: 'False', label: 'False' },
+          { value: 'True', label: 'True' },
+          { value: 'Custom', label: 'Custom' },
+        ]}
+        optionType="button"
+      />
+
+      <Collapse
+        defaultActiveKey={['1']}
+        items={[
+          {
+            key: '1',
+            label: 'Accordion is loading, click to toggle',
+            extra: <Spin size="small" />,
+            children: content,
+          },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+### Disabled state
+
+Sometimes the reader should not be able to close an accordion - for instance
+while a form field inside it still shows an error. `collapsible: 'disabled'`
+takes the interaction off both the label and the arrow.
+
+Pair it with `defaultActiveKey` so the content stays visible.
+
+```tsx interactive
+import React from 'react';
+import { Card, Collapse, Form, Input } from 'antd';
+
+export default () => {
+  const [value, setValue] = React.useState('');
+  const invalid = value === '';
+
+  return (
+    <Collapse
+      defaultActiveKey={['1']}
+      items={[
+        {
+          key: '1',
+          label: 'Security settings',
+          collapsible: invalid ? 'disabled' : undefined,
+          children: (
+            <Card size="small">
+              <Form layout="vertical">
+                <Form.Item
+                  label="Password"
+                  validateStatus={invalid ? 'error' : undefined}
+                  help={
+                    invalid
+                      ? 'You must enter your password to save these changes.'
+                      : undefined
+                  }
+                  style={{ marginBottom: 0 }}
+                >
+                  <Input.Password
+                    value={value}
+                    onChange={(e) => setValue(e.currentTarget.value)}
+                  />
+                </Form.Item>
+              </Form>
+            </Card>
+          ),
+        },
+      ]}
+    />
+  );
+};
+```
+
+### When content changes dynamically
+
+If the content grows or shrinks while the accordion is open, it resizes with it.
+
+```tsx interactive
+import React from 'react';
+import { Button, Card, Collapse, Space, Typography } from 'antd';
+
+const Lines = () => {
+  const [count, setCount] = React.useState(1);
+
+  return (
+    <Typography>
+      <Space size={8} style={{ marginBottom: 12 }}>
+        <Button size="small" onClick={() => setCount(count + 1)}>
+          Increase height to {count + 1} items
+        </Button>
+        <Button
+          size="small"
+          disabled={count === 1}
+          onClick={() => setCount(Math.max(1, count - 1))}
+        >
+          Decrease height to {count - 1} item{count > 2 ? 's' : ''}
+        </Button>
+      </Space>
+      <ul>
+        {Array.from({ length: count }, (_, i) => (
+          <li key={i}>Row {i + 1}</li>
+        ))}
+      </ul>
+    </Typography>
+  );
+};
+
+export default () => (
+  <Collapse
+    defaultActiveKey={['1']}
+    items={[
+      {
+        key: '1',
+        label: 'Click me to toggle close / open',
+        children: (
+          <Card size="small">
+            <Lines />
+          </Card>
+        ),
+      },
+    ]}
+  />
+);
+```
+
+### Interactive content in the trigger
+
+A link or a button inside the label sits within the element that toggles the
+accordion. To keep a click on it from opening the accordion, stop the event.
+
+```tsx interactive
+import React from 'react';
+import { Card, Collapse, Typography } from 'antd';
+
+export default () => (
+  <Collapse
+    items={[
+      {
+        key: '1',
+        label: (
+          <Typography.Link
+            href="#interactive-content-in-the-trigger"
+            onClick={(e) => e.stopPropagation()}
+          >
+            This is a nested link
+          </Typography.Link>
+        ),
+        children: (
+          <Card size="small">
+            Any content inside of <strong>Collapse</strong> will appear here.
+          </Card>
+        ),
+      },
+    ]}
+  />
+);
+```
+
+### Styled for forms
+
+An accordion around a form section wants a little more shape than the bare
+default: a border, some padding, and a heading that reads as a section title
+rather than as a control.
+
+```tsx interactive
+import React from 'react';
+import { Collapse, Flex, Form, Input, Space, Typography } from 'antd';
+
+// A row of form fields aligns at the top, not down the middle. One field with
+// a hint below it is taller than its neighbour, and centring the row would
+// offset both labels against each other.
+const formStyle = (
+  <Form layout="vertical">
+    <Flex gap={16}>
+      <Form.Item label="Username" style={{ flex: 1 }}>
+        <Input placeholder="John" />
+      </Form.Item>
+      <Form.Item
+        label="Password"
+        extra="Must include one number and one symbol"
+        style={{ flex: 1 }}
+      >
+        <Input.Password />
+      </Form.Item>
+    </Flex>
+    <Form.Item label="Body" style={{ marginBottom: 0 }}>
+      <Input.TextArea rows={3} />
+    </Form.Item>
+  </Form>
+);
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Collapse
+      defaultActiveKey={['1']}
+      items={[
+        {
+          key: '1',
+          label: (
+            <Typography.Text strong>
+              Repeatable form{' '}
+              <Typography.Text type="secondary">(optional)</Typography.Text>
+            </Typography.Text>
+          ),
+          children: formStyle,
+        },
+      ]}
+    />
+
+    <Collapse
+      items={[
+        {
+          key: '1',
+          label: (
+            <Typography.Text strong>
+              Another repeatable form{' '}
+              <Typography.Text type="secondary">(optional)</Typography.Text>
+            </Typography.Text>
+          ),
+          children: formStyle,
+        },
+      ]}
+    />
+  </Space>
+);
+```

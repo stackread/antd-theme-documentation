@@ -1,0 +1,19 @@
+{
+  "//": "Erbt bewusst NICHT von @docusaurus/tsconfig: das Paket benutzt `baseUrl`, das TypeScript 7 entfernt hat. Die noetigen Angaben stehen deshalb hier ausgeschrieben.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "paths": { "@site/*": ["./*"] },
+    "types": ["@docusaurus/module-type-aliases", "@docusaurus/theme-classic"]
+  },
+  "include": ["src/**/*", "tests/**/*", "docusaurus.config.ts", "sidebars.ts"]
+}

@@ -1,0 +1,132 @@
+---
+title: Date picker range
+description: Ant Design DatePicker.RangePicker
+antd_components: [DatePicker]
+sidebar_position: 2
+---
+
+# Date picker range
+
+One control for a start and an end. It can be built from two date pickers
+passed into a wrapper; Ant Design ships it as `DatePicker.RangePicker`,
+which is the same two fields in one frame with one panel behind them.
+
+The frame is what makes it a range. Two separate pickers side by side read as
+two questions, and nothing stops the reader from answering them in the wrong
+order.
+
+```tsx interactive
+import React from 'react';
+import { DatePicker, Form } from 'antd';
+import dayjs from 'dayjs';
+
+export default () => {
+  const [range, setRange] = React.useState([dayjs(), dayjs().add(11, 'day')]);
+
+  return (
+    <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+      <Form.Item label="Select a range" style={{ marginBottom: 0 }}>
+        <DatePicker.RangePicker
+          value={range}
+          onChange={setRange}
+          style={{ inlineSize: '100%' }}
+        />
+      </Form.Item>
+    </Form>
+  );
+};
+```
+
+:::tip
+
+Where more is needed - relative times ("last 15 minutes"), suggested ranges, a
+refresh interval - that is a bigger control than this one, built on top of it.
+
+:::
+
+## Inline display
+
+The panel can sit on the page rather than in a popover, for a screen where
+choosing the range is the task.
+
+```tsx interactive
+import React from 'react';
+import { Card, DatePicker, Space, Switch } from 'antd';
+import dayjs from 'dayjs';
+
+export default () => {
+  const [framed, setFramed] = React.useState(true);
+  const [showTime, setShowTime] = React.useState(false);
+  const [range, setRange] = React.useState([dayjs(), dayjs().add(11, 'day')]);
+
+  const calendar = (
+    <DatePicker.RangePicker
+      open
+      showTime={showTime}
+      value={range}
+      onChange={setRange}
+      getPopupContainer={(k) => k.parentElement}
+      style={{ visibility: 'hidden', blockSize: 0, padding: 0, border: 0 }}
+    />
+  );
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={16} wrap>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={framed} onChange={setFramed} />
+          Shadow
+        </label>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={showTime} onChange={setShowTime} />
+          Show time
+        </label>
+      </Space>
+
+      {framed ? (
+        <Card size="small" style={{ display: 'inline-block' }}>
+          <div style={{ position: 'relative' }}>{calendar}</div>
+        </Card>
+      ) : (
+        <div style={{ position: 'relative' }}>{calendar}</div>
+      )}
+    </Space>
+  );
+};
+```
+
+### Dynamic `minDate` and `maxDate`
+
+Move the limits as the reader chooses, and the impossible half of the calendar
+is greyed out before they reach it: once a start is set, everything before it
+stops being selectable as an end.
+
+That is feedback in the only place it costs nothing - before the mistake,
+rather than after it as an error message.
+
+```tsx interactive
+import React from 'react';
+import { DatePicker, Form } from 'antd';
+import dayjs from 'dayjs';
+
+export default () => {
+  const [range, setRange] = React.useState([dayjs(), dayjs().add(11, 'day')]);
+
+  return (
+    <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+      <Form.Item
+        label="At most thirty days, starting no earlier than today"
+        style={{ marginBottom: 0 }}
+      >
+        <DatePicker.RangePicker
+          value={range}
+          onChange={setRange}
+          minDate={dayjs()}
+          maxDate={range?.[0] ? range[0].add(30, 'day') : undefined}
+          style={{ inlineSize: '100%' }}
+        />
+      </Form.Item>
+    </Form>
+  );
+};
+```

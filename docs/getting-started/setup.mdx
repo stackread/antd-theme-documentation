@@ -1,0 +1,115 @@
+---
+title: Setup
+description: The theme in an application
+sidebar_position: 2
+---
+
+# Setup
+
+Two imports and one provider.
+
+```tsx
+import { ConfigProvider } from 'antd';
+import { themeFor } from '@stackread/antd-theme';
+import '@stackread/antd-theme/theme.css';
+
+export const App = () => (
+  <ConfigProvider theme={themeFor('light')}>
+    <YourApplication />
+  </ConfigProvider>
+);
+```
+
+`themeFor` returns Ant Design's own `ThemeConfig`, filled from our vocabulary.
+Nothing about it is special: any Ant Design application can take it, and any
+Ant Design API keeps working.
+
+`antd`, `react` and `react-dom` are peer dependencies - the package brings no
+components of its own. It colours the ones you already have.
+
+## The stylesheet is not optional
+
+`theme.css` carries the 55 deviations - the places where a value cannot travel
+through a token because Ant Design has no token for it. The loading ring, the
+skeleton gradient's angle, the autofilled field's background.
+
+Without it the application is *nearly* right, which is the hardest kind of
+wrong to notice - so it says so. `themeFor` checks once, on its first call,
+for a marker that only the stylesheet sets, and warns in the console if it is
+missing.
+
+## Values Ant Design does not carry
+
+Some of the vocabulary has no Ant Design token to travel through: the LIGHT
+level of a meaning, the risk meaning, the measured component metrics. They
+arrive as custom properties, and something has to write them onto the
+document:
+
+```tsx
+import { applyVariables, tokensFor } from '@stackread/antd-theme';
+
+applyVariables(tokensFor('light'));
+```
+
+Call it once at startup, and again whenever the appearance changes.
+
+## Live
+
+The switch below is the same one this documentation uses. It changes
+`themeFor`'s argument, nothing else.
+
+```tsx interactive
+import React from 'react';
+import { Button, Card, Flex, Space, Switch, Tag, Typography } from 'antd';
+
+export default () => {
+  const [dark, setDark] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={dark} onChange={setDark} />
+        Dark appearance
+      </label>
+
+      <Card title="A card, drawn by the theme" style={{ maxInlineSize: 520 }}>
+        <Space orientation="vertical" size={12} style={{ display: 'flex' }}>
+          <Typography.Text>
+            Every value here - the border, the radius, the heading weight, the
+            gap - comes from the vocabulary.
+          </Typography.Text>
+          <Flex gap={8} wrap>
+            <Tag color="success">Passing</Tag>
+            <Tag color="warning">Degraded</Tag>
+            <Tag color="error">Failing</Tag>
+          </Flex>
+          <Flex gap={8}>
+            <Button type="primary">Save</Button>
+            <Button color="primary" variant="filled">Duplicate</Button>
+            <Button>Cancel</Button>
+          </Flex>
+        </Space>
+      </Card>
+    </Space>
+  );
+};
+```
+
+:::note[The switch above is a demonstration, not the mechanism]
+
+Switching appearance for real means passing the other argument to `themeFor`
+and letting `ConfigProvider` re-render. See [Color
+mode](./theming/color-mode).
+
+:::
+
+## Dependencies
+
+`antd`, `react` and `react-dom`, all as peer dependencies. The package itself
+brings nothing - no CSS-in-JS runtime of its own, no build step, no plugin.
+
+## Two packages
+
+`@stackread/antd-theme` is the theme itself and knows nothing about any host.
+`@stackread/docusaurus-theme` wears it and maps it onto a Docusaurus shell.
+A React application needs only the first.

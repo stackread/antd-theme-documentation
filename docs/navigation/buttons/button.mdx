@@ -1,0 +1,697 @@
+---
+title: Button
+description: Ant Design Button, its levels, colours and states
+antd_components: [Button]
+sidebar_position: 1
+---
+
+# Button
+
+Buttons carry **user actions**. They are what forms, modals, toolbars and
+toolstrips are made of, so the difference between one button and another is the
+difference between a page that reads clearly and one that does not.
+
+There are three levels of prominence, and choosing between them is the whole
+job: a filled button for the one thing the reader is meant to do, a tinted one
+for the actions beside it, a plain one for everything that only changes the
+view.
+
+## Button types
+
+### Regular
+
+The everyday button. Tinted rather than filled: visible without competing.
+
+Use it for **secondary actions** - the things that are worth doing but are not
+the point of the page. Several of them can stand together without any of them
+shouting.
+
+The **primary action** is the same button filled. There should be one per
+layout, and often none.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space } from 'antd';
+
+const levels = [
+  { title: 'Button', props: { color: 'primary', variant: 'filled' } },
+  { title: 'Primary button', props: { type: 'primary' } },
+];
+
+export default () => (
+  <Space size={8}>
+    {levels.map((s) => (
+      <Button key={s.title} {...s.props}>
+        {s.title}
+      </Button>
+    ))}
+  </Space>
+);
+```
+
+### Empty
+
+An empty button has no surface at all. It is for **tertiary** actions - close,
+cancel, filter, refresh - the ones that change how data is shown rather than
+what the data is.
+
+It carries the least weight of the three, which is exactly why it is the right
+button beside a filled one: nothing about it competes.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space } from 'antd';
+
+export default () => (
+  <Space size={8}>
+    <Button type="text">Empty button</Button>
+
+    <Button type="text" size="small">
+      Small
+    </Button>
+
+    <Button type="text" danger>
+      Delete
+    </Button>
+  </Space>
+);
+```
+
+### Icon
+
+An icon-only button. Use it only where the icon is understood without a word -
+a trash can, a pencil, a chevron - and never for an action a reader would have
+to learn.
+
+Two things are needed every time:
+
+- an `aria-label`, since there is no text to announce;
+- a tooltip, since a sighted reader who does not use a screen reader has
+  nothing else to go on.
+
+Do not use the browser's own `title` attribute for the second. It is unstyled,
+its delay cannot be controlled, and screen readers announce it inconsistently.
+
+Where the tooltip says the same thing as the label, the screen reader should
+hear it once, not twice.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Tooltip } from 'antd';
+import { DeleteOutlined, EditOutlined, ExpandOutlined, ReloadOutlined, SettingOutlined } from '@ant-design/icons';
+
+const names = {
+  edit: 'Edit',
+  expand: 'Expand',
+  remove: 'Delete',
+  settings: 'Settings',
+  refresh: 'Refresh',
+};
+
+export default () => (
+  <Space size={8}>
+    <Tooltip title={names.edit}>
+      <Button type="text" aria-label={names.edit}>
+        <EditOutlined />
+      </Button>
+    </Tooltip>
+
+    <Tooltip title={names.expand}>
+      <Button type="text" aria-label={names.expand}>
+        <ExpandOutlined />
+      </Button>
+    </Tooltip>
+
+    <Tooltip title={names.remove}>
+      <Button type="text" danger aria-label={names.remove}>
+        <DeleteOutlined />
+      </Button>
+    </Tooltip>
+
+    <Tooltip title={names.settings}>
+      <Button color="primary" variant="filled" aria-label={names.settings}>
+        <SettingOutlined />
+      </Button>
+    </Tooltip>
+
+    <Tooltip title={names.refresh}>
+      <Button aria-label={names.refresh}>
+        <ReloadOutlined />
+      </Button>
+    </Tooltip>
+  </Space>
+);
+```
+
+:::note[Accessibility]
+
+An icon-only button needs an `aria-label`. Without one it announces itself as
+"button" and nothing more.
+
+:::
+
+Use icon buttons for universal actions that are easy to understand. An icon
+alone inside a full-size button looks awkward and takes room it does not earn.
+
+### Button as link
+
+A button given an `href` renders as an `<a>`; one given an `onClick` renders as
+a `<button>`. Passing both is usually a mistake - the element is one or the
+other, and the reader's expectations follow from which.
+
+Use a button for an **action** and a link for **navigation**. For a link inside
+running text, use a text link, not a button dressed as one.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space } from 'antd';
+
+export default () => (
+  <Space size={8}>
+    <Button href="#" color="primary" variant="filled">
+      Link to example.com
+    </Button>
+
+    <Button href="#" type="text">
+      Link to example.com
+    </Button>
+  </Space>
+);
+```
+
+## Style
+
+:::warning
+
+Do not override button styles. Colour, size and state are all props, and they
+cover the cases - a one-off style is a case nobody else will find again.
+
+:::
+
+### Color and semantic
+
+Most buttons are `primary`, neutral text, or `danger`. Primary is the default.
+
+The semantic colours mean particular things:
+
+- **Danger**: destructive, irreversible, needs attention.
+- **Warning**: proceed carefully.
+- **Success**: something completed, or something ready to be committed.
+
+**Avoid reaching for them directly.** A red button belongs on the confirmation
+of a destructive act, not on every delete-shaped control - the meaning holds
+only while it is rare.
+
+And never let the colour carry the meaning alone: it needs a label or an icon
+too.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space } from 'antd';
+
+const colors = ['primary', 'success', 'warning', 'danger'];
+const names = { primary: 'Primary', success: 'Success', warning: 'Warning', danger: 'Danger' };
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Space size={8} wrap>
+      {colors.map((f) => (
+        <Button key={f} color={f} variant="filled">
+          {names[f]}
+        </Button>
+      ))}
+    </Space>
+
+    <Space size={8} wrap>
+      {colors.map((f) => (
+        <Button key={f} color={f} variant="solid">
+          {names[f]}
+        </Button>
+      ))}
+    </Space>
+
+    <Space size={8} wrap>
+      {['primary', 'danger', 'default'].map((f) => (
+        <Button key={f} color={f} variant="text">
+          {names[f] ?? 'Neutral'}
+        </Button>
+      ))}
+    </Space>
+  </Space>
+);
+```
+
+### `Text` color variant
+
+The neutral variant - a white surface with a grey border - is for screens that
+are already busy. On a page of inputs, tables and toolbars, a row of tinted
+buttons is noise; the neutral one recedes and lets the one coloured button be
+seen.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Tooltip } from 'antd';
+import { SettingOutlined } from '@ant-design/icons';
+
+const name = 'Settings';
+
+export default () => (
+  <Space size={8}>
+    <Button>Neutral</Button>
+
+    <Tooltip title={name}>
+      <Button aria-label={name}>
+        <SettingOutlined />
+      </Button>
+    </Tooltip>
+  </Space>
+);
+```
+
+### Size
+
+Medium is the default and fits nearly everywhere. Small exists for constrained
+spaces - inside a popover, a toast, a filter bar, a compressed form.
+
+**Do not mix sizes in one group.** A row of buttons should share a height; a
+smaller one beside a larger one reads as less important in a way that was
+probably not intended.
+
+Pick a size because the space demands it, not because it looks better.
+
+| Do | Do not |
+| --- | --- |
+| A medium button beside a medium icon button, both primary | A medium button beside a small danger icon button - two colours and two heights in one row |
+
+### Width
+
+A button is as wide as its content, plus a minimum so that a one-word label
+does not produce a stub. An icon-only button is square.
+
+Full width belongs in a narrow form - a sign-in box, a phone screen - where the
+button is the only thing on its line anyway. On a wide desktop layout it makes
+a small action look enormous.
+
+| Do | Do not |
+| --- | --- |
+| Full-width buttons stacked in a narrow sign-in form | A full-width button spanning a wide desktop page |
+
+### `Flush` prop
+
+A `flush` setting could strip an empty button's horizontal padding, so its text
+lines up with the text above it rather than sitting a few
+pixels in.
+
+Ant Design has no such prop. A negative inline margin the width of the padding
+does the same thing, and does it where it is needed rather than as a state of
+the button.
+
+It is worth doing. At the edge of a container, an unflushed empty button leaves
+a ragged left edge that is visible even when nobody can say why.
+
+```tsx interactive
+import React from 'react';
+import { Button, Card, Space, Typography } from 'antd';
+
+export default () => (
+  <Space size={16} align="start" wrap style={{ display: 'flex' }}>
+    <Card size="small" style={{ inlineSize: 240 }}>
+      <Typography.Paragraph>Aligned with the text above it.</Typography.Paragraph>
+      <Button type="text" style={{ marginInlineStart: -15 }}>
+        Flush left
+      </Button>
+    </Card>
+
+    <Card size="small" style={{ inlineSize: 240 }}>
+      <Typography.Paragraph>Not aligned - note the ragged edge.</Typography.Paragraph>
+      <Button type="text">Not flush</Button>
+    </Card>
+
+    <Card size="small" style={{ inlineSize: 240 }}>
+      <Typography.Paragraph>A filled button keeps its padding.</Typography.Paragraph>
+      <Button color="primary" variant="filled">
+        Never flush
+      </Button>
+    </Card>
+  </Space>
+);
+```
+
+## State
+
+### Disabled
+
+Disable a button when the action cannot be performed - no permission, no
+licence, invalid input.
+
+Whether to show it at all is a separate question. A disabled button tells the
+reader the action exists and is currently out of reach; hiding it tells them
+nothing. Show it where knowing matters, hide it where it never will.
+
+Every kind of button shares one disabled appearance.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space } from 'antd';
+
+const levels = [
+  { title: 'Filled', props: { type: 'primary' } },
+  { title: 'Regular', props: { color: 'primary', variant: 'filled' } },
+  { title: 'Neutral', props: {} },
+  { title: 'Empty', props: { type: 'text' } },
+];
+
+export default () => (
+  <Space size={8} wrap>
+    {levels.map((s) => (
+      <Button key={s.title} disabled {...s.props}>
+        {s.title}
+      </Button>
+    ))}
+  </Space>
+);
+```
+
+### Disabled and focusable
+
+:::note[A natively disabled button cannot be focused]
+
+`disabled` renders the native attribute, which takes the button out of the tab
+order entirely. A keyboard user never reaches it, and never hears why it is
+disabled.
+
+:::
+
+Where the reason matters - and it usually does - the button should look
+disabled but stay focusable, so a tooltip can explain it.
+
+That means `aria-disabled="true"` instead of the native attribute, and the
+click handler removed by hand. The button is then announced as disabled, is
+reachable by tab, and can carry its own explanation.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Tooltip } from 'antd';
+
+const reason = 'You need write access to this index.';
+
+const disabled = {
+  'aria-disabled': true,
+  onClick: undefined,
+  style: { pointerEvents: 'auto', opacity: 1 },
+};
+
+export default () => (
+  <Space size={8} wrap>
+    <Button disabled type="primary">
+      Natively disabled
+    </Button>
+
+    <Tooltip title={reason}>
+      <Button
+        type="primary"
+        {...disabled}
+        onKeyDown={(e) => {
+          if (e.key !== 'Tab' && e.key !== 'Escape') e.preventDefault();
+        }}
+      >
+        Disabled and focusable
+      </Button>
+    </Tooltip>
+  </Space>
+);
+```
+
+#### CSS selector
+
+:::danger
+
+`:disabled` does not match a button disabled this way.
+
+:::
+
+A rule written against `:disabled` silently stops applying the moment the
+button becomes `aria-disabled` instead. Write both:
+
+```css
+.ant-btn:disabled,
+.ant-btn[aria-disabled='true'] {
+  /* ... */
+}
+```
+
+The three below are the same button in the three states a rule has to cover.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space } from 'antd';
+
+const states = [
+  { title: 'Enabled', props: {} },
+  { title: 'Natively disabled', props: { disabled: true } },
+  {
+    title: 'Disabled by attribute',
+    props: { 'aria-disabled': true },
+  },
+];
+
+export default () => (
+  <Space size={8} wrap>
+    {states.map((z) => (
+      <Button key={z.title} type="primary" {...z.props}>
+        {z.title}
+      </Button>
+    ))}
+  </Space>
+);
+```
+
+### Loading
+
+A loading button says the action was received and is still running. Keep the
+button in place while it runs - swapping it for a spinner removes the thing the
+reader just clicked, and with it the sense that the click landed.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Switch } from 'antd';
+
+export default () => {
+  const [loading, setLoading] = React.useState(true);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={loading} onChange={setLoading} />
+        Is loading
+      </label>
+
+      <Button type="primary" loading={loading}>
+        {loading ? 'Loading...' : 'Button'}
+      </Button>
+    </Space>
+  );
+};
+```
+
+## Button labels
+
+A label should say what the action does: a verb, and an object where the
+context does not supply one - "Create dashboard", not "Create".
+
+Three words is the ceiling. Anything longer wants to be a text link.
+
+### Preferred words
+
+- **Add X** - makes a new relationship. Always with an object. Opposite: Remove.
+- **Cancel** - stops without saving. Never red; always an empty button.
+- **Create X** - makes a new object. Always with an object. Opposite: Delete.
+- **Delete N items** - destroys data permanently. Not the same as Remove.
+- **Remove X** - breaks a relationship without destroying anything. Opposite:
+  Add.
+- **Save**, **Save and complete** - commits pending changes.
+
+### Words to be avoided
+
+- **New** - use Add or Create.
+- **Ok** - use the word for the action.
+- **Yes** / **No** - say what happens instead.
+
+## Usage
+
+### Additional icons
+
+An icon beside a label emphasises the action, and should be rare. It works for
+binary actions - Create, Delete - and for final ones - Save.
+
+A chevron pointing right says there is more to come; a check says this is the
+end. An icon that says neither is decoration, and on the right-hand side it is
+decoration in the reader's way.
+
+| Do | Do not |
+| --- | --- |
+| **Continue →** and **✓ Save and complete** - the arrow says more follows, the check says this is the last step | **Create index pattern ⎘** - the icon adds nothing and is hard to read on the right |
+
+### Combining buttons
+
+One filled button per layout. Not every page needs one.
+
+Beside it, tertiary actions belong in empty buttons - the ones that leave the
+flow or change nothing.
+
+**Do not use all three levels in one group.** Where several actions sit
+together, pick the tinted level or the empty level for all of them. And do not
+mix text buttons with icon-only buttons in a single row.
+
+| Do | Do not |
+| --- | --- |
+| **Save** (filled) beside **Cancel** (empty), same colour | **Save** (filled), **Cancel** (tinted) and a small red **Delete** - three levels, three colours, two sizes |
+
+On a dense screen, use the neutral variant for the supporting actions. It cuts
+the noise and leaves the one coloured button visible.
+
+### Placement and order
+
+In a **narrow container** - a modal, a popover, a bottom bar, a flyout - put
+the buttons on the right. The reader scans left to right and top to bottom, so
+the bottom right is where they finish; the primary action belongs there, with
+the secondary one to its left.
+
+In an **unrestricted width** - a page-wide form - put them on the left, under
+the content they belong to. The eye is already at the left edge and should not
+have to travel across empty space to find the action.
+
+The rule underneath both: the primary button goes at the end of the scan. In a
+left-aligned row that is the leftmost position; in a right-aligned row it is
+the rightmost.
+
+Where the action belongs to the page rather than to a form, put it near the
+page title, top right. On an empty state, centre both the title and the action:
+there is little else on screen, and the reader is being guided rather than
+scanning.
+
+### Popover buttons
+
+Where a group has grown past three or four actions, put them behind one control
+with a menu. When there are many buttons, none of them matter.
+
+The main action stays visible and clickable; the rest sit behind the arrow
+beside it.
+
+```tsx interactive
+import React from 'react';
+import { Button, Dropdown, Space } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
+export default () => (
+  <Space.Compact>
+    <Button type="primary">Edit</Button>
+
+    <Dropdown
+      trigger={['click']}
+      menu={{
+        items: [
+          { key: 'copy', label: 'Copy' },
+          { key: 'share', label: 'Share' },
+          { type: 'divider' },
+          { key: 'delete', label: 'Delete', danger: true },
+        ],
+      }}
+    >
+      <Button type="primary" aria-label="More actions">
+        <DownOutlined />
+      </Button>
+    </Dropdown>
+  </Space.Compact>
+);
+```
+
+### Toggle button
+
+A toggle button is a button whose state persists. Two ways to show it: change
+the label, or keep the label and change the appearance.
+
+Do both and the reader cannot tell what they are looking at - the label
+describes one state while the styling describes the other.
+
+:::note[Accessibility]
+
+Do not set `aria-pressed` when the readable text changes. A button that already
+says "Toggled" does not also need to announce that it is pressed; the two
+together are read as a contradiction.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Tooltip } from 'antd';
+import { SaveOutlined } from '@ant-design/icons';
+
+export default () => {
+  const [label, setLabel] = React.useState(false);
+  const [playing, setPlaying] = React.useState(true);
+  const [selected, setSelected] = React.useState(true);
+  const [autosave, setAutosave] = React.useState(false);
+
+  const playLabel = playing ? 'Play' : 'Pause';
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={16} align="center">
+        <Button onClick={() => setLabel((z) => !z)}>
+          {label ? 'Toggled' : 'Toggle me'}
+        </Button>
+
+        <Tooltip title={playLabel}>
+          <Button
+            type="text"
+            size="small"
+            aria-label={playLabel}
+            onClick={() => setPlaying((z) => !z)}
+          >
+            <span aria-hidden>{playing ? '▶' : '⏸'}</span>
+          </Button>
+        </Tooltip>
+      </Space>
+
+      <Space size={16} align="center">
+        <Button
+          aria-pressed={selected}
+          type={selected ? 'primary' : 'default'}
+          onClick={() => setSelected((z) => !z)}
+        >
+          <span aria-hidden style={{ marginInlineEnd: 6 }}>{selected ? '★' : '☆'}</span>
+          Toggle me
+        </Button>
+
+        <Tooltip title="Autosave">
+          <Button
+            aria-label="Autosave"
+            aria-pressed={autosave}
+            color={autosave ? 'success' : 'default'}
+            variant={autosave ? 'filled' : 'text'}
+            onClick={() => setAutosave((z) => !z)}
+          >
+            <SaveOutlined />
+          </Button>
+        </Tooltip>
+      </Space>
+    </Space>
+  );
+};
+```
+
+### Save button
+
+"Save" is the word for committing data permanently - not "Update", not
+"Create", not "Apply". Keep "Apply" for changes that are temporary.
+
+The save button should be the most dominant action on the screen and the same
+one every time: filled, primary, with a noun in the label - "Save dashboard".
+
+It does not need an icon. It is already the loudest thing there; an icon adds
+nothing and invites inconsistency across the screens where it was forgotten.
+
+| Do | Do not |
+| --- | --- |
+| **Tertiary** (empty), **Secondary** (tinted), **Save** (filled) - one clear dominant action | **Cancel** (empty), **Apply** (tinted) - with only two buttons, the committing one should still be filled |

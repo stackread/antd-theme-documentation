@@ -1,0 +1,202 @@
+---
+title: Flex grids
+description: Ant Design Row and Col
+antd_components: [Row, Col]
+sidebar_position: 2
+---
+
+# Flex grids
+
+A grid is for repeated rows of same-width items - a list of cards, a set of
+statistics, a gallery.
+
+Where a flex row asks "how should these things share the space", a grid says
+"there are this many columns". That rigidity is the point: rows of a grid line
+up with each other, and a flex row's do not.
+
+Ant Design builds this with `Row` and `Col` on a 24-column base, so a column
+count is expressed as the span each item takes: three columns is `span={8}`,
+four is `span={6}`.
+
+```tsx interactive
+import React from 'react';
+import { Col, Row } from 'antd';
+
+const boxStyle = {
+  padding: '8px 12px',
+  background: 'var(--ant-color-bg-layout)',
+  border: '1px solid var(--ant-color-border)',
+  borderRadius: 4,
+};
+
+export default () => (
+  <Row gutter={[16, 16]}>
+    {['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven'].map((t) => (
+      <Col key={t} span={8}>
+        <div style={boxStyle}>{t}</div>
+      </Col>
+    ))}
+  </Row>
+);
+```
+
+Anything past four columns tends to break on a laptop, and past six it breaks
+everywhere. If the items are small enough that eight would fit, they are
+probably a list rather than a grid.
+
+## Responsive flex grids
+
+A grid stacks on a narrow screen. In Ant Design that is not a switch but the
+column spans themselves: each breakpoint gets its own span, and the grid
+changes shape as the window does.
+
+Writing the spans out is more verbose than a single flag, and it is also the
+whole answer - there is no separate responsive mode to turn off when the
+defaults do not suit.
+
+```tsx interactive
+import React from 'react';
+import { Col, Row } from 'antd';
+
+const boxStyle = {
+  padding: '8px 12px',
+  background: 'var(--ant-color-bg-layout)',
+  border: '1px solid var(--ant-color-border)',
+  borderRadius: 4,
+};
+
+export default () => (
+  <Row gutter={[16, 16]}>
+    {['One', 'Two', 'Three', 'Four', 'Five', 'Six'].map((t) => (
+      <Col key={t} xs={12} sm={12} md={6}>
+        <div style={boxStyle}>{t}</div>
+      </Col>
+    ))}
+  </Row>
+);
+```
+
+## Display customization
+
+### Align
+
+A grid can align its children across the row. It has no say over spacing along
+the row - the columns are evenly divided by definition, which is what makes it
+a grid.
+
+```tsx interactive
+import React from 'react';
+import { Col, Row } from 'antd';
+
+const boxStyle = {
+  padding: '8px 12px',
+  background: 'var(--ant-color-bg-layout)',
+  border: '1px solid var(--ant-color-border)',
+  borderRadius: 4,
+};
+
+export default () => (
+  <Row gutter={[16, 16]} align="middle">
+    <Col span={12}>
+      <div style={boxStyle}>
+        I<br />am<br />a<br />tall<br />item
+      </div>
+    </Col>
+    <Col span={12}>
+      <div style={boxStyle}>I am vertically centered</div>
+    </Col>
+  </Row>
+);
+```
+
+### Gutter sizing
+
+The gap between items is set on the row, as a pair: one number for the space
+between columns, one for the space between rows.
+
+Keeping the two separate matters more than it looks. A grid with a comfortable
+horizontal gap and no vertical one reads as several separate rows; the reverse
+reads as columns.
+
+```tsx interactive
+import React from 'react';
+import { Col, Row, Segmented, Space } from 'antd';
+
+const boxStyle = {
+  padding: '8px 12px',
+  background: 'var(--ant-color-bg-layout)',
+  border: '1px solid var(--ant-color-border)',
+  borderRadius: 4,
+};
+
+export default () => {
+  const [gap, setGap] = React.useState(16);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Segmented
+        value={gap}
+        onChange={setGap}
+        aria-label="Gutter size"
+        options={[
+          { value: 0, label: 'None' },
+          { value: 4, label: 'Extra small' },
+          { value: 8, label: 'Small' },
+          { value: 16, label: 'Medium' },
+          { value: 24, label: 'Large' },
+          { value: 32, label: 'Extra large' },
+        ]}
+      />
+
+      <Row gutter={[gap, gap]}>
+        {['One', 'Two', 'Three', 'Four'].map((t) => (
+          <Col key={t} span={6}>
+            <div style={boxStyle}>{t}</div>
+          </Col>
+        ))}
+      </Row>
+    </Space>
+  );
+};
+```
+
+### Changing direction
+
+A grid could be flipped so that items run top-down and then across.
+
+Ant Design's grid has no such setting - a `Row` is a row. Where the order has
+to go down the columns first, the layout is a CSS `grid` with
+`grid-auto-flow: column`, and the items are placed by the browser rather than
+by the component.
+
+```tsx interactive
+import React from 'react';
+import { Row } from 'antd';
+
+const boxStyle = {
+  padding: '8px 12px',
+  background: 'var(--ant-color-bg-layout)',
+  border: '1px solid var(--ant-color-border)',
+  borderRadius: 4,
+};
+
+export default () => (
+  <Row>
+    <div
+      style={{
+        display: 'grid',
+        gridAutoFlow: 'column',
+        gridTemplateRows: 'repeat(4, auto)',
+        gap: 16,
+        inlineSize: '100%',
+      }}
+    >
+      {['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven'].map((t) => (
+        <div key={t} style={boxStyle}>
+          {t}
+        </div>
+      ))}
+    </div>
+  </Row>
+);
+```

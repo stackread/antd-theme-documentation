@@ -1,0 +1,71 @@
+---
+title: Health
+description: Composed from Badge status
+antd_components: [Badge]
+---
+
+# Health
+
+Health shows the comparative state of things in a list - servers, response
+codes, nodes, indices.
+
+Colour alone does not carry it, and an icon is vague and takes room. **Colour
+plus a word** is recognisable, light, and works in nearly every context.
+
+Ant Design has no health component. The closest is `Badge` with `status`, which
+draws exactly that: a small coloured dot followed by text.
+
+```tsx interactive
+import React from 'react';
+import { Badge, Space } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={8} style={{ display: 'flex' }}>
+    <Badge status="default" text="Unknown" />
+    <Badge status="success" text="Success" />
+    <Badge text="Neutral" color="var(--ant-color-info)" />
+    <Badge status="warning" text="Warning" />
+    <Badge text="Risk" color="var(--stackread-risk-filled)" />
+    <Badge status="error" text="Danger" />
+    <Badge text="Custom color as hex" color="#000000" />
+  </Space>
+);
+```
+
+## Text sizes
+
+The text should match the size of what surrounds it. Where health sits inside a
+heading, it takes the heading's size rather than setting one of its own -
+otherwise a status in a title reads as a footnote.
+
+```tsx interactive
+import React from 'react';
+import { Badge, Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={12} style={{ display: 'flex' }}>
+    <Badge status="success" text={<span style={{ fontSize: 12 }}>Extra small</span>} />
+    <Badge status="success" text={<span style={{ fontSize: 14 }}>Small</span>} />
+    <Badge status="success" text={<span style={{ fontSize: 16 }}>Medium</span>} />
+
+    <Typography.Title level={3} style={{ marginBottom: 0 }}>
+      <Badge status="success" text={<span style={{ fontSize: 'inherit' }}>Inherit</span>} />
+    </Typography.Title>
+  </Space>
+);
+```
+
+:::note[Omitted: two measured colours]
+
+**Affects:** 0 specimens - colour names, not health indicators.
+
+Two semantic colours have no name in Ant Design's badge: `neutral` and `risk`.
+Both are in the vocabulary - `neutral` as `--ant-color-info`, since
+it fills Ant Design's `info` role, and `risk` as `--stackread-risk-filled`,
+which was added for exactly this specimen. They are passed above as explicit
+colours, so the name is ours rather than the component's.
+
+`status` stays for the four Ant Design does name. Passing all six as colours
+would make the page uniform and would hide that two of them are ours.
+
+:::

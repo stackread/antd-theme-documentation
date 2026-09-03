@@ -1,0 +1,100 @@
+---
+title: Number
+description: Ant Design InputNumber
+antd_components: [InputNumber]
+sidebar_position: 1
+---
+
+import FormRowCallout from '../_partials/_form-row-callout.mdx';
+import FormUsage from '../_partials/_form-usage.mdx';
+
+# Basic number field
+
+<FormRowCallout />
+
+For entering numbers. It renders `<input type="number">`, which brings the
+browser's stepper, its numeric keyboard on a phone, and its own idea of what
+counts as a number.
+
+That last part is worth knowing: an empty field and an unparsable one are both
+"no value", and the two are not the same thing to the reader.
+
+```tsx interactive
+import React from 'react';
+import { InputNumber, Space, Switch } from 'antd';
+
+export default () => {
+  const [compressed, setCompressed] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(false);
+  const [invalid, setInvalid] = React.useState(false);
+
+  const toggles = [
+    ['Compressed', compressed, setCompressed],
+    ['Disabled', disabled, setDisabled],
+    ['Invalid', invalid, setInvalid],
+  ];
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <Space size={16} wrap>
+        {toggles.map(([name, value, setIt]) => (
+          <label key={name} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <Switch size="small" checked={value} onChange={setIt} />
+            {name}
+          </label>
+        ))}
+      </Space>
+
+      <InputNumber
+        aria-label="A number field"
+        placeholder="Placeholder text"
+        style={{ inlineSize: '100%' }}
+        size={compressed ? 'small' : 'middle'}
+        disabled={disabled}
+        status={invalid ? 'error' : undefined}
+      />
+    </Space>
+  );
+};
+```
+
+## Native validation
+
+Given `min`, `max` or `step`, the control knows what it will accept and can say
+so as the reader types, without waiting for the form to be submitted.
+
+The message the browser shows for this is its own - a tooltip on hover, in the
+browser's language, in the browser's wording. Where the message matters, give
+the row an error of its own instead of relying on it.
+
+```tsx interactive
+import React from 'react';
+import { Form, InputNumber } from 'antd';
+
+export default () => {
+  const [value, setValue] = React.useState(5);
+  const outside = value === null || value < 0 || value > 10 || value % 2 !== 0;
+
+  return (
+    <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+      <Form.Item
+        label="Enter an even number between 0 and 10"
+        validateStatus={outside ? 'error' : undefined}
+        help={outside ? 'Must be an even number from 0 to 10.' : undefined}
+        style={{ marginBottom: 0 }}
+      >
+        <InputNumber
+          min={0}
+          max={10}
+          step={2}
+          value={value}
+          onChange={setValue}
+          style={{ inlineSize: '100%' }}
+        />
+      </Form.Item>
+    </Form>
+  );
+};
+```
+
+<FormUsage />

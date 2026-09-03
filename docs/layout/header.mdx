@@ -1,0 +1,627 @@
+---
+title: Header
+description: Ant Design Layout.Header, composed by hand
+antd_components: [Layout]
+sidebar_position: 2
+---
+
+# Header
+
+A header is not one component but a shape made of several. Ant Design ships
+one, `Layout.Header`, and leaves the inside to the page.
+
+The examples below therefore define three small helpers - `Section`, `Item` and
+`Logo` - so that the same arrangement is written the same way each time:
+
+- **`Section`**: a left or right container with flex behaviour.
+- **`Item`**: one thing in a section, as a flex child.
+- **`Logo`**: a linked mark sized to the header's height.
+
+The two that Ant Design does supply are an ordinary `Button` for a header
+control, and `Breadcrumb` for a trail inside the header.
+
+## Component
+
+Everything at once: a logo, a control, a trail, and a set of controls on the
+right.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Badge, Breadcrumb, Button, Layout } from 'antd';
+import { AppstoreOutlined, SearchOutlined } from '@ant-design/icons';
+
+const Logo = ({ children }) => (
+  <span style={{ fontWeight: 700, paddingInlineEnd: 16 }}>{children}</span>
+);
+const Section = ({ children, style }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 4, ...style }}>{children}</div>
+);
+const Item = ({ children }) => (
+  <div style={{ display: 'flex', alignItems: 'center' }}>{children}</div>
+);
+
+const headerStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingInline: 16,
+  blockSize: 48,
+  lineHeight: '48px',
+  background: 'var(--ant-color-bg-container)',
+  borderBlockEnd: '1px solid var(--ant-color-split)',
+};
+
+export default () => (
+  <Layout.Header style={headerStyle}>
+    <Section>
+      <Item>
+        <Logo>stackread</Logo>
+      </Item>
+
+      <Item>
+        <Button type="text" aria-label="Spaces menu">
+          <Avatar size={24} shape="square">
+            S
+          </Avatar>
+        </Button>
+      </Item>
+
+      <Item>
+        <Breadcrumb
+          aria-label="Header breadcrumbs"
+          items={[
+            { title: <a href="#">Management</a> },
+            { title: <a href="#">Users</a> },
+            { title: 'Create' },
+          ]}
+        />
+      </Item>
+    </Section>
+
+    <Section>
+      <Item>
+        <Button type="text" aria-label="Sitewide search">
+          <SearchOutlined />
+        </Button>
+      </Item>
+
+      <Item>
+        <Button type="text" aria-label="Account menu">
+          <Avatar size={24}>JU</Avatar>
+        </Button>
+      </Item>
+
+      <Button type="text" aria-label="Apps menu with 1 new app">
+        <Badge count={1} size="small">
+          <AppstoreOutlined />
+        </Badge>
+      </Button>
+    </Section>
+  </Layout.Header>
+);
+```
+
+## Usage
+
+### Sections
+
+A header has two sides. What goes on the left is where the reader is; what goes
+on the right is what they can do about it.
+
+Keeping that split consistent across an application is most of what makes a
+header readable - a control that moves from one side to the other between pages
+has to be looked for every time.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Button, Layout } from 'antd';
+import { AppstoreOutlined, SearchOutlined } from '@ant-design/icons';
+
+const Logo = ({ children }) => (
+  <span style={{ fontWeight: 700, paddingInlineEnd: 16 }}>{children}</span>
+);
+
+const headerStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingInline: 16,
+  blockSize: 48,
+  lineHeight: '48px',
+  background: 'var(--ant-color-bg-container)',
+  borderBlockEnd: '1px solid var(--ant-color-split)',
+};
+
+export default () => (
+  <Layout.Header style={headerStyle}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+      <Logo>stackread</Logo>
+      <Button type="text" aria-label="Spaces menu">
+        <Avatar size={24} shape="square">
+          S
+        </Avatar>
+      </Button>
+    </div>
+
+    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+      <Button type="text" aria-label="Sitewide search">
+        <SearchOutlined />
+      </Button>
+      <Button type="text" aria-label="Apps menu">
+        <AppstoreOutlined />
+      </Button>
+      <Button type="text" aria-label="Account menu">
+        <Avatar size={24}>JU</Avatar>
+      </Button>
+    </div>
+  </Layout.Header>
+);
+```
+
+### Header links
+
+Where the header carries navigation rather than controls, the links belong in
+their own group, with the current one marked.
+
+On a narrow screen they collapse behind one control - a row of links is the
+first thing a header cannot afford at that width.
+
+```tsx interactive
+import React from 'react';
+import { Layout, Space } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+
+const Logo = ({ children }) => (
+  <span style={{ fontWeight: 700, paddingInlineEnd: 16 }}>{children}</span>
+);
+const Item = ({ children }) => (
+  <div style={{ display: 'flex', alignItems: 'center' }}>{children}</div>
+);
+
+const headerStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 16,
+  paddingInline: 16,
+  blockSize: 48,
+  lineHeight: '48px',
+  background: 'var(--ant-color-bg-container)',
+  borderBlockEnd: '1px solid var(--ant-color-split)',
+};
+
+export default () => (
+  <Layout.Header style={headerStyle}>
+    <Item>
+      <Logo>stackread</Logo>
+    </Item>
+
+    <Item>
+      <Space size={16} role="navigation" aria-label="App navigation links">
+        <a href="#" aria-current="page" style={{ fontWeight: 600 }}>
+          Docs
+        </a>
+        <a href="#">Code</a>
+        <a href="#">
+          <QuestionCircleOutlined />
+          Help
+        </a>
+      </Space>
+    </Item>
+  </Layout.Header>
+);
+```
+
+### Fixed header
+
+A fixed header stays put while the page scrolls under it. That is right for
+something the reader needs at any point - navigation, an account menu - and
+wrong for anything they only need once.
+
+Fixing it takes it out of the flow, so the content beneath needs padding equal
+to the header's height, or the top of the page starts underneath it.
+
+```tsx interactive
+import React from 'react';
+import { Layout, Space, Switch, Typography } from 'antd';
+
+const Logo = ({ children }) => (
+  <span style={{ fontWeight: 700, paddingInlineEnd: 16 }}>{children}</span>
+);
+
+export default () => {
+  const [fixed, setFixed] = React.useState(false);
+
+  const headerStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    paddingInline: 16,
+    blockSize: 48,
+    lineHeight: '48px',
+    background: 'var(--ant-color-bg-container)',
+    borderBlockEnd: '1px solid var(--ant-color-split)',
+    position: fixed ? 'sticky' : 'static',
+    insetBlockStart: 0,
+    zIndex: 10,
+  };
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={fixed} onChange={setFixed} />
+        Make header fixed position
+      </label>
+
+      <div style={{ maxBlockSize: 160, overflowY: 'auto', border: '1px solid var(--ant-color-border)' }}>
+        <Layout.Header style={headerStyle}>
+          <Logo>stackread</Logo>
+        </Layout.Header>
+
+        <div style={{ padding: 16 }}>
+          {Array.from({ length: 8 }, (_, i) => (
+            <Typography.Paragraph key={i}>
+              Scroll this panel to see whether the header stays.
+            </Typography.Paragraph>
+          ))}
+        </div>
+      </div>
+    </Space>
+  );
+};
+```
+
+### Dark theme
+
+A header on a dark surface marks it out as chrome rather than content. It is a
+useful signal in an application whose pages are otherwise light - the dark bar
+is the one thing that does not change from page to page.
+
+Take care with what goes on it. Everything inside has to be legible against the
+dark surface, which is a different set of colours, not the same ones dimmed.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Badge, Button, Layout, Space, Tag } from 'antd';
+import { DownOutlined, MailOutlined } from '@ant-design/icons';
+
+const Logo = ({ children }) => (
+  <span style={{ fontWeight: 700, paddingInlineEnd: 16, color: 'inherit' }}>{children}</span>
+);
+
+const headerStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingInline: 16,
+  blockSize: 48,
+  lineHeight: '48px',
+  background: '#1D1E24',
+  color: '#FFFFFF',
+};
+
+export default () => (
+  <Layout.Header style={headerStyle}>
+    <Space size={4}>
+      <Logo>stackread</Logo>
+      <span role="navigation" aria-label="App navigation, dark theme">
+        <a href="#" style={{ color: '#FFFFFF', marginInlineEnd: 16, fontWeight: 600 }}>
+          Docs
+        </a>
+        <a href="#" style={{ color: '#CAD3E2', marginInlineEnd: 16 }}>
+          Code
+        </a>
+        <a href="#" style={{ color: '#CAD3E2' }}>
+          Help
+        </a>
+      </span>
+    </Space>
+
+    <Space size={4}>
+      <Tag style={{ background: '#343741', color: '#FFFFFF', borderColor: 'transparent' }}>
+        Production logs <DownOutlined />
+      </Tag>
+
+      <Button type="text" aria-label="2 Notifications" style={{ color: '#FFFFFF' }}>
+        <Badge count={2} size="small">
+          <MailOutlined />
+        </Badge>
+      </Button>
+
+      <Button type="text" aria-label="Account menu" style={{ color: '#FFFFFF' }}>
+        <Avatar size={24}>JU</Avatar>
+      </Button>
+    </Space>
+  </Layout.Header>
+);
+```
+
+### Portal content in the header
+
+A control in the header often opens something much larger than the header -
+a feed of updates, an account panel. That content is rendered in a layer of its
+own, so it is not clipped by the bar it came from.
+
+Which of the two shapes to use is a question about length. A popover suits a
+short list the reader will scan and close; a drawer suits a feed they may read
+through.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Badge, Button, Drawer, Layout, Popover, Space, Tag, Typography } from 'antd';
+import { BellOutlined, MailOutlined } from '@ant-design/icons';
+
+const Logo = ({ children }) => (
+  <span style={{ fontWeight: 700, paddingInlineEnd: 16 }}>{children}</span>
+);
+const Section = ({ children }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>{children}</div>
+);
+const Item = ({ children }) => (
+  <div style={{ display: 'flex', alignItems: 'center' }}>{children}</div>
+);
+
+const messages = [
+  { title: 'Control access to features', text: 'Show or hide applications per space.', date: '1 May', badgeFor: '7.1' },
+  { title: 'A new look for dashboards', text: 'Simplified navigation and dark mode.', date: '10 April', badgeFor: '7.0' },
+  { title: 'Enter dark mode', text: 'Now supported across the entire UI.', date: '10 April', badgeFor: '7.0' },
+];
+
+const Message = ({ m }) => (
+  <div style={{ paddingBlock: 12, borderBlockEnd: '1px solid var(--ant-color-split)' }}>
+    <Space size={8} style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <Typography.Text strong>{m.title}</Typography.Text>
+      <Tag>{m.badgeFor}</Tag>
+    </Space>
+    <Typography.Paragraph type="secondary" style={{ marginBottom: 4 }}>
+      {m.text}
+    </Typography.Paragraph>
+    <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+      {m.date}
+    </Typography.Text>
+  </div>
+);
+
+const headerStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingInline: 16,
+  blockSize: 48,
+  lineHeight: '48px',
+  background: 'var(--ant-color-bg-container)',
+  borderBlockEnd: '1px solid var(--ant-color-split)',
+};
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+  const heading = "What's new";
+
+  return (
+    <>
+      <Layout.Header style={headerStyle}>
+        <Section>
+          <Item>
+            <Logo>stackread</Logo>
+          </Item>
+        </Section>
+
+        <Section>
+          <Button type="text" aria-label="Alerts feed: updates available" onClick={() => setOpen(true)}>
+            <Badge dot>
+              <BellOutlined />
+            </Badge>
+          </Button>
+
+          <Item>
+            <Popover
+              trigger="click"
+              placement="bottomRight"
+              title={heading}
+              content={
+                <div style={{ inlineSize: 300, maxBlockSize: 240, overflowY: 'auto' }}>
+                  {messages.map((m) => (
+                    <Message key={m.title} m={m} />
+                  ))}
+                </div>
+              }
+            >
+              <Button type="text" aria-label="News feed: updates available">
+                <Badge count={6} size="small">
+                  <MailOutlined />
+                </Badge>
+              </Button>
+            </Popover>
+          </Item>
+
+          <Item>
+            <Popover
+              trigger="click"
+              placement="bottomRight"
+              content={
+                <Space size={16} align="start" style={{ inlineSize: 280 }}>
+                  <Avatar size={48}>JU</Avatar>
+                  <div>
+                    <Typography.Paragraph>John Username</Typography.Paragraph>
+                    <Space size={16}>
+                      <a href="#">Edit profile</a>
+                      <a href="#">Log out</a>
+                    </Space>
+                  </div>
+                </Space>
+              }
+            >
+              <Button type="text" aria-label="Account menu">
+                <Avatar size={24}>JU</Avatar>
+              </Button>
+            </Popover>
+          </Item>
+        </Section>
+      </Layout.Header>
+
+      <Drawer open={open} onClose={() => setOpen(false)} title={heading} placement="right">
+        {messages.map((m) => (
+          <Message key={m.title} m={m} />
+        ))}
+      </Drawer>
+    </>
+  );
+};
+```
+
+### Header notifications
+
+A control in the header can carry a count of what is waiting behind it.
+
+Put the number in the control's accessible name as well as on it. "News feed"
+and "News feed, 3 updates" are different pieces of information, and only one of
+them is visible.
+
+```tsx interactive
+import React from 'react';
+import { Badge, Button, Layout, Space } from 'antd';
+import { BellOutlined } from '@ant-design/icons';
+
+const Logo = ({ children }) => (
+  <span style={{ fontWeight: 700, paddingInlineEnd: 16 }}>{children}</span>
+);
+
+const headerStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingInline: 16,
+  blockSize: 48,
+  lineHeight: '48px',
+  background: 'var(--ant-color-bg-container)',
+  borderBlockEnd: '1px solid var(--ant-color-split)',
+};
+
+export default () => {
+  const [count, setCount] = React.useState(0);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Button size="small" onClick={() => setCount((n) => (n >= 3 ? 0 : n + 1))}>
+        {count >= 3 ? 'Reset' : 'Notify'}
+      </Button>
+
+      <Layout.Header style={headerStyle}>
+        <Logo>stackread</Logo>
+
+        <Space size={4}>
+          {[
+            { glyphe: <BellOutlined />, dot: true },
+            { glyphe: '\u2709', dot: false },
+          ].map((k) => (
+            <Button
+              key={k.glyphe}
+              type="text"
+              aria-label={
+                count
+                  ? k.dot
+                    ? 'News feed: updates available'
+                    : `News feed: ${count} updates`
+                  : 'News feed: no updates'
+              }
+            >
+              <Badge dot={k.dot && count > 0} count={k.dot ? 0 : count} size="small">
+                <span aria-hidden>{k.glyphe}</span>
+              </Badge>
+            </Button>
+          ))}
+        </Space>
+      </Layout.Header>
+    </Space>
+  );
+};
+```
+
+### Stacked headers
+
+Two headers can sit one above the other: the upper one for the account and the
+product, the lower one for the place inside it.
+
+The split is by rate of change. What is the same on every page of the
+application belongs above; what changes with the page belongs below.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Badge, Breadcrumb, Button, Layout, Space, Switch } from 'antd';
+import { MailOutlined } from '@ant-design/icons';
+
+const Logo = ({ children }) => (
+  <span style={{ fontWeight: 700, paddingInlineEnd: 16 }}>{children}</span>
+);
+
+export default () => {
+  const [fixed, setFixed] = React.useState(false);
+
+  const shared = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingInline: 16,
+    blockSize: 48,
+    lineHeight: '48px',
+    position: fixed ? 'sticky' : 'static',
+    zIndex: 10,
+  };
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={fixed} onChange={setFixed} />
+        Make headers fixed position
+      </label>
+
+      <div>
+        <Layout.Header
+          style={{ ...shared, background: '#1D1E24', color: '#FFFFFF', insetBlockStart: 0 }}
+        >
+          <Logo>stackread</Logo>
+
+          <Avatar size={24} aria-label="John Username">
+            JU
+          </Avatar>
+        </Layout.Header>
+
+        <Layout.Header
+          style={{
+            ...shared,
+            background: 'var(--ant-color-bg-container)',
+            borderBlockEnd: '1px solid var(--ant-color-split)',
+            insetBlockStart: 48,
+          }}
+        >
+          <Space size={8}>
+            <Button type="text" aria-label="Spaces menu">
+              <Avatar size={24} shape="square">
+                D
+              </Avatar>
+            </Button>
+
+            <Breadcrumb
+              aria-label="Stacked header breadcrumbs"
+              items={[{ title: <a href="#">Management</a> }, { title: 'Users' }]}
+            />
+          </Space>
+
+          <Button type="text" aria-label="News feed: updates available">
+            <Badge dot>
+              <MailOutlined />
+            </Badge>
+          </Button>
+        </Layout.Header>
+      </div>
+    </Space>
+  );
+};
+```
+
+### Product navigation
+
+A full worked example would be a header, a collapsible nav under it, and the
+state of both kept between visits.
+
+That is a pattern rather than a component, and it belongs to the application
+that builds it: which groups exist, what is pinned, and where that is stored
+are decisions no theme can make.

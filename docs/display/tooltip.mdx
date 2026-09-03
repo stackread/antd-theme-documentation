@@ -1,0 +1,219 @@
+---
+title: Tooltip
+description: Ant Design Tooltip
+antd_components: [Tooltip]
+---
+
+# Tooltip
+
+A tooltip gives short, **non-essential** context - usually naming something or
+describing it in a few more words. Anything interactive, or anything that is not
+text, belongs in a popover instead.
+
+**Prefer a tooltip to the browser's own.** The native one cannot be styled, does
+not appear on touch devices at all, and is announced differently by every
+screen reader.
+
+In Ant Design this is `Tooltip`. It takes `title` for the content, and
+`placement` for a suggested position - which it will change if the tooltip would
+otherwise run off the edge of the screen.
+
+```tsx interactive
+import React from 'react';
+import { Space, Tooltip, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Typography>
+      <p style={{ marginBottom: 0 }}>
+        This tooltip appears on the{' '}
+        <Tooltip title="Here is some tooltip text." placement="top">
+          <Typography.Link href="#">top</Typography.Link>
+        </Tooltip>
+        , this one on the{' '}
+        <Tooltip title="Here is some tooltip text." placement="right">
+          <Typography.Link href="#">right</Typography.Link>
+        </Tooltip>
+        , this one on the{' '}
+        <Tooltip title="Here is some tooltip text." placement="bottom">
+          <Typography.Link href="#">bottom</Typography.Link>
+        </Tooltip>
+        , and this one on the{' '}
+        <Tooltip title="Here is some tooltip text." placement="left">
+          <Typography.Link href="#">left</Typography.Link>
+        </Tooltip>
+        .
+      </p>
+    </Typography>
+
+    <Tooltip title="Here is some tooltip text. Lets add some more content to see how it wraps.">
+      <span style={{ borderBlockEnd: '1px dotted var(--ant-color-border)' }}>
+        Long content wraps
+      </span>
+    </Tooltip>
+  </Space>
+);
+```
+
+## Accessibility requirements
+
+### Tooltip anchor
+
+The thing a tooltip hangs on must be reachable by keyboard. A tooltip on a plain
+`<span>` can only be found with a mouse, which means it does not exist for
+anyone else.
+
+### Tooltip content
+
+Keep it to text. A tooltip disappears the moment the pointer leaves, so anything
+that has to be clicked inside it cannot be reached.
+
+## Screen reader output
+
+A tooltip on a control that already has a label produces that label twice. Where
+the tooltip only repeats the name, it should not be announced again.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Tooltip } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
+
+export default () => (
+  <Space size={24}>
+    <Tooltip title="Edit">
+      <Button aria-label="Edit"><EditOutlined /></Button>
+    </Tooltip>
+
+    <Tooltip title="Edit" disableScreenReaderOutput>
+      <Button aria-label="Edit"><EditOutlined /></Button>
+    </Tooltip>
+  </Space>
+);
+```
+
+## Disabled elements
+
+A disabled control fires no pointer events, so a tooltip on it never appears -
+which is unfortunate, because "why is this disabled" is exactly when the reader
+wants one.
+
+The remedy is to hang the tooltip on a wrapper rather than on the control.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Tooltip } from 'antd';
+
+export default () => (
+  <Space size={24}>
+    <Tooltip title="Fill in all required fields to save">
+      <span>
+        <Button disabled style={{ pointerEvents: 'none' }}>
+          Save
+        </Button>
+      </span>
+    </Tooltip>
+
+    <Tooltip title="Fill in all required fields to save">
+      <Button disabled>Save without a wrapper</Button>
+    </Tooltip>
+
+    <Tooltip title="Tooltip remains visible while the child is focused.">
+      <Button>Focus me</Button>
+    </Tooltip>
+  </Space>
+);
+```
+
+## Wrapping components
+
+A tooltip needs an element that forwards a ref and accepts pointer events. Most
+components do; a fragment or a bare string does not, and then the tooltip needs
+a wrapper of its own.
+
+```tsx interactive
+import React from 'react';
+import { Button, Input, Space, Tooltip } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+    <Tooltip title="I do not think it means what you think it means">
+      <Button>Hover me</Button>
+    </Tooltip>
+
+    <Tooltip title="Source maps allow browser dev tools to map minified code to the original source code">
+      <Input placeholder="A field with a tooltip" />
+    </Tooltip>
+
+    <Tooltip title="Here is some tooltip text">
+      <span style={{ borderBlockEnd: '1px dotted var(--ant-color-border)', alignSelf: 'start' }}>
+        A wrapped piece of text
+      </span>
+    </Tooltip>
+  </Space>
+);
+```
+
+## Tooltip on a fixed element
+
+A tooltip follows its anchor while the page scrolls, including one that is
+fixed in place.
+
+```tsx interactive
+import React from 'react';
+import { Button, Tooltip } from 'antd';
+
+export default () => (
+  <div style={{ blockSize: 140, overflow: 'auto', padding: 16, border: '1px solid var(--ant-color-border)' }}>
+    <div style={{ position: 'sticky', insetBlockStart: 0 }}>
+      <Tooltip title="This tooltip text scrolls with the fixed example button.">
+        <Button>Hover me while scrolling</Button>
+      </Tooltip>
+    </div>
+    <div style={{ blockSize: 400 }}>Scroll this area.</div>
+  </div>
+);
+```
+
+## Icon tip
+
+An icon with a tooltip is the compact form: a question mark beside a label,
+carrying the explanation that would otherwise crowd the form.
+
+The icon still needs a label of its own - without one it is a shape a screen
+reader cannot name.
+
+```tsx interactive
+import React from 'react';
+import { Space, Tooltip, Typography } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+
+const glyph = {
+  cursor: 'help',
+  color: 'var(--ant-color-text-description)',
+};
+
+export default () => (
+  <Space orientation="vertical" size={12} style={{ display: 'flex' }}>
+    <Typography.Text>
+      Source maps{' '}
+      <Tooltip title="Source maps allow browser dev tools to map minified code to the original source code">
+        <QuestionCircleOutlined aria-label="Icon with tooltip" />
+      </Tooltip>
+    </Typography.Text>
+
+    <Typography.Text>
+      Here is some text{' '}
+      <Tooltip title="Tooltip titles are optional">
+        <QuestionCircleOutlined aria-label="Icon with tooltip" />
+      </Tooltip>
+    </Typography.Text>
+
+    <Typography.Text>
+      And one more{' '}
+      <Tooltip title="Here is some tooltip text">
+        <QuestionCircleOutlined aria-label="Icon with tooltip" />
+      </Tooltip>
+    </Typography.Text>
+  </Space>
+);
+```

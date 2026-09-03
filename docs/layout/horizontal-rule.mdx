@@ -1,0 +1,93 @@
+---
+title: Horizontal rule
+description: Ant Design Divider
+antd_components: [Divider]
+sidebar_position: 3
+---
+
+# Horizontal rule
+
+A styled `<hr>`. It comes in three lengths, and full width is the default.
+
+A rule separates things that are already separate. Where the two sides differ
+enough to be told apart without one - different backgrounds, different
+spacing - the rule is one more line for the eye to cross.
+
+```tsx interactive
+import React from 'react';
+import { Divider, Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={0} style={{ display: 'flex', maxInlineSize: 400 }}>
+    <Typography.Text type="secondary">Full - the default</Typography.Text>
+    <Divider />
+
+    <Typography.Text type="secondary">Half</Typography.Text>
+    <Divider style={{ inlineSize: '50%', minInlineSize: 0 }} />
+
+    <Typography.Text type="secondary">Quarter</Typography.Text>
+    <Divider style={{ inlineSize: '25%', minInlineSize: 0 }} />
+
+    <Typography.Text type="secondary">Vertical, between two things on a line</Typography.Text>
+    <div>
+      One
+      <Divider orientation="vertical" />
+      Two
+      <Divider orientation="vertical" />
+      Three
+    </div>
+  </Space>
+);
+```
+
+## Margins
+
+The space before and after a rule is a prop.
+
+Remember that these margins collapse against whatever sits above and below.
+A rule with a large margin between two paragraphs that already have their own
+does not add the two together - it takes the larger of them, which is usually
+not the spacing that was intended.
+
+```tsx interactive
+import React from 'react';
+import { Divider, Segmented, Space, Typography } from 'antd';
+
+const text = 'A paragraph, so that the space around the rule is visible.';
+
+export default () => {
+  const [gap, setGap] = React.useState(16);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <Segmented
+        value={gap}
+        onChange={setGap}
+        aria-label="Margin"
+        options={[
+          { value: 0, label: 'None' },
+          { value: 4, label: 'XS' },
+          { value: 8, label: 'S' },
+          { value: 16, label: 'M' },
+          { value: 24, label: 'L' },
+          { value: 32, label: 'XL' },
+        ]}
+      />
+
+      <div>
+        <Typography.Paragraph style={{ marginBottom: 0 }}>{text}</Typography.Paragraph>
+        <Divider style={{ marginBlock: gap }} />
+        <Typography.Paragraph style={{ marginBottom: 0 }}>{text}</Typography.Paragraph>
+        <Divider style={{ marginBlock: gap }} />
+        <Typography.Paragraph style={{ marginBottom: 0 }}>{text}</Typography.Paragraph>
+        <Divider style={{ marginBlock: gap }} />
+        <Typography.Paragraph style={{ marginBottom: 0 }}>{text}</Typography.Paragraph>
+        <Divider style={{ marginBlock: gap }} />
+        <Typography.Paragraph style={{ marginBottom: 0 }}>{text}</Typography.Paragraph>
+        <Divider style={{ marginBlock: gap }} />
+        <Typography.Paragraph style={{ marginBottom: 0 }}>{text}</Typography.Paragraph>
+      </div>
+    </Space>
+  );
+};
+```

@@ -1,0 +1,286 @@
+---
+title: List group
+description: A list group composed from Flex
+antd_components: [Flex]
+---
+
+# List group
+
+A list group presents items in a neat, tight list - a navigation panel, a set of
+saved searches, a menu that is not a menu.
+
+**Ant Design has no list group.** It had a `List`, and marks it as deprecated in
+v6; the next major version removes it. What follows is composed from `Flex`:
+one for the group, one for each row.
+
+That is not a workaround. Measured, a list item **is** a
+flex row - 32px tall, an 8px gap between the icon and the label, and no
+separator between one item and the next. Composing it from `Flex` says exactly
+that, where reaching for a component would have said "whatever the component
+does".
+
+```tsx interactive
+import React from 'react';
+import { Flex, Space, Switch, Typography } from 'antd';
+
+const rowStyle = {
+  blockSize: 32,
+  paddingInline: 8,
+  borderRadius: 4,
+  alignItems: 'center',
+  gap: 8,
+};
+
+export default () => {
+  const [bordered, setBordered] = React.useState(true);
+
+  const groupStyle = bordered
+    ? {
+        border: '1px solid var(--ant-color-border)',
+        borderRadius: 6,
+        padding: 4,
+      }
+    : undefined;
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={bordered} onChange={setBordered} />
+        Bordered
+      </label>
+
+      <Flex vertical style={groupStyle}>
+        <Flex style={rowStyle}>
+          <Typography.Text>First item</Typography.Text>
+        </Flex>
+        <Flex style={rowStyle}>
+          <Typography.Text>Second item</Typography.Text>
+        </Flex>
+        <Flex style={rowStyle}>
+          <Typography.Text>Third item</Typography.Text>
+        </Flex>
+        <Flex style={rowStyle}>
+          <Typography.Text>Fourth item</Typography.Text>
+        </Flex>
+      </Flex>
+    </Space>
+  );
+};
+```
+
+## List of links
+
+Where the items are links, the list becomes navigation. One of them is usually
+the current place, and it should say so - a list of links with nothing marked
+leaves the reader without a position.
+
+Mark it with `aria-current` as well as with weight. Bold text is a position for
+a reader who can see it and nothing at all for one who cannot.
+
+```tsx interactive
+import React from 'react';
+import { Flex, Typography } from 'antd';
+
+const rowStyle = { blockSize: 32, paddingInline: 8, borderRadius: 4, alignItems: 'center', gap: 8 };
+const groupStyle = {
+  border: '1px solid var(--ant-color-border)',
+  borderRadius: 6,
+  padding: 4,
+  maxInlineSize: 400,
+};
+
+export default () => (
+  <Flex vertical style={groupStyle}>
+    <Flex style={{ ...rowStyle, background: 'var(--ant-color-primary-bg)' }}>
+      <Typography.Link href="#" aria-current="page" style={{ fontWeight: 600 }}>
+        First item
+      </Typography.Link>
+    </Flex>
+    <Flex style={rowStyle}>
+      <Typography.Link href="#">Second item</Typography.Link>
+    </Flex>
+    <Flex style={rowStyle}>
+      <Typography.Link href="#">Third item</Typography.Link>
+    </Flex>
+    <Flex style={rowStyle}>
+      <Typography.Text disabled>Fourth item</Typography.Text>
+    </Flex>
+  </Flex>
+);
+```
+
+## Secondary link actions
+
+An item can carry an action of its own - pin, delete, open elsewhere. It sits
+apart from the item's own click target, so that reaching one does not trigger
+the other.
+
+The action needs a label naming the item it belongs to. "Delete" repeated down a
+list says nothing about which thing is being deleted.
+
+```tsx interactive
+import React from 'react';
+import { Button, Flex, Typography } from 'antd';
+
+const entries = ['First item', 'Second item', 'Third item', 'Fourth item', 'Fifth item'];
+
+export default () => {
+  const [pinned, setPinned] = React.useState(['Second item']);
+
+  const toggle = (name) =>
+    setPinned((a) => (a.includes(name) ? a.filter((x) => x !== name) : [...a, name]));
+
+  return (
+    <Flex
+      vertical
+      style={{
+        border: '1px solid var(--ant-color-border)',
+        borderRadius: 6,
+        padding: 4,
+        maxInlineSize: 400,
+      }}
+    >
+      {entries.map((name) => (
+        <Flex
+          key={name}
+          style={{
+            blockSize: 32,
+            paddingInline: 8,
+            borderRadius: 4,
+            alignItems: 'center',
+            gap: 8,
+            justifyContent: 'space-between',
+          }}
+        >
+          <Typography.Link href="#">{name}</Typography.Link>
+
+          <Button
+            type="text"
+            size="small"
+            aria-label={`${pinned.includes(name) ? 'Unpin' : 'Pin'} ${name}`}
+            onClick={() => toggle(name)}
+          >
+            {pinned.includes(name) ? 'Pinned' : 'Pin'}
+          </Button>
+        </Flex>
+      ))}
+    </Flex>
+  );
+};
+```
+
+## Text wrapping and tooltips
+
+A long label truncates by default and shows the whole of itself in a tooltip.
+Wrapping can be turned on instead, which suits a list where the labels are
+sentences rather than names.
+
+A wrapped row is no longer 32px tall, so the two settings are alternatives: a
+list of names keeps its rhythm, a list of sentences gives it up.
+
+```tsx interactive
+import React from 'react';
+import { Flex, Tooltip, Typography } from 'antd';
+
+const longText =
+  'Fourth very long item with wrapping enabled, custom props, and will not force truncation.';
+
+const cut = {
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  display: 'block',
+};
+
+export default () => (
+  <Flex
+    vertical
+    style={{
+      border: '1px solid var(--ant-color-border)',
+      borderRadius: 6,
+      padding: 4,
+      maxInlineSize: 400,
+    }}
+  >
+    <Flex style={{ blockSize: 32, paddingInline: 8, alignItems: 'center' }}>
+      <Tooltip title="First item">
+        <Typography.Text style={cut}>First item</Typography.Text>
+      </Tooltip>
+    </Flex>
+
+    <Flex style={{ blockSize: 32, paddingInline: 8, alignItems: 'center' }}>
+      <Tooltip title={longText}>
+        <Typography.Text style={cut}>{longText}</Typography.Text>
+      </Tooltip>
+    </Flex>
+
+    <Flex style={{ minBlockSize: 32, paddingInline: 8, alignItems: 'center', paddingBlock: 6 }}>
+      <Typography.Text>{longText}</Typography.Text>
+    </Flex>
+
+    <Flex style={{ blockSize: 32, paddingInline: 8, alignItems: 'center' }}>
+      <Typography.Text>Fourth item</Typography.Text>
+    </Flex>
+  </Flex>
+);
+```
+
+## List item color
+
+An item can take a colour: the default text, a subdued one for something
+secondary, or the primary colour for the current place. On a dark surface the
+same list needs its ghost variant.
+
+```tsx interactive
+import React from 'react';
+import { Card, Flex, Space, Typography } from 'antd';
+
+const rowStyle = { blockSize: 32, paddingInline: 8, alignItems: 'center' };
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+    <Flex vertical style={{ border: '1px solid var(--ant-color-border)', borderRadius: 6, padding: 4 }}>
+      <Flex style={rowStyle}>
+        <Typography.Text style={{ fontSize: 12 }}>Text by default (xs)</Typography.Text>
+      </Flex>
+      <Flex style={rowStyle}>
+        <Typography.Link href="#" style={{ fontSize: 14 }}>Primary (s)</Typography.Link>
+      </Flex>
+      <Flex style={rowStyle}>
+        <Typography.Text style={{ fontSize: 16 }}>Text (m)</Typography.Text>
+      </Flex>
+      <Flex style={rowStyle}>
+        <Typography.Text type="secondary" style={{ fontSize: 18 }}>Subdued (l)</Typography.Text>
+      </Flex>
+    </Flex>
+
+    <Card
+      data-variante="surface"
+      variant="borderless"
+      style={{ background: 'var(--ant-color-text)' }}
+      styles={{ body: { padding: 8 } }}
+    >
+      <Flex vertical>
+        <Flex style={rowStyle}>
+          <Typography.Text style={{ color: 'var(--ant-color-bg-container)' }}>Ghost</Typography.Text>
+        </Flex>
+      </Flex>
+    </Card>
+  </Space>
+);
+```
+
+## Pinnable list group
+
+:::note[Omitted: the pinnable list]
+
+**Affects:** 0 specimens - a separate component, not a list item.
+
+Pinning across a whole list is a component of its own: which items are pinned,
+in what order, and where the pinned ones appear. Ant
+Design has nothing equivalent.
+
+The pin *action* is shown above under secondary actions; what is missing is the
+bookkeeping around it, which is application work rather than theming.
+
+:::

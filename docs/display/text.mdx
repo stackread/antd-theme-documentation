@@ -1,0 +1,169 @@
+---
+title: Text
+description: Ant Design Typography
+antd_components: [Typography]
+---
+
+# Text
+
+Text is a catch-all wrapper that applies the standard typography and spacing to
+plain HTML. Because it forces those styles onto whatever it contains, it only
+takes markup - not components.
+
+In Ant Design this is `Typography` as a wrapper, with `Typography.Text` and
+`Typography.Paragraph` for individual pieces.
+
+```tsx interactive
+import React from 'react';
+import { Typography } from 'antd';
+
+export default () => (
+  <Typography>
+    <h1>This is Heading One</h1>
+    <p>
+      Far out in the uncharted backwaters of the unfashionable end of the western
+      spiral arm of the Galaxy lies a small unregarded yellow sun.
+    </p>
+
+    <h2>This is Heading Two</h2>
+    <p>
+      Orbiting this at a distance of roughly ninety-two million miles is an
+      utterly insignificant little blue-green planet whose ape-descended life
+      forms are so amazingly primitive that they still think digital watches are
+      a pretty neat idea.
+    </p>
+
+    <ul>
+      <li>List item one</li>
+      <li>List item two</li>
+      <li>List item three</li>
+    </ul>
+
+    <blockquote>
+      <p>
+        I am a blockquote, and I am here to be quoted.
+      </p>
+    </blockquote>
+
+    <p>
+      Text can contain <a href="#">links</a>, <strong>strong emphasis</strong>,{' '}
+      <em>emphasis</em> and <code>code</code>.
+    </p>
+  </Typography>
+);
+```
+
+## Text can come in various sizes
+
+Text comes in smaller sizes than the default. The point of the scale is that
+**every line-height lands on the 4px baseline grid** - which is what lets blocks
+of different sizes sit next to each other without drifting apart.
+
+```tsx interactive
+import React from 'react';
+import { Radio, Space, Typography } from 'antd';
+
+const paragraph =
+  'Orbiting this at a distance of roughly ninety-two million miles is an utterly insignificant little blue-green planet.';
+
+const levels = {
+  m: { fontSize: 16, lineHeight: '24px' },
+  s: { fontSize: 14, lineHeight: '20px' },
+  xs: { fontSize: 12, lineHeight: '16px' },
+  relative: { fontSize: 'inherit', lineHeight: 'inherit' },
+};
+
+export default () => {
+  const [level, setLevel] = React.useState('m');
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Radio.Group
+        value={level}
+        onChange={(e) => setLevel(e.target.value)}
+        optionType="button"
+        options={[
+          { value: 'm', label: 'medium' },
+          { value: 's', label: 'small' },
+          { value: 'xs', label: 'extra small' },
+          { value: 'relative', label: 'relative' },
+        ]}
+      />
+
+      <div style={{ display: 'flex', gap: 24 }}>
+        <Typography style={{ ...levels[level], flex: 1 }}>
+          <h3 style={{ fontSize: 'inherit' }}>The chosen size</h3>
+          <p style={{ marginBottom: 0 }}>{paragraph}</p>
+        </Typography>
+
+        <Typography style={{ ...levels.m, flex: 1 }}>
+          <h3 style={{ fontSize: 'inherit' }}>Medium, for comparison</h3>
+          <p style={{ marginBottom: 0 }}>{paragraph}</p>
+        </Typography>
+      </div>
+    </Space>
+  );
+};
+```
+
+## Coloring text
+
+There are two ways to colour text: piece by piece, or by colouring a whole
+block at once.
+
+A whole block is the right choice when the colour is a property of the passage -
+a subdued note, a warning. Piece by piece is for a word that carries the colour
+on its own.
+
+```tsx interactive
+import React from 'react';
+import { Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Typography>
+      <p style={{ marginBottom: 0 }}>
+        <Typography.Text>default</Typography.Text>{' '}
+        <Typography.Text type="secondary">subdued</Typography.Text>{' '}
+        <Typography.Text type="success">success</Typography.Text>{' '}
+        <Typography.Text type="warning">warning</Typography.Text>{' '}
+        <Typography.Text type="danger">danger</Typography.Text>{' '}
+        <Typography.Text style={{ color: 'var(--ant-color-magenta)' }}>accent</Typography.Text>
+      </p>
+    </Typography>
+
+    <Typography style={{ color: 'var(--ant-color-text-description)' }}>
+      <h3 style={{ color: 'inherit' }}>The whole block is subdued</h3>
+      <p style={{ marginBottom: 0 }}>
+        Including its heading - the colour is a property of the passage, not of
+        one word in it. On a dark surface the same mechanism gives ghost text.
+      </p>
+    </Typography>
+  </Space>
+);
+```
+
+## Alignment
+
+Alignment works the same way: a single piece, or a whole block.
+
+```tsx interactive
+import React from 'react';
+import { Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Typography style={{ textAlign: 'left' }}>
+      <p style={{ marginBottom: 0 }}>Left aligned - the default for this language.</p>
+    </Typography>
+
+    <Typography style={{ textAlign: 'center' }}>
+      <p style={{ marginBottom: 0 }}>Center aligned.</p>
+    </Typography>
+
+    <Typography style={{ textAlign: 'right' }}>
+      <p style={{ marginBottom: 0 }}>Right aligned.</p>
+    </Typography>
+  </Space>
+);
+```

@@ -1,0 +1,169 @@
+---
+title: Avatar
+description: Ant Design Avatar
+antd_components: [Avatar]
+---
+
+# Avatar
+
+An avatar stands for a person or a workspace. It shows initials, a picture, or
+an icon.
+
+In Ant Design this is `Avatar`.
+
+## Component
+
+An avatar takes a name. From it come the initials, and - unless one is given -
+the background colour, so that the same person keeps the same colour wherever
+they appear.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Space, Typography } from 'antd';
+
+const color = (name) => {
+  const palettes = ['#0B64DD', '#008A5E', '#BC1E70', '#19799F', '#8144CC', '#C24411'];
+  let n = 0;
+  for (const z of name) n = (n + z.charCodeAt(0)) % palettes.length;
+  return palettes[n];
+};
+
+const names = ['Cat Stevens', 'Build Machine', 'stackread', 'Raphael', 'Donatello'];
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Typography.Text strong>Colours from the name</Typography.Text>
+    <Space size={8}>
+      <Avatar style={{ background: color('Cat Stevens') }} aria-label="Cat Stevens">CS</Avatar>
+      <Avatar style={{ background: color('Build Machine') }} aria-label="Build Machine">BM</Avatar>
+      <Avatar style={{ background: color('stackread') }} aria-label="stackread">S</Avatar>
+    </Space>
+
+    <Typography.Text strong>Sizes</Typography.Text>
+    <Space size={8} align="center">
+      <Avatar size={16} aria-label="Extra small">R</Avatar>
+      <Avatar size={24} aria-label="Small">R</Avatar>
+      <Avatar size={32} aria-label="Medium">R</Avatar>
+      <Avatar size={40} aria-label="Large">R</Avatar>
+      <Avatar size={64} aria-label="Extra large">R</Avatar>
+    </Space>
+  </Space>
+);
+```
+
+## Usage
+
+### Initials
+
+The initials come from the name: the first letter of each word, **never more
+than two**. Both the number of letters and the letters themselves can be set
+instead - but two remains the ceiling, because three no longer read as initials.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Typography.Text strong>From the name</Typography.Text>
+    <Space size={8}>
+      <Avatar aria-label="Two words">CS</Avatar>
+      <Avatar aria-label="One word">S</Avatar>
+      <Avatar aria-label="Three words">KM</Avatar>
+      <Avatar aria-label="A long single word">L</Avatar>
+    </Space>
+
+    <Typography.Text strong>Set by hand</Typography.Text>
+    <Space size={8}>
+      <Avatar aria-label="One letter from a long name">C</Avatar>
+      <Avatar aria-label="Custom initials">EL</Avatar>
+      <Avatar aria-label="Still capped at two">KI</Avatar>
+      <Avatar aria-label="A single custom letter">X</Avatar>
+    </Space>
+  </Space>
+);
+```
+
+### Types
+
+The type sets the shape: round for a person, square-cornered for a workspace.
+The difference matters in a list where both appear - a shape is read before a
+name.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Typography.Text strong>People are round</Typography.Text>
+    <Space size={8}>
+      <Avatar aria-label="Cat Stevens">CS</Avatar>
+      <Avatar aria-label="Build Machine">BM</Avatar>
+    </Space>
+
+    <Typography.Text strong>Workspaces are square</Typography.Text>
+    <Space size={8}>
+      <Avatar shape="square" aria-label="Engineering">EN</Avatar>
+      <Avatar shape="square" aria-label="Design">DE</Avatar>
+    </Space>
+  </Space>
+);
+```
+
+### Icons
+
+An icon can stand in place of initials or a picture. Given nothing else, it
+takes its size and colour from the avatar around it.
+
+Where an icon has colours of its own - a logo - keep them, and make sure the
+background behind it is one they can be read against. An icon recoloured for
+contrast stops being that logo.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Space, Typography } from 'antd';
+import { BarChartOutlined, GlobalOutlined, ToolOutlined, UserOutlined } from '@ant-design/icons';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Typography.Text strong>Sized and coloured by the avatar</Typography.Text>
+    <Space size={8} align="center">
+      <Avatar size={24} aria-label="User"><UserOutlined /></Avatar>
+      <Avatar size={32} aria-label="User"><UserOutlined /></Avatar>
+      <Avatar size={40} aria-label="User"><UserOutlined /></Avatar>
+      <Avatar size={64} aria-label="User"><UserOutlined /></Avatar>
+    </Space>
+
+    <Typography.Text strong>Keeping the icon&rsquo;s own colours</Typography.Text>
+    <Space size={8} align="center">
+      <Avatar style={{ background: 'var(--ant-color-bg-layout)' }} aria-label="Logo"><GlobalOutlined /></Avatar>
+      <Avatar style={{ background: 'var(--ant-color-bg-layout)' }} aria-label="Logo"><BarChartOutlined /></Avatar>
+      <Avatar style={{ background: 'var(--ant-color-bg-layout)' }} aria-label="Logo"><ToolOutlined /></Avatar>
+      <Avatar style={{ background: 'var(--ant-color-bg-layout)' }} aria-label="Logo"><ToolOutlined /></Avatar>
+    </Space>
+  </Space>
+);
+```
+
+### Disabled
+
+An avatar has no behaviour of its own, so it cannot be disabled. What it can do
+is *look* disabled, for when it sits inside something that is.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Space } from 'antd';
+import { GlobalOutlined, UserOutlined } from '@ant-design/icons';
+
+const off = { opacity: 0.5, filter: 'grayscale(1)' };
+
+export default () => (
+  <Space size={8}>
+    <Avatar style={off} aria-label="Cat Stevens, unavailable">CS</Avatar>
+    <Avatar style={off} shape="square" aria-label="Engineering, unavailable">EN</Avatar>
+    <Avatar style={off} aria-label="User, unavailable"><UserOutlined /></Avatar>
+    <Avatar style={off} aria-label="Logo, unavailable"><GlobalOutlined /></Avatar>
+  </Space>
+);
+```

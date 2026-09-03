@@ -1,0 +1,934 @@
+---
+title: Combo box
+description: Ant Design Select in its searching and multiple forms
+antd_components: [Select]
+sidebar_position: 3
+---
+
+import FormRowCallout from '../_partials/_form-row-callout.mdx';
+import FormUsage from '../_partials/_form-usage.mdx';
+
+# Combo box
+
+A combo box is a text field with a list attached: the reader types to narrow
+the list, and picks from what is left. It can take several answers, and it can
+take answers that are not on the list at all.
+
+Reach for it when:
+
+- there are enough options that the reader will want to search,
+- more than one may be chosen, or
+- the reader should be able to add a value of their own.
+
+Ant Design has no separate component for this. It is `Select` with searching
+turned on, and `mode="multiple"` or `mode="tags"` where several answers or new
+ones are wanted.
+
+```tsx interactive
+import React from 'react';
+import { Select, Space, Switch } from 'antd';
+
+const options = [
+  { value: 'titan', label: 'Titan' },
+  { value: 'enceladus', label: 'Enceladus' },
+  { value: 'mimas', label: 'Mimas' },
+  { value: 'dione', label: 'Dione' },
+  { value: 'iapetus', label: 'Iapetus' },
+  { value: 'phoebe', label: 'Phoebe' },
+  { value: 'rhea', label: 'Rhea' },
+];
+
+export default () => {
+  const [compressed, setCompressed] = React.useState(false);
+  const [invalid, setInvalid] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+
+  const toggles = [
+    ['Compressed', compressed, setCompressed],
+    ['Invalid', invalid, setInvalid],
+    ['Loading', loading, setLoading],
+  ];
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <Space size={16} wrap>
+        {toggles.map(([name, value, setIt]) => (
+          <label key={name} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <Switch size="small" checked={value} onChange={setIt} />
+            {name}
+          </label>
+        ))}
+      </Space>
+
+      <Select
+        mode="multiple"
+        aria-label="A combo box"
+        placeholder="Select or create options"
+        defaultValue={['mimas']}
+        options={options}
+        size={compressed ? 'small' : 'middle'}
+        status={invalid ? 'error' : undefined}
+        loading={loading}
+        style={{ inlineSize: '100%' }}
+      />
+    </Space>
+  );
+};
+```
+
+<FormRowCallout />
+
+## Disabled
+
+A disabled combo box keeps its pills so the reader can still read what was
+chosen; it simply cannot be changed.
+
+```tsx interactive
+import React from 'react';
+import { Select } from 'antd';
+
+export default () => (
+  <Select
+    mode="multiple"
+    disabled
+    aria-label="A disabled combo box"
+    defaultValue={['titan', 'mimas']}
+    options={[
+      { value: 'titan', label: 'Titan' },
+      { value: 'mimas', label: 'Mimas' },
+      { value: 'dione', label: 'Dione' },
+    ]}
+    style={{ inlineSize: '100%', maxInlineSize: 400 }}
+  />
+);
+```
+
+## Virtualized
+
+The list renders only the rows that are on screen, so a list of ten thousand
+opens as fast as a list of ten.
+
+Ant Design does this by default; there is nothing to turn on. What it asks in
+return is that every row be the same height - which is why truncating a long
+label matters more here than it looks.
+
+```tsx interactive
+import React from 'react';
+import { Select } from 'antd';
+
+const manyOptions = Array.from({ length: 5000 }, (_, i) => ({
+  value: `option_${i}`,
+  label: `Option ${i + 1}`,
+}));
+
+export default () => (
+  <Select
+    mode="multiple"
+    showSearch
+    aria-label="A combo box with five thousand options"
+    placeholder="Five thousand options"
+    options={manyOptions}
+    style={{ inlineSize: '100%', maxInlineSize: 400 }}
+  />
+);
+```
+
+## Containers
+
+The list is rendered in a layer of its own, outside the flow of the page. That
+is what lets it escape a panel with `overflow: hidden` - and what makes it
+worth testing inside anything else that does the same, a modal or a popover.
+
+Where a container scrolls, the list should scroll with it. Tell it to render
+inside the container rather than at the end of the document.
+
+```tsx interactive
+import React from 'react';
+import { Button, Modal, Popover, Select, Space } from 'antd';
+
+const options = [
+  { value: 'titan', label: 'Titan' },
+  { value: 'mimas', label: 'Mimas' },
+  { value: 'dione', label: 'Dione' },
+];
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+  const heading = 'A combo box in a modal';
+
+  const field = (
+    <Select
+      mode="multiple"
+      aria-label="A combo box inside a container"
+      placeholder="Select options"
+      options={options}
+      style={{ inlineSize: '100%' }}
+    />
+  );
+
+  return (
+    <Space size={8}>
+      <Button onClick={() => setOpen(true)}>Open a modal</Button>
+
+      <Popover
+        trigger="click"
+        content={<div style={{ inlineSize: 260 }}>{field}</div>}
+      >
+        <Button>Open a popover</Button>
+      </Popover>
+
+      <Modal
+        open={open}
+        onCancel={() => setOpen(false)}
+        onOk={() => setOpen(false)}
+        title={heading}
+      >
+        {field}
+      </Modal>
+    </Space>
+  );
+};
+```
+
+## Pill colors
+
+A pill can carry a colour, which is useful where the options are tags or
+categories rather than plain values.
+
+The colour has to be legible against whatever text sits on it, so a custom
+colour needs its text colour chosen too rather than inherited.
+
+```tsx interactive
+import React from 'react';
+import { Select, Tag } from 'antd';
+
+const colors = {
+  titan: 'magenta',
+  mimas: 'green',
+  dione: 'blue',
+  rhea: '#8144CC',
+};
+
+export default () => (
+  <Select
+    mode="multiple"
+    aria-label="A combo box with coloured pills"
+    defaultValue={['titan', 'mimas']}
+    style={{ inlineSize: '100%', maxInlineSize: 400 }}
+    options={Object.keys(colors).map((k) => ({
+      value: k,
+      label: k[0].toUpperCase() + k.slice(1),
+    }))}
+    tagRender={({ label, value, closable, onClose }) => (
+      <Tag color={colors[value]} closable={closable} onClose={onClose} style={{ marginInlineEnd: 4 }}>
+        {label}
+      </Tag>
+    )}
+  />
+);
+```
+
+## Option rendering
+
+An option can carry something before or after its label - an icon, a count, a
+status. It shows in the list and on the pill.
+
+What it does not do is take part in the search. Only the label is matched, so
+anything the reader might type has to be in the label itself.
+
+```tsx interactive
+import React from 'react';
+import { Select, Space } from 'antd';
+
+const options = [
+  { value: 'titan', label: 'Titan', vor: 'new', nach: '12' },
+  { value: 'mimas', label: 'Mimas', vor: 'waxing', nach: '3' },
+  { value: 'dione', label: 'Dione', vor: 'half', nach: '48' },
+];
+
+export default () => (
+  <Select
+    mode="multiple"
+    aria-label="A combo box with decorated options"
+    defaultValue={['titan']}
+    options={options}
+    style={{ inlineSize: '100%', maxInlineSize: 400 }}
+    optionRender={({ data }) => (
+      <Space size={8} style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>
+          <span aria-hidden style={{ marginInlineEnd: 8 }}>{data.vor}</span>
+          {data.label}
+        </span>
+        <span style={{ color: 'var(--ant-color-text-description)' }}>{data.nach}</span>
+      </Space>
+    )}
+  />
+);
+```
+
+### Custom dropdown content
+
+Where the fixed slots are not enough, the whole row can be drawn by hand. The
+search string is available while doing so, which is how the matched part is
+highlighted.
+
+**Note:** rows drawn by hand still have to be the same height, or the
+virtualised list will misplace them. Truncate rather than wrap.
+
+```tsx interactive
+import React from 'react';
+import { Select } from 'antd';
+
+const options = [
+  { value: 'titan', label: 'Titan', state: 'success' },
+  { value: 'mimas', label: 'Mimas', state: 'warning' },
+  { value: 'dione', label: 'Dione', state: 'error' },
+];
+
+export default () => {
+  const [query, setQuery] = React.useState('');
+
+  const highlight = (text) => {
+    const i = text.toLowerCase().indexOf(query.toLowerCase());
+    if (!query || i === -1) return text;
+    return (
+      <>
+        {text.slice(0, i)}
+        <strong>{text.slice(i, i + query.length)}</strong>
+        {text.slice(i + query.length)}
+      </>
+    );
+  };
+
+  return (
+    <Select
+      mode="multiple"
+      showSearch
+      aria-label="A combo box with hand-drawn rows"
+      placeholder="Type to see the match highlighted"
+      options={options}
+      onSearch={setQuery}
+      style={{ inlineSize: '100%', maxInlineSize: 400 }}
+      optionRender={({ data }) => (
+        <span
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <span
+            aria-hidden
+            style={{
+              inlineSize: 8,
+              blockSize: 8,
+              borderRadius: '50%',
+              background: `var(--ant-color-${data.state})`,
+            }}
+          />
+          {highlight(data.label)}
+        </span>
+      )}
+    />
+  );
+};
+```
+
+## Tooltips
+
+An option can carry a tooltip explaining what it is. Use it for the option that
+needs a sentence, not for every option - a list where every row explains itself
+on hover is a list that should have been written differently.
+
+```tsx interactive
+import React from 'react';
+import { Select, Tooltip } from 'antd';
+
+const options = [
+  { value: 'titan', label: 'Titan', hint: 'The only moon with a dense atmosphere.' },
+  { value: 'mimas', label: 'Mimas', hint: 'Has one crater a third of its own width.' },
+  { value: 'dione', label: 'Dione', hint: null },
+];
+
+export default () => (
+  <Select
+    mode="multiple"
+    aria-label="A combo box with tooltips on its options"
+    placeholder="Hover an option"
+    options={options}
+    style={{ inlineSize: '100%', maxInlineSize: 400 }}
+    optionRender={({ data }) =>
+      data.hint ? (
+        <Tooltip title={data.hint} placement="right">
+          <span style={{ display: 'block' }}>{data.label}</span>
+        </Tooltip>
+      ) : (
+        data.label
+      )
+    }
+  />
+);
+```
+
+## Truncation
+
+A long label is cut at the end by default, since the beginning of a label is
+usually what tells the options apart.
+
+Where it is the end that differs - a path, a version, an id - cut in the middle
+or at the start instead, so the part that matters survives.
+
+```tsx interactive
+import React from 'react';
+import { Select } from 'antd';
+
+const longText = [
+  { value: 'a', label: '/var/log/application/gc.log.0.current' },
+  { value: 'b', label: '/var/log/application/gc.log.1.current' },
+  { value: 'c', label: '/var/log/application/audit.log' },
+];
+
+export default () => (
+  <Select
+    mode="multiple"
+    aria-label="A combo box with long option labels"
+    placeholder="Long labels, cut at the end"
+    options={longText}
+    style={{ inlineSize: 260 }}
+    optionRender={({ data }) => (
+      <span
+        title={data.label}
+        style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+      >
+        {data.label}
+      </span>
+    )}
+  />
+);
+```
+
+:::info[Wrapping turns truncation off]
+
+A row that wraps has no fixed height, so there is nothing left to truncate.
+The two settings are alternatives, not a pair.
+
+:::
+
+## Multiple lines
+
+In the rare case where the text must wrap rather than be cut, let the rows grow
+- and give up virtualisation, since rows of different heights cannot be placed
+without measuring them.
+
+:::warning[Wrapping costs performance]
+
+Without virtualisation every option is rendered, whether it is on screen or
+not. On a long list that is felt.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Select } from 'antd';
+
+const longText = [
+  { value: 'a', label: 'An option whose label is long enough that it will wrap onto a second line rather than being cut off' },
+  { value: 'b', label: 'A shorter one' },
+  { value: 'c', label: 'Another option with a label long enough to need more than one line to itself' },
+];
+
+export default () => (
+  <Select
+    mode="multiple"
+    virtual={false}
+    aria-label="A combo box whose options wrap"
+    placeholder="Options that wrap"
+    options={longText}
+    style={{ inlineSize: 260 }}
+    optionRender={({ data }) => (
+      <span style={{ display: 'block', whiteSpace: 'normal' }}>{data.label}</span>
+    )}
+  />
+);
+```
+
+## Groups
+
+Options can be gathered under headings. The heading is a label for the reader,
+not an option: it cannot be selected, and it is not matched against the search.
+
+```tsx interactive
+import React from 'react';
+import { Select } from 'antd';
+
+export default () => (
+  <Select
+    mode="multiple"
+    showSearch
+    aria-label="A combo box with grouped options"
+    placeholder="Select from a group"
+    style={{ inlineSize: '100%', maxInlineSize: 400 }}
+    options={[
+      {
+        label: 'Inner moons',
+        options: [
+          { value: 'mimas', label: 'Mimas' },
+          { value: 'enceladus', label: 'Enceladus' },
+        ],
+      },
+      {
+        label: 'Outer moons',
+        options: [
+          { value: 'titan', label: 'Titan' },
+          { value: 'iapetus', label: 'Iapetus' },
+          { value: 'phoebe', label: 'Phoebe' },
+        ],
+      },
+    ]}
+  />
+);
+```
+
+## Single selection
+
+Where only one answer is wanted, drop the multiple mode. The chosen option then
+shows as plain text rather than as a pill - which is the honest rendering,
+since a pill implies there could be a second one beside it.
+
+```tsx interactive
+import React from 'react';
+import { Select, Space, Switch } from 'antd';
+
+export default () => {
+  const [compressed, setCompressed] = React.useState(false);
+  const [invalid, setInvalid] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <Space size={16} wrap>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={compressed} onChange={setCompressed} />
+          Compressed
+        </label>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={invalid} onChange={setInvalid} />
+          Invalid
+        </label>
+      </Space>
+
+      <Select
+        showSearch
+        allowClear
+        aria-label="A combo box that takes one answer"
+        placeholder="Select a single option"
+        size={compressed ? 'small' : 'middle'}
+        status={invalid ? 'error' : undefined}
+        style={{ inlineSize: '100%' }}
+        options={[
+          { value: 'titan', label: 'Titan' },
+          { value: 'mimas', label: 'Mimas' },
+          { value: 'dione', label: 'Dione' },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+### Single selection with prepended label
+
+A prepend or an append only fits where the control has a fixed height - which
+is to say, where it takes a single answer. With several pills the field grows
+and the addon beside it does not.
+
+```tsx interactive
+import React from 'react';
+import { Select, Space } from 'antd';
+
+export default () => (
+  <Space.Compact style={{ inlineSize: '100%', maxInlineSize: 400 }}>
+    <span
+      id="stackread-combo-label"
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        padding: '0 11px',
+        background: 'var(--ant-color-fill-alter)',
+        border: '1px solid var(--ant-color-border)',
+        borderInlineEnd: 0,
+        borderStartEndRadius: 0,
+        borderEndEndRadius: 0,
+      }}
+    >
+      Moon
+    </span>
+    <Select
+      showSearch
+      aria-labelledby="stackread-combo-label"
+      placeholder="Select one"
+      style={{ inlineSize: '100%' }}
+      options={[
+        { value: 'titan', label: 'Titan' },
+        { value: 'mimas', label: 'Mimas' },
+      ]}
+    />
+  </Space.Compact>
+);
+```
+
+### Single selection with custom options
+
+One answer, which may be a new one. In Ant Design that is `mode="tags"` held to
+a single value.
+
+Say so in help text. A field that accepts a value not on its list looks exactly
+like one that does not, until the reader tries.
+
+```tsx interactive
+import React from 'react';
+import { Form, Select } from 'antd';
+
+export default () => {
+  const [value, setValue] = React.useState([]);
+
+  return (
+    <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+      <Form.Item
+        label="Moon"
+        extra="Pick one from the list, or type a name of your own and press enter."
+        style={{ marginBottom: 0 }}
+      >
+        <Select
+          mode="tags"
+          value={value}
+          onChange={(v) => setValue(v.slice(-1))}
+          placeholder="Select or add one"
+          style={{ inlineSize: '100%' }}
+          options={[
+            { value: 'titan', label: 'Titan' },
+            { value: 'mimas', label: 'Mimas' },
+          ]}
+        />
+      </Form.Item>
+    </Form>
+  );
+};
+```
+
+## Disallowing custom options
+
+Leave the tags mode off and the reader can only choose what is on the list.
+That is the right default: a field that quietly accepts a typo as a new value
+turns one mistake into a piece of data.
+
+```tsx interactive
+import React from 'react';
+import { Form, Select } from 'antd';
+
+export default () => (
+  <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+    <Form.Item
+      label="Moon"
+      extra="Only the options in the list can be chosen."
+      style={{ marginBottom: 0 }}
+    >
+      <Select
+        mode="multiple"
+        showSearch
+        placeholder="Select from the list"
+        style={{ inlineSize: '100%' }}
+        options={[
+          { value: 'titan', label: 'Titan' },
+          { value: 'mimas', label: 'Mimas' },
+          { value: 'dione', label: 'Dione' },
+        ]}
+      />
+    </Form.Item>
+  </Form>
+);
+```
+
+## Custom options only, with validation
+
+The other extreme: no list at all, only what the reader types. Then the field
+has to check what it is given, since there is nothing to choose from and
+nothing to fall back on.
+
+```tsx interactive
+import React from 'react';
+import { Form, Select } from 'antd';
+
+const isValid = (value) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value);
+
+export default () => {
+  const [values, setValues] = React.useState(['someone@example.com']);
+  const invalidOnes = values.filter((w) => !isValid(w));
+
+  return (
+    <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+      <Form.Item
+        label="Email addresses"
+        validateStatus={invalidOnes.length ? 'error' : undefined}
+        help={
+          invalidOnes.length
+            ? `Not a valid address: ${invalidOnes.join(', ')}`
+            : 'Type an address and press enter.'
+        }
+        style={{ marginBottom: 0 }}
+      >
+        <Select
+          mode="tags"
+          value={values}
+          onChange={setValues}
+          open={false}
+          suffixIcon={null}
+          placeholder="name@example.com"
+          style={{ inlineSize: '100%' }}
+        />
+      </Form.Item>
+    </Form>
+  );
+};
+```
+
+## Async
+
+Where the options come from a server, fetch them as the reader types and say
+that you are doing so. Without that, an empty list means either "no matches" or
+"not loaded yet", and the reader cannot tell which.
+
+```tsx interactive
+import React from 'react';
+import { Select } from 'antd';
+
+const everything = ['Titan', 'Enceladus', 'Mimas', 'Dione', 'Iapetus', 'Phoebe', 'Rhea'];
+
+export default () => {
+  const [loading, setLoading] = React.useState(false);
+  const [options, setOptions] = React.useState([]);
+  const run = React.useRef(0);
+
+  const runSearch = (text) => {
+    const mine = ++run.current;
+    setLoading(true);
+    window.setTimeout(() => {
+      if (run.current !== mine) return;
+      setOptions(
+        everything
+          .filter((o) => o.toLowerCase().includes(text.toLowerCase()))
+          .map((o) => ({ value: o.toLowerCase(), label: o }))
+      );
+      setLoading(false);
+    }, 600);
+  };
+
+  return (
+    <Select
+      mode="multiple"
+      showSearch
+      filterOption={false}
+      loading={loading}
+      onSearch={runSearch}
+      notFoundContent={loading ? 'Loading...' : 'No matches'}
+      aria-label="A combo box that fetches its options"
+      placeholder="Type to search"
+      options={options}
+      style={{ inlineSize: '100%', maxInlineSize: 400 }}
+    />
+  );
+};
+```
+
+## With delimiter
+
+Give the field a separator character and a pasted list becomes several values
+rather than one long one. Best where the content is likely to arrive from
+somewhere else - a spreadsheet column, a comma-separated line.
+
+```tsx interactive
+import React from 'react';
+import { Form, Select } from 'antd';
+
+export default () => (
+  <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+    <Form.Item
+      label="Hosts"
+      extra="Paste a comma-separated list, or type one host at a time."
+      style={{ marginBottom: 0 }}
+    >
+      <Select
+        mode="tags"
+        tokenSeparators={[',']}
+        open={false}
+        suffixIcon={null}
+        placeholder="host-1, host-2, host-3"
+        style={{ inlineSize: '100%' }}
+      />
+    </Form.Item>
+  </Form>
+);
+```
+
+## Matches
+
+### Case-sensitive matching
+
+By default the search ignores case, which is what a reader expects. Turn that
+off only where case actually distinguishes two values - an identifier, a
+key name.
+
+```tsx interactive
+import React from 'react';
+import { Select } from 'antd';
+
+export default () => (
+  <Select
+    mode="multiple"
+    showSearch
+    aria-label="A combo box that matches case"
+    placeholder="Type TI to see it match only Titan"
+    style={{ inlineSize: '100%', maxInlineSize: 400 }}
+    filterOption={(input, option) => option.label.includes(input)}
+    options={[
+      { value: 'titan', label: 'Titan' },
+      { value: 'TITAN', label: 'TITAN' },
+      { value: 'mimas', label: 'Mimas' },
+    ]}
+  />
+);
+```
+
+### Sorting matches
+
+Matches keep their original order by default. Where the list is long, putting
+the options that **start with** the search string first makes the one the
+reader meant easier to reach.
+
+```tsx interactive
+import React from 'react';
+import { Select } from 'antd';
+
+export default () => (
+  <Select
+    mode="multiple"
+    showSearch
+    aria-label="A combo box that sorts its matches"
+    placeholder="Type an to see the ones that start with it first"
+    style={{ inlineSize: '100%', maxInlineSize: 400 }}
+    filterSort={(a, b, { searchValue }) => {
+      const s = searchValue.toLowerCase();
+      const av = a.label.toLowerCase().startsWith(s) ? 0 : 1;
+      const bv = b.label.toLowerCase().startsWith(s) ? 0 : 1;
+      return av - bv;
+    }}
+    options={[
+      { value: 'titan', label: 'Titan' },
+      { value: 'anthe', label: 'Anthe' },
+      { value: 'pandora', label: 'Pandora' },
+      { value: 'atlas', label: 'Atlas' },
+    ]}
+  />
+);
+```
+
+### Custom option matcher
+
+The default matcher shows every option whose label contains the search string.
+In rare cases that is the wrong test - matching on a code rather than a name,
+or matching whole words only.
+
+Replace it with a function of your own, and keep it cheap: it runs against
+every option on every keystroke.
+
+```tsx interactive
+import React from 'react';
+import { Select } from 'antd';
+
+export default () => (
+  <Select
+    mode="multiple"
+    showSearch
+    aria-label="A combo box with its own matcher"
+    placeholder="Matches the code as well as the name"
+    style={{ inlineSize: '100%', maxInlineSize: 400 }}
+    filterOption={(input, option) => {
+      const s = input.toLowerCase();
+      return option.label.toLowerCase().startsWith(s) || option.code.toLowerCase().startsWith(s);
+    }}
+    options={[
+      { value: 'titan', label: 'Titan', code: 'SVI' },
+      { value: 'mimas', label: 'Mimas', code: 'SI' },
+      { value: 'dione', label: 'Dione', code: 'SIV' },
+    ]}
+  />
+);
+```
+
+## Labels
+
+### Duplicate labels
+
+Two options with the same label leave the reader with no way to tell them
+apart, so avoid them where you can.
+
+Where the data really does contain duplicates, they still need distinct values
+- the value is what the field stores and what identifies the row. Give the
+label something to disambiguate it as well, or the reader is choosing at
+random.
+
+```tsx interactive
+import React from 'react';
+import { Select } from 'antd';
+
+export default () => (
+  <Select
+    mode="multiple"
+    aria-label="A combo box with duplicate labels"
+    placeholder="Two options share a name"
+    style={{ inlineSize: '100%', maxInlineSize: 400 }}
+    options={[
+      { value: 'titan-1', label: 'Titan (Saturn VI)' },
+      { value: 'titan-2', label: 'Titan (launch vehicle)' },
+      { value: 'mimas', label: 'Mimas' },
+    ]}
+  />
+);
+```
+
+### Accessible label with aria-labelledby
+
+Sometimes the thing that names the field is a heading or a paragraph already on
+the page. Give that element an `id` and point the field at it, rather than
+repeating the text in an `aria-label`.
+
+Two copies of the same label will drift apart. One will be updated; the other
+will be the one the screen reader reads.
+
+```tsx interactive
+import React from 'react';
+import { Select, Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={8} style={{ display: 'flex', maxInlineSize: 400 }}>
+    <Typography.Title level={5} id="stackread-combo-heading" style={{ marginBlockStart: 0 }}>
+      Moons to include
+    </Typography.Title>
+
+    <Select
+      mode="multiple"
+      aria-labelledby="stackread-combo-heading"
+      placeholder="Named by the heading above"
+      style={{ inlineSize: '100%' }}
+      options={[
+        { value: 'titan', label: 'Titan' },
+        { value: 'mimas', label: 'Mimas' },
+      ]}
+    />
+  </Space>
+);
+```
+
+<FormUsage />

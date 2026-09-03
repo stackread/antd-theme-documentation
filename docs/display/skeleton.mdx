@@ -1,0 +1,287 @@
+---
+title: Skeleton
+description: Ant Design Skeleton
+antd_components: [Skeleton]
+---
+
+# Skeleton
+
+A skeleton stands in for content that has not arrived yet, in roughly the shape
+it will take. Unlike a spinner it keeps the layout still - what appears later
+appears where the skeleton was.
+
+In Ant Design this is `Skeleton`, with `Skeleton.Avatar`, `Skeleton.Input` and
+`Skeleton.Node` for the individual shapes.
+
+## Text
+
+Lines of text at the size they will be, so the block keeps its height.
+
+```tsx interactive
+import React from 'react';
+import { Radio, Skeleton, Space, Switch, Typography } from 'antd';
+
+export default () => {
+  const [loading, setLoading] = React.useState(true);
+  const [rows, setRows] = React.useState(3);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 480 }}>
+      <Space size={16}>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={loading} onChange={setLoading} />
+          Loading
+        </label>
+        <Radio.Group
+          size="small"
+          value={rows}
+          onChange={(e) => setRows(e.target.value)}
+          optionType="button"
+          options={[
+            { value: 1, label: '1 line' },
+            { value: 3, label: '3 lines' },
+            { value: 5, label: '5 lines' },
+          ]}
+        />
+      </Space>
+
+      <Skeleton loading={loading} active paragraph={{ rows: rows }} title={false}>
+        <Typography>
+          <p style={{ marginBottom: 0 }}>
+            The content that was waiting arrives in the space the skeleton held.
+          </p>
+        </Typography>
+      </Skeleton>
+    </Space>
+  );
+};
+```
+
+## Title
+
+A heading is a single wider bar. It takes the size of the heading it replaces,
+so that the jump from skeleton to text does not move the rest of the page.
+
+```tsx interactive
+import React from 'react';
+import { Skeleton, Space, Switch, Typography } from 'antd';
+
+export default () => {
+  const [loading, setLoading] = React.useState(true);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={loading} onChange={setLoading} />
+        Loading
+      </label>
+
+      {loading ? (
+        <Skeleton.Input active style={{ inlineSize: 320, blockSize: 30 }} />
+      ) : (
+        <Typography.Title level={1} style={{ marginBottom: 0 }}>stackread Cloud</Typography.Title>
+      )}
+
+      {loading ? (
+        <Skeleton.Input active style={{ inlineSize: 280, blockSize: 24 }} />
+      ) : (
+        <Typography.Title level={2} style={{ marginBottom: 0 }}>stackread Cloud</Typography.Title>
+      )}
+
+      {loading ? (
+        <Skeleton.Input active style={{ inlineSize: 240, blockSize: 20 }} />
+      ) : (
+        <Typography.Title level={3} style={{ marginBottom: 0 }}>This is a title</Typography.Title>
+      )}
+
+      {loading ? (
+        <Skeleton.Input active style={{ inlineSize: 200, blockSize: 16 }} />
+      ) : (
+        <Typography.Title level={4} style={{ marginBottom: 0 }}>This is a title</Typography.Title>
+      )}
+
+      {loading ? (
+        <Skeleton.Input active style={{ inlineSize: 180, blockSize: 14 }} />
+      ) : (
+        <Typography.Title level={5} style={{ marginBottom: 0 }}>This is a title</Typography.Title>
+      )}
+
+      {loading ? (
+        <Skeleton.Input active style={{ inlineSize: 160, blockSize: 12 }} />
+      ) : (
+        <Typography.Text strong style={{ fontSize: 12 }}>This is a title</Typography.Text>
+      )}
+    </Space>
+  );
+};
+```
+
+## Circle
+
+A round placeholder for an avatar or a round icon.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Skeleton, Space, Switch } from 'antd';
+
+export default () => {
+  const [loading, setLoading] = React.useState(true);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={loading} onChange={setLoading} />
+        Loading
+      </label>
+
+      <Space size={16} align="center">
+        {loading ? <Skeleton.Avatar active size={24} /> : <Avatar size={24} aria-label="Small">S</Avatar>}
+        {loading ? <Skeleton.Avatar active size={32} /> : <Avatar size={32} aria-label="Medium">M</Avatar>}
+        {loading ? <Skeleton.Avatar active size={40} /> : <Avatar size={40} aria-label="Large">L</Avatar>}
+        {loading ? <Skeleton.Avatar active size={64} /> : <Avatar size={64} aria-label="Extra large">XL</Avatar>}
+      </Space>
+    </Space>
+  );
+};
+```
+
+## Rectangle
+
+For anything else - an image, a chart, a card - a rectangle in the size the
+content will occupy.
+
+```tsx interactive
+import React from 'react';
+import { Skeleton, Space, Switch } from 'antd';
+
+const boxStyle = (b, h) => ({
+  inlineSize: b,
+  blockSize: h,
+  background: 'var(--ant-color-bg-layout)',
+  border: '1px solid var(--ant-color-border)',
+  borderRadius: 4,
+});
+
+export default () => {
+  const [loading, setLoading] = React.useState(true);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={loading} onChange={setLoading} />
+        Loading
+      </label>
+
+      <Space size={16} align="start">
+        {loading ? (
+          <Skeleton.Node active style={{ inlineSize: 80, blockSize: 80 }}><span /></Skeleton.Node>
+        ) : (
+          <div style={boxStyle(80, 80)} />
+        )}
+        {loading ? (
+          <Skeleton.Node active style={{ inlineSize: 160, blockSize: 80 }}><span /></Skeleton.Node>
+        ) : (
+          <div style={boxStyle(160, 80)} />
+        )}
+        {loading ? (
+          <Skeleton.Node active style={{ inlineSize: 240, blockSize: 120 }}><span /></Skeleton.Node>
+        ) : (
+          <div style={boxStyle(240, 120)} />
+        )}
+      </Space>
+    </Space>
+  );
+};
+```
+
+## Combining multiple skeletons
+
+Several shapes together make the outline of a whole block - an avatar, a
+heading, a few lines. That is where a skeleton earns its keep: it shows the
+*structure* of what is coming, which a spinner cannot.
+
+```tsx interactive
+import React from 'react';
+import { Card, Skeleton, Space, Switch, Typography } from 'antd';
+
+export default () => {
+  const [loading, setLoading] = React.useState(true);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 480 }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={loading} onChange={setLoading} />
+        Loading
+      </label>
+
+      <Card>
+        <Space size={16} align="start">
+          {loading ? <Skeleton.Avatar active size={40} /> : null}
+          <div style={{ flex: 1 }}>
+            {loading ? <Skeleton.Input active style={{ inlineSize: 200, blockSize: 20 }} /> : null}
+            <Skeleton loading={loading} active title={false} paragraph={{ rows: 2 }}>
+              <Typography>
+                <h3>The heading that was waiting</h3>
+                <p style={{ marginBottom: 0 }}>And the paragraph beneath it.</p>
+              </Typography>
+            </Skeleton>
+          </div>
+        </Space>
+      </Card>
+
+      <Card>
+        {loading ? (
+          <Skeleton.Node active style={{ inlineSize: '100%', blockSize: 80 }}><span /></Skeleton.Node>
+        ) : null}
+        <Skeleton loading={loading} active title={false} paragraph={{ rows: 2 }}>
+          <Typography>
+            <p style={{ marginBottom: 0 }}>A block with a picture above it.</p>
+          </Typography>
+        </Skeleton>
+      </Card>
+    </Space>
+  );
+};
+```
+
+## Customizing screen reader announcements
+
+A skeleton should say that something is loading, and say when it has arrived.
+Without that, a screen reader finds an empty region and then, later, content
+that appeared without explanation.
+
+```tsx interactive
+import React from 'react';
+import { Button, Skeleton, Space, Typography } from 'antd';
+
+export default () => {
+  const [loading, setLoading] = React.useState(true);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 480 }}>
+      <Space size={8}>
+        <Button size="small" onClick={() => setLoading(true)}>
+          Start loading
+        </Button>
+        <Button size="small" onClick={() => setLoading(false)}>
+          Finish loading
+        </Button>
+      </Space>
+
+      <div aria-live="polite" aria-busy={loading}>
+        <Skeleton loading={loading} active paragraph={{ rows: 2 }}>
+          <Typography>
+            <p style={{ marginBottom: 0 }}>Your content has loaded.</p>
+          </Typography>
+        </Skeleton>
+
+        <Skeleton loading={loading} active title={false} paragraph={{ rows: 1 }}>
+          <Typography>
+            <p style={{ marginBottom: 0 }}>A second region, announced with it.</p>
+          </Typography>
+        </Skeleton>
+      </div>
+    </Space>
+  );
+};
+```

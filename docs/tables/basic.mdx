@@ -1,0 +1,536 @@
+---
+title: Basic table
+description: Ant Design Table
+antd_components: [Table]
+sidebar_position: 1
+---
+
+# Basic tables
+
+A table needs two things:
+
+- **`dataSource`** - the rows, one object per row.
+- **`columns`** - what each column is called and where its value comes from.
+
+Everything else is a refinement of those two. A column can format its value, or
+render something else entirely in its place.
+
+```tsx interactive
+import React from 'react';
+import { Table, Tag, Typography } from 'antd';
+
+const people = [
+  { key: '1', vorname: 'Mira', nachname: 'Holt', github: 'mholt', geboren: '1988-04-12', online: true },
+  { key: '2', vorname: 'Jonas', nachname: 'Frey', github: 'jfrey', geboren: '1992-11-03', online: false },
+  { key: '3', vorname: 'Ada', nachname: 'Sole', github: 'asole', geboren: '1979-01-27', online: true },
+];
+
+export default () => (
+  <Table
+    dataSource={people}
+    pagination={false}
+    columns={[
+      { title: 'First Name', dataIndex: 'vorname' },
+      { title: 'Last Name', dataIndex: 'nachname', ellipsis: true },
+      {
+        title: 'Github',
+        dataIndex: 'github',
+        render: (name) => <Typography.Link href="#">{name}</Typography.Link>,
+      },
+      { title: 'Date of Birth', dataIndex: 'geboren', align: 'right' },
+      {
+        title: 'Online',
+        dataIndex: 'online',
+        render: (an) => <Tag color={an ? 'green' : 'red'}>{an ? 'Online' : 'Offline'}</Tag>,
+      },
+    ]}
+  />
+);
+```
+
+Numbers and dates read better right-aligned, so that the digits line up
+column-wise. That is a property of the column, not of each cell.
+
+Where a column name needs an explanation, put it behind a marker in the header
+rather than in the name itself: a long header sets the width of the whole
+column.
+
+## Row selection
+
+Rows can be selected, either with the table keeping track or with the selection
+held outside it.
+
+Hold it outside where something else on the page can change it - a "select all
+matching" control, a filter that should clear the selection. Inside the table,
+that state is unreachable.
+
+## Row actions
+
+A column can hold the actions for its row.
+
+Two rules keep an actions column usable:
+
+- **At most two actions visible.** Past that, the first two stay and the rest
+  go behind one control, or the column grows wider than the data.
+- **Individual actions off while rows are selected.** Once the reader has
+  selected rows, the thing they mean to act on is the selection, and a per-row
+  action there is almost always a misclick.
+
+### Accessibility
+
+An action's **name** and its **description** are different things. The name
+identifies it - "Delete" - and the description says what it will do.
+
+Where no meaningful description exists, use the same string for both. A tooltip
+that repeats the name is then visual only, and a screen reader announces it
+once instead of twice.
+
+```tsx interactive
+import React from 'react';
+import { Button, Dropdown, Space, Table, Tooltip } from 'antd';
+import { CopyOutlined } from '@ant-design/icons';
+
+const people = [
+  { key: '1', vorname: 'Mira', nachname: 'Holt' },
+  { key: '2', vorname: 'Jonas', nachname: 'Frey' },
+];
+
+export default () => (
+  <Table
+    dataSource={people}
+    pagination={false}
+    columns={[
+      { title: 'First Name', dataIndex: 'vorname' },
+      { title: 'Last Name', dataIndex: 'nachname' },
+      {
+        title: 'Actions',
+        key: 'aktionen',
+        width: 120,
+        render: (_, row) => (
+          <Space size={4}>
+            <Tooltip title={`Clone ${row.vorname}`}>
+              <Button type="text" size="small" aria-label={`Clone ${row.vorname}`}>
+                <CopyOutlined />
+              </Button>
+            </Tooltip>
+
+            <Dropdown
+              trigger={['click']}
+              menu={{
+                items: [
+                  { key: 'edit', label: 'Edit' },
+                  { key: 'export', label: 'Export' },
+                  { type: 'divider' },
+                  { key: 'delete', label: 'Delete', danger: true },
+                ],
+              }}
+            >
+              <Button type="text" size="small" aria-label={`More actions for ${row.vorname}`}>
+                <span aria-hidden>&hellip;</span>
+              </Button>
+            </Dropdown>
+          </Space>
+        ),
+      },
+    ]}
+  />
+);
+```
+
+Where the name really is the whole story, the tooltip should say only that -
+and be marked so it is not read out a second time:
+
+```tsx
+<Tooltip title="Delete">
+  <Button aria-label={`Delete ${zeile.vorname} ${zeile.nachname}`}>
+    <span aria-hidden>&#128465;</span>
+  </Button>
+</Tooltip>
+```
+
+The tooltip repeats what is on screen for a reader using a mouse; the
+`aria-label` says which row it belongs to, which the tooltip cannot.
+
+## Expanding rows
+
+A row can open to reveal more about itself - a description, a nested table, a
+chart.
+
+Keep what is inside secondary. Anything the reader needs in order to compare
+rows has to be in the row itself; an expanded row can only be read one at a
+time.
+
+```tsx interactive
+import React from 'react';
+import { Table, Typography } from 'antd';
+
+const people = [
+  { key: '1', vorname: 'Mira', nachname: 'Holt', notiz: 'Joined in 2019. Works on the ingest pipeline.' },
+  { key: '2', vorname: 'Jonas', nachname: 'Frey', notiz: 'Joined in 2021. Works on the query layer.' },
+  { key: '3', vorname: 'Ada', nachname: 'Sole', notiz: 'Joined in 2016. Works on storage.' },
+];
+
+export default () => (
+  <Table
+    dataSource={people}
+    pagination={false}
+    expandable={{
+      expandedRowRender: (row) => (
+        <Typography.Paragraph style={{ marginBottom: 0 }}>{row.notiz}</Typography.Paragraph>
+      ),
+    }}
+    columns={[
+      { title: 'First Name', dataIndex: 'vorname' },
+      { title: 'Last Name', dataIndex: 'nachname' },
+    ]}
+  />
+);
+```
+
+## Table row classes
+
+Rows and cells can take classes of their own, worked out from the data. That is
+how a row is marked as new, as failing, or as the one the reader just came
+from.
+
+Marking has to survive sorting and paging - it is a property of the row, not of
+its position - and it needs something besides colour, or it is invisible to a
+reader who cannot see the tint.
+
+```tsx interactive
+import React from 'react';
+import { Table, Tag } from 'antd';
+
+const people = [
+  { key: '1', vorname: 'Mira', nachname: 'Holt', online: true },
+  { key: '2', vorname: 'Jonas', nachname: 'Frey', online: false },
+  { key: '3', vorname: 'Ada', nachname: 'Sole', online: false },
+];
+
+export default () => (
+  <Table
+    dataSource={people}
+    pagination={false}
+    onRow={(row) => ({
+      style: row.online ? { background: 'var(--ant-color-success-bg)' } : undefined,
+    })}
+    columns={[
+      { title: 'First Name', dataIndex: 'vorname' },
+      { title: 'Last Name', dataIndex: 'nachname' },
+      {
+        title: 'Online',
+        dataIndex: 'online',
+        render: (an) => <Tag color={an ? 'green' : 'red'}>{an ? 'Online' : 'Offline'}</Tag>,
+      },
+    ]}
+  />
+);
+```
+
+The same applies to a single cell, where it is one value that is unusual rather
+than the whole row.
+
+```tsx interactive
+import React from 'react';
+import { Table } from 'antd';
+
+const values = [
+  { key: '1', metrik: 'Latency', value: 24 },
+  { key: '2', metrik: 'Errors', value: 812 },
+  { key: '3', metrik: 'Requests', value: 90 },
+];
+
+export default () => (
+  <Table
+    dataSource={values}
+    pagination={false}
+    columns={[
+      { title: 'Metric', dataIndex: 'metrik' },
+      {
+        title: 'Value',
+        dataIndex: 'value',
+        align: 'right',
+        onCell: (row) => ({
+          style: row.value > 500 ? { color: 'var(--ant-color-error-text)', fontWeight: 600 } : undefined,
+        }),
+      },
+    ]}
+  />
+);
+```
+
+## Adding a footer to a table
+
+A footer holds what belongs to the column as a whole - a total, a count, a
+unit.
+
+Say what it covers. "12" under a paged table is either twelve on this page or
+twelve altogether, and the reader has no way to tell which.
+
+```tsx interactive
+import React from 'react';
+import { Table, Typography } from 'antd';
+
+const people = [
+  { key: '1', vorname: 'Mira', nachname: 'Holt', ort: 'Berlin, Germany' },
+  { key: '2', vorname: 'Jonas', nachname: 'Frey', ort: 'Lyon, France' },
+  { key: '3', vorname: 'Ada', nachname: 'Sole', ort: 'Porto, Portugal' },
+];
+
+export default () => (
+  <Table
+    dataSource={people}
+    pagination={false}
+    summary={(rows) => (
+      <Table.Summary.Row>
+        <Table.Summary.Cell index={0}>
+          <em>Page totals:</em>
+        </Table.Summary.Cell>
+        <Table.Summary.Cell index={1}>{rows.length} people</Table.Summary.Cell>
+        <Table.Summary.Cell index={2}>
+          {new Set(rows.map((z) => z.ort.split(', ')[1])).size} countries
+        </Table.Summary.Cell>
+      </Table.Summary.Row>
+    )}
+    columns={[
+      { title: 'First Name', dataIndex: 'vorname' },
+      { title: 'Last Name', dataIndex: 'nachname' },
+      { title: 'Location', dataIndex: 'ort' },
+    ]}
+  />
+);
+```
+
+## Table layout
+
+A fixed layout gives every column the width you set and holds it whatever the
+content. An automatic layout lets the content decide.
+
+Fixed is the right default. Columns that change width as the data changes make
+the table hard to scan, and truncation only works when a cell has a width to be
+truncated to.
+
+Vertical alignment is a column-level choice, and applies to the cells but not
+to the header.
+
+```tsx interactive
+import React from 'react';
+import { Segmented, Space, Table } from 'antd';
+
+const people = [
+  { key: '1', vorname: 'Mira', notiz: 'A short note.' },
+  { key: '2', vorname: 'Jonas', notiz: 'A much longer note that will need more than one line to itself in a narrow column.' },
+];
+
+export default () => {
+  const [fixed, setFixed] = React.useState(true);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Segmented
+        value={fixed}
+        onChange={setFixed}
+        aria-label="Table layout"
+        options={[
+          { value: true, label: 'fixed' },
+          { value: false, label: 'auto' },
+        ]}
+      />
+
+      <Table
+        dataSource={people}
+        pagination={false}
+        tableLayout={fixed ? 'fixed' : 'auto'}
+        columns={[
+          { title: 'First Name', dataIndex: 'vorname', width: 120 },
+          { title: 'Note', dataIndex: 'notiz', ellipsis: fixed },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+## Responsive tables
+
+A table cannot stay a table on a phone. Below a breakpoint each row becomes a
+block of its own, with the column names beside the values instead of above them.
+
+A table with two or three columns may not need it. One with ten does, and no
+amount of horizontal scrolling substitutes.
+
+```tsx interactive
+import React from 'react';
+import { Card, Space, Switch, Table, Typography } from 'antd';
+
+const people = [
+  { key: '1', vorname: 'Mira', nachname: 'Holt', ort: 'Berlin' },
+  { key: '2', vorname: 'Jonas', nachname: 'Frey', ort: 'Lyon' },
+];
+
+const columns = [
+  { title: 'First Name', dataIndex: 'vorname' },
+  { title: 'Last Name', dataIndex: 'nachname' },
+  { title: 'Location', dataIndex: 'ort' },
+];
+
+export default () => {
+  const [narrow, setNarrow] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={narrow} onChange={setNarrow} />
+        Mobile layout
+      </label>
+
+      {narrow ? (
+        <Space orientation="vertical" size={8} style={{ display: 'flex', maxInlineSize: 320 }}>
+          {people.map((z) => (
+            <Card key={z.key} size="small">
+              {columns.map((s) => (
+                <div key={s.dataIndex} style={{ display: 'flex', gap: 8 }}>
+                  <Typography.Text type="secondary" style={{ inlineSize: 96 }}>
+                    {s.title}
+                  </Typography.Text>
+                  <Typography.Text>{z[s.dataIndex]}</Typography.Text>
+                </div>
+              ))}
+            </Card>
+          ))}
+        </Space>
+      ) : (
+        <Table dataSource={people} pagination={false} columns={columns} />
+      )}
+    </Space>
+  );
+};
+```
+
+Which cells appear in the narrow layout is a per-column choice. A column that
+only repeats what another one says - a last name beside a full name - can be
+left out entirely.
+
+### Inline scrolling
+
+A dense table can scroll sideways inside its own container rather than pushing
+the page wide.
+
+Give the columns explicit widths when you do, and use absolute units. A width
+in per cent or viewport units is measured against something that is itself
+being scrolled, and the result is a table that never settles.
+
+## Manual pagination and sorting
+
+The pagination and sorting props control what the table **shows** - the arrows,
+the page numbers - not what it does to the data. Paging and sorting the rows
+themselves is the page's job.
+
+That is what makes the table usable over an API: the server sorts and pages,
+and the table only reports what the reader asked for.
+
+:::tip
+
+For a few hundred rows that are already loaded, let the table do the work
+in memory instead. Handling it by hand is a cost you pay for data you do not
+have.
+
+:::
+
+### Pagination
+
+```tsx interactive
+import React from 'react';
+import { Table } from 'antd';
+
+const everything = Array.from({ length: 42 }, (_, i) => ({
+  key: String(i),
+  vorname: `Person ${i + 1}`,
+  ort: ['Berlin', 'Lyon', 'Porto'][i % 3],
+}));
+
+export default () => {
+  const [page, setPage] = React.useState(1);
+  const [perPage, setPerPage] = React.useState(5);
+
+  const visible = everything.slice((page - 1) * perPage, page * perPage);
+
+  return (
+    <Table
+      dataSource={visible}
+      columns={[
+        { title: 'First Name', dataIndex: 'vorname' },
+        { title: 'Location', dataIndex: 'ort' },
+      ]}
+      pagination={{
+        current: page,
+        pageSize: perPage,
+        total: everything.length,
+        showSizeChanger: true,
+        pageSizeOptions: [5, 10, 20],
+        onChange: (s, size) => {
+          setPage(s);
+          setPerPage(size);
+        },
+      }}
+    />
+  );
+};
+```
+
+### Sorting
+
+Mark the columns that can be sorted, and handle the sorting yourself.
+
+:::warning[Rows need unique keys]
+
+Sorting reorders rows, and a row is identified by its key. Duplicate keys make
+rows disappear or double up - which looks like a sorting bug and is a data
+one.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Table } from 'antd';
+
+const everything = [
+  { key: '1', vorname: 'Mira', nachname: 'Holt', ort: 'Berlin' },
+  { key: '2', vorname: 'Jonas', nachname: 'Frey', ort: 'Lyon' },
+  { key: '3', vorname: 'Ada', nachname: 'Sole', ort: 'Porto' },
+];
+
+export default () => {
+  const [sorting, setSorting] = React.useState({ field: 'vorname', direction: 'ascend' });
+
+  const sorted = [...everything].sort((a, b) => {
+    const v = String(a[sorting.field]).localeCompare(String(b[sorting.field]));
+    return sorting.direction === 'ascend' ? v : -v;
+  });
+
+  return (
+    <Table
+      dataSource={sorted}
+      pagination={false}
+      onChange={(_, __, sorter) =>
+        setSorting({ field: sorter.field ?? 'vorname', direction: sorter.order ?? 'ascend' })
+      }
+      columns={[
+        {
+          title: 'First Name',
+          dataIndex: 'vorname',
+          sorter: true,
+          sortOrder: sorting.field === 'vorname' ? sorting.direction : null,
+        },
+        {
+          title: 'Last Name',
+          dataIndex: 'nachname',
+          sorter: true,
+          sortOrder: sorting.field === 'nachname' ? sorting.direction : null,
+        },
+        { title: 'Location', dataIndex: 'ort' },
+      ]}
+    />
+  );
+};
+```

@@ -1,0 +1,324 @@
+---
+title: Callout
+description: Ant Design Alert
+antd_components: [Alert]
+---
+
+# Callout
+
+A callout draws attention to a message that belongs to the content around it.
+It interrupts reading on purpose - which is why it sits one type step above body
+text and carries a coloured bar down its leading edge.
+
+In Ant Design this is `Alert`.
+
+## Component
+
+Without further arguments you get the base meaning and a preset icon.
+
+```tsx interactive
+import React from 'react';
+import { Alert } from 'antd';
+
+export default () => (
+  <Alert
+    showIcon
+    type="info"
+    title="Callout title"
+    description="Description text goes here."
+  />
+);
+```
+
+## Usage
+
+Most callouts carry a meaning: information, confirmation, a warning, or an
+error. The meaning lives in `type`.
+
+### Info
+
+For general information.
+
+Ant Design calls the base meaning `info`; measured, it is `primary`. The
+colours are the same - the mapping points at `primary`, not at `neutral`. A callout does not need a description; a title on its own is a
+valid callout.
+
+```tsx interactive
+import React from 'react';
+import { Alert, Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={12} style={{ display: 'flex' }}>
+    <Alert
+      showIcon
+      type="info"
+      title="Check it out, here's a really long title that will wrap within a narrower browser"
+      description={
+        <>
+          <p>
+            Here's some stuff that you need to know. We can make this text really
+            long so that, when viewed within a browser that's fairly narrow, it
+            will wrap, too.
+          </p>
+          <p style={{ marginBottom: 0 }}>
+            And some other stuff on another line, just for kicks. And{' '}
+            <Typography.Link href="#">here's a link</Typography.Link>.
+          </p>
+        </>
+      }
+    />
+
+    <Alert showIcon type="info" title="Callouts can have only a title." />
+  </Space>
+);
+```
+
+:::note[Omitted: the small variant]
+
+**Affects:** 1 specimen
+
+A third specimen was measured with a small size - 12px instead of 16px
+padding, 14px text, a 16px icon. **Ant Design's `Alert` has no size
+variant.**
+
+Rebuilding it would take a CSS class set by hand at every call site; no component
+would offer it. It is recorded as deviation 24 rather than shown here as an
+example. Whether we want a small variant at all belongs to our own design work.
+
+:::
+
+### Success
+
+For the completion of an action.
+
+```tsx interactive
+import React from 'react';
+import { Alert, Typography } from 'antd';
+
+export default () => (
+  <Alert
+    showIcon
+    type="success"
+    title="Good news, everyone!"
+    description={
+      <>
+        I have no news. Which is good! And{' '}
+        <Typography.Link href="#">here's a link</Typography.Link>.
+      </>
+    }
+  />
+);
+```
+
+### Warning
+
+For something the reader should know before continuing.
+
+The warning icon is a two-tone triangle - a yellow face with a dark glyph on it.
+Yellow carries no text meaning in this palette; it is always a surface.
+
+```tsx interactive
+import React from 'react';
+import { Alert, Typography } from 'antd';
+
+export default () => (
+  <Alert
+    showIcon
+    type="warning"
+    title="Proceed with caution!"
+    description={
+      <>
+        Here be dragons. Don't wanna mess with no dragons. And{' '}
+        <Typography.Link href="#">here's a link</Typography.Link>.
+      </>
+    }
+  />
+);
+```
+
+### Danger
+
+For an error that has already happened.
+
+```tsx interactive
+import React from 'react';
+import { Alert, Typography } from 'antd';
+
+export default () => (
+  <Alert
+    showIcon
+    type="error"
+    title="Sorry, there was an error"
+    description={
+      <>
+        Now you have to fix it, but maybe{' '}
+        <Typography.Link href="#">this link can help</Typography.Link>.
+      </>
+    }
+  />
+);
+```
+
+### Actions
+
+A callout can offer up to two actions. The first renders as a filled button and
+the second as a plain one; **colour and size follow the callout and are not set
+per call site** - a button inside a callout that carried its own colour would
+put a second meaning into a box that already has one.
+
+Ant Design has an `action` prop, but it places the node to the *right* of the
+text. Measured, actions sit *below* it, aligned with the text column, so they
+are set as part of the description here. Recorded as deviation 33.
+
+```tsx interactive
+import React from 'react';
+import { Alert, Button, Space } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Alert
+      showIcon
+      type="warning"
+      title="Your index needs to be updated"
+      description={
+        <>
+          <p>
+            This operation may take a few minutes. You can continue using the app
+            while it runs.
+          </p>
+          <Space size={8}>
+            <Button size="small" type="primary">Update now</Button>
+            <Button size="small" type="text" href="#">Learn more</Button>
+          </Space>
+        </>
+      }
+    />
+
+    <Alert
+      showIcon
+      type="error"
+      title="Your session is about to expire"
+      description={
+        <Space size={8}>
+          <Button size="small" type="primary">Stay signed in</Button>
+        </Space>
+      }
+    />
+  </Space>
+);
+```
+
+### Dismissible callouts
+
+A callout can carry a close button in its top right corner. Ant Design takes
+`closable` and reports through `onClose`, leaving the showing and hiding to the
+caller.
+
+The measured behaviour remembers the choice in `localStorage` - a callout
+dismissed once should not return on every page load.
+
+```tsx interactive
+import React from 'react';
+import { Alert, Button, Space, Switch } from 'antd';
+
+export default () => {
+  const [visible, setVisible] = React.useState(
+    () => !window.localStorage.getItem('calloutDismissed')
+  );
+  const [showText, setShowText] = React.useState(true);
+
+  const dismiss = () => {
+    setVisible(false);
+    window.localStorage.setItem('calloutDismissed', 'yes');
+  };
+  const resetDemo = () => {
+    setVisible(true);
+    window.localStorage.removeItem('calloutDismissed');
+  };
+
+  return (
+    <div style={{ maxInlineSize: 500 }}>
+      <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={showText} onChange={setShowText} />
+          Show text
+        </label>
+
+        {visible ? (
+          <Alert
+            showIcon
+            closable
+            type="info"
+            onClose={dismiss}
+            title="You can dismiss this callout by clicking the Close button in the top right corner"
+            description={
+              showText
+                ? "Here's more some stuff users need to know. But maybe users don't need to know it on every page refresh, so you could remember whether or not to display this callout in local storage."
+                : undefined
+            }
+          />
+        ) : (
+          <Button color="primary" variant="filled" onClick={resetDemo}>
+            The callout has been dismissed. Click to reset the demo
+          </Button>
+        )}
+      </Space>
+    </div>
+  );
+};
+```
+
+:::note[Omitted: the "Small size" toggle]
+
+**Affects:** 0 specimens - a toggle, not a callout.
+
+A second switch next to "Show text" would flip between two sizes. It falls
+away for the same reason as the third specimen under *Info* - deviation 24.
+
+:::
+
+### Screen reader announcements
+
+An `announceOnMount` flag would let the callout announce its title and content
+through an `aria-live` region when it appears, then clear that region after two
+seconds so the content is not left duplicated in the tree.
+
+This matters when a callout appears as the result of an action. On first page
+load it is unnecessary - a screen reader reaches the content anyway while moving
+through the page.
+
+**Ant Design does not provide this.** The `aria-live` region below is set by
+hand.
+
+The button uses `color="primary" variant="filled"`. Ant Design's plain button is
+white with a border; here the plain button is a light tint of the semantic
+colour with no border. `variant="filled"` is Ant Design's own way of
+saying that.
+
+```tsx interactive
+import React from 'react';
+import { Alert, Button, Space } from 'antd';
+
+export default () => {
+  const [shown, setShown] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Button color="primary" variant="filled" onClick={() => setShown((s) => !s)}>
+        {shown ? 'Hide' : 'Show'} callout
+      </Button>
+
+      <div aria-live="polite">
+        {shown && (
+          <Alert
+            showIcon
+            type="info"
+            title="Important notification!"
+            description="This content will be announced to screen readers when it appears."
+          />
+        )}
+      </div>
+    </Space>
+  );
+};
+```

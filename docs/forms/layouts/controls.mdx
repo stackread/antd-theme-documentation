@@ -1,0 +1,259 @@
+---
+title: Form control layouts
+description: Ant Design Input and Space.Compact as control layouts
+antd_components: [Input, Space]
+sidebar_position: 6
+---
+
+# Form control layouts
+
+:::note[Building block only]
+
+This page documents a layout, not a control you would reach for directly.
+
+:::
+
+The layout that sits around every form control can be published on its own, so
+that a control you write yourself looks like the ones that ship.
+
+Ant Design draws no such line. `Input` **is** the layout: the icon, the loading
+state, the clear button, the addons and the invalid state are all its props,
+and a control of your own reuses it by rendering an `Input` rather than by
+borrowing its wrapper.
+
+The examples below therefore show the same set of states on an ordinary text
+control.
+
+```tsx interactive
+import React from 'react';
+import { Button, Input, Space, Spin } from 'antd';
+import { BorderOutlined, DownOutlined, SearchOutlined, ThunderboltOutlined } from '@ant-design/icons';
+
+const spinner = <Spin size="small" />;
+const chevron = <DownOutlined />;
+
+/*
+ * Add-ons are no longer a prop in antd v6 but neighbours inside a
+ * `Space.Compact`. So the box is drawn here.
+ */
+const addonStyle = (page) => ({
+  display: 'inline-flex',
+  alignItems: 'center',
+  padding: '0 11px',
+  background: 'var(--ant-color-fill-alter)',
+  border: '1px solid var(--ant-color-border)',
+  whiteSpace: 'nowrap',
+  ...(page === 'vor'
+    ? { borderInlineEnd: 0, borderStartEndRadius: 0, borderEndEndRadius: 0 }
+    : { borderInlineStart: 0, borderStartStartRadius: 0, borderEndStartRadius: 0 }),
+});
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+    <Input aria-label="With an icon" prefix={<SearchOutlined />} />
+
+    <Input aria-label="Loading" suffix={spinner} />
+
+    <Input aria-label="Clearable" allowClear defaultValue="Some text" />
+
+    <Input aria-label="Invalid" status="error" defaultValue="Not a valid value" />
+
+    <Input
+      aria-label="Clearable, with an icon"
+      allowClear
+      defaultValue="Some text"
+      prefix={<SearchOutlined />}
+    />
+
+    <Input aria-label="Loading dropdown" readOnly suffix={<Space size={4}>{spinner}{chevron}</Space>} />
+
+    <Input
+      aria-label="Clearable dropdown with a status icon"
+      allowClear
+      defaultValue="Running"
+      prefix={<BorderOutlined />}
+      suffix={chevron}
+    />
+
+    <Input
+      aria-label="Loading, clearable dropdown with an icon"
+      allowClear
+      defaultValue="Some text"
+      suffix={
+        <Space size={4}>
+          <ThunderboltOutlined />
+          {spinner}
+          {chevron}
+        </Space>
+      }
+    />
+
+    <div style={{ display: 'flex' }}>
+      <span style={addonStyle('vor')}>Label</span>
+      <Input aria-label="With a label addon" />
+    </div>
+
+    <div style={{ display: 'flex' }}>
+      <span style={addonStyle('vor')}>Read only</span>
+      <Input aria-label="Read only, with a button addon" readOnly defaultValue="Cannot be edited" />
+      <Button>Button</Button>
+    </div>
+
+    <div style={{ display: 'flex' }}>
+      <Input aria-label="With an append" />
+      <span style={addonStyle('nach')}>px</span>
+    </div>
+
+    <div style={{ display: 'flex' }}>
+      <span style={addonStyle('vor')}>Label</span>
+      <Input
+        aria-label="Loading and clearable, with a prepend"
+        allowClear
+        defaultValue="Some text"
+        suffix={spinner}
+      />
+    </div>
+  </Space>
+);
+```
+
+## Delimited layout
+
+A delimited layout is two controls in one frame with something between them: a
+range, a pair of bounds, two things being merged.
+
+The frame matters. Two separate fields side by side read as two questions; one
+frame with a delimiter reads as one question with two ends - which is what a
+range is.
+
+Ant Design builds this with `Space.Compact`, which joins adjacent controls into
+a single group and removes the seam between them.
+
+```tsx interactive
+import React from 'react';
+import { Button, InputNumber, Space, Spin } from 'antd';
+import { BorderOutlined, SwapOutlined } from '@ant-design/icons';
+
+const Separator = ({ children = '→' }) => (
+  <span
+    aria-hidden
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      padding: '0 8px',
+      border: '1px solid var(--ant-color-border)',
+      borderInline: 0,
+      background: 'var(--ant-color-bg-container)',
+      color: 'var(--ant-color-text-description)',
+    }}
+  >
+    {children}
+  </span>
+);
+
+const addonStyle = (page) => ({
+  display: 'inline-flex',
+  alignItems: 'center',
+  padding: '0 11px',
+  background: 'var(--ant-color-fill-alter)',
+  border: '1px solid var(--ant-color-border)',
+  whiteSpace: 'nowrap',
+  ...(page === 'vor'
+    ? { borderInlineEnd: 0, borderStartEndRadius: 0, borderEndEndRadius: 0 }
+    : { borderInlineStart: 0, borderStartStartRadius: 0, borderEndStartRadius: 0 }),
+});
+
+const numberStyle = { style: { inlineSize: '100%' }, controls: false };
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+    <Space.Compact style={{ inlineSize: '100%' }}>
+      <InputNumber {...numberStyle} placeholder="0" aria-label="Lower bound, full width" />
+      <Separator />
+      <InputNumber {...numberStyle} placeholder="100" aria-label="Upper bound, full width" />
+    </Space.Compact>
+
+    <Space.Compact>
+      <InputNumber {...numberStyle} placeholder="0" aria-label="Lower bound" />
+      <Separator />
+      <InputNumber {...numberStyle} placeholder="100" aria-label="Upper bound" />
+    </Space.Compact>
+
+    <Space.Compact style={{ inlineSize: '100%' }}>
+      <InputNumber {...numberStyle} placeholder="0" aria-label="Lower bound in pixels" />
+      <Separator />
+      <InputNumber {...numberStyle} placeholder="100" aria-label="Upper bound in pixels" />
+      <span style={addonStyle('nach')}>px</span>
+    </Space.Compact>
+
+    <Space.Compact style={{ inlineSize: '100%' }}>
+      <InputNumber
+        {...numberStyle}
+        placeholder="0"
+        aria-label="Lower bound with an icon"
+        prefix={<BorderOutlined />}
+      />
+      <Separator />
+      <InputNumber {...numberStyle} placeholder="100" aria-label="Upper bound with an icon" />
+    </Space.Compact>
+
+    <Space.Compact style={{ inlineSize: '100%' }}>
+      <InputNumber {...numberStyle} defaultValue={0} aria-label="Lower bound, loading" />
+      <Separator />
+      <InputNumber {...numberStyle} defaultValue={100} aria-label="Upper bound, loading" />
+      <Button icon={<Spin size="small" />} aria-label="Loading" />
+    </Space.Compact>
+
+    <Space.Compact style={{ inlineSize: '100%' }}>
+      <InputNumber {...numberStyle} placeholder="0" aria-label="Lower bound while loading" />
+      <Separator />
+      <InputNumber {...numberStyle} placeholder="100" aria-label="Upper bound while loading" />
+    </Space.Compact>
+
+    <Space.Compact size="small" style={{ inlineSize: '100%' }}>
+      <InputNumber {...numberStyle} size="small" placeholder="0" aria-label="Lower bound, compressed" />
+      <Separator />
+      <InputNumber {...numberStyle} size="small" placeholder="100" aria-label="Upper bound, compressed" />
+    </Space.Compact>
+
+    <Space.Compact style={{ inlineSize: '100%' }}>
+      <span style={addonStyle('vor')}>Add</span>
+      <InputNumber {...numberStyle} placeholder="0" aria-label="First addend" />
+      <Separator>+</Separator>
+      <InputNumber {...numberStyle} placeholder="100" aria-label="Second addend" />
+    </Space.Compact>
+
+    <Space.Compact style={{ inlineSize: '100%' }}>
+      <span style={addonStyle('vor')}>Merge</span>
+      <InputNumber {...numberStyle} placeholder="0" aria-label="First value to merge" />
+      <Separator><SwapOutlined /></Separator>
+      <InputNumber {...numberStyle} placeholder="100" aria-label="Second value to merge" />
+    </Space.Compact>
+
+    <Space.Compact style={{ inlineSize: '100%' }}>
+      <span style={addonStyle('vor')}>Read only</span>
+      <InputNumber {...numberStyle} readOnly defaultValue={0} aria-label="Lower bound, read only" />
+      <Separator />
+      <InputNumber {...numberStyle} readOnly defaultValue={100} aria-label="Upper bound, read only" />
+    </Space.Compact>
+
+    <Space.Compact style={{ inlineSize: '100%' }}>
+      <span style={addonStyle('vor')}>Disabled</span>
+      <InputNumber {...numberStyle} disabled placeholder="0" aria-label="Lower bound, disabled" />
+      <Separator />
+      <InputNumber {...numberStyle} disabled placeholder="100" aria-label="Upper bound, disabled" />
+    </Space.Compact>
+
+    <Space.Compact style={{ inlineSize: '100%' }}>
+      <span style={addonStyle('vor')}>Invalid</span>
+      <InputNumber {...numberStyle} status="error" placeholder="0" aria-label="Lower bound, invalid" />
+      <Separator />
+      <InputNumber {...numberStyle} status="error" placeholder="100" aria-label="Upper bound, invalid" />
+    </Space.Compact>
+  </Space>
+);
+```
+
+Give each end its own `aria-label`. A screen reader reads the two controls one
+after the other, and "0" followed by "100" says nothing about which is the
+lower bound.

@@ -1,0 +1,440 @@
+---
+title: Date picker
+description: Ant Design DatePicker
+antd_components: [DatePicker]
+sidebar_position: 1
+---
+
+import FormUsage from '../_partials/_form-usage.mdx';
+
+# Date picker
+
+The control every other date and time control is built on. Ant Design's version
+uses [dayjs](https://day.js.org/) for parsing and formatting, so the value it
+hands back is a dayjs object rather than a `Date`.
+
+At a minimum it needs a value and an `onChange`. Everything else - the time
+column, the limits, the format - is a prop.
+
+```tsx interactive
+import React from 'react';
+import { DatePicker, Form } from 'antd';
+import dayjs from 'dayjs';
+
+export default () => {
+  const [value, setValue] = React.useState(dayjs());
+
+  return (
+    <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+      <Form.Item label="Select a date" style={{ marginBottom: 0 }}>
+        <DatePicker value={value} onChange={setValue} style={{ inlineSize: '100%' }} />
+      </Form.Item>
+    </Form>
+  );
+};
+```
+
+## Date picker states
+
+The same states as any other control, and they look the same as any other
+control - which is the point of building it on the same layout.
+
+```tsx interactive
+import React from 'react';
+import { DatePicker, Form, Space, Switch } from 'antd';
+import dayjs from 'dayjs';
+
+export default () => {
+  const [compressed, setCompressed] = React.useState(false);
+  const [value, setValue] = React.useState(dayjs());
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={compressed} onChange={setCompressed} />
+        Compressed
+      </label>
+
+      <Form layout="vertical">
+        <Form.Item label="Disabled">
+          <DatePicker disabled value={value} size={compressed ? 'small' : 'middle'} style={{ inlineSize: '100%' }} />
+        </Form.Item>
+
+        <Form.Item label="Invalid" validateStatus="error" help="Pick a date in the future.">
+          <DatePicker
+            status="error"
+            value={value}
+            onChange={setValue}
+            size={compressed ? 'small' : 'middle'}
+            style={{ inlineSize: '100%' }}
+          />
+        </Form.Item>
+
+        <Form.Item label="Read only" style={{ marginBottom: 0 }}>
+          <DatePicker
+            open={false}
+            inputReadOnly
+            value={value}
+            size={compressed ? 'small' : 'middle'}
+            style={{ inlineSize: '100%' }}
+          />
+        </Form.Item>
+      </Form>
+    </Space>
+  );
+};
+```
+
+## Time selection
+
+Two settings decide what the panel shows: whether a time column appears beside
+the calendar, and whether the calendar appears at all.
+
+Match the format to what is being asked. A field showing a date while the panel
+offers a time is a field the reader will fill in wrongly once and then distrust.
+
+```tsx interactive
+import React from 'react';
+import { DatePicker, Form } from 'antd';
+import dayjs from 'dayjs';
+
+export default () => {
+  const [value, setValue] = React.useState(dayjs());
+
+  return (
+    <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+      <Form.Item label="Date and time">
+        <DatePicker
+          showTime
+          format="YYYY-MM-DD HH:mm"
+          value={value}
+          onChange={setValue}
+          style={{ inlineSize: '100%' }}
+        />
+      </Form.Item>
+
+      <Form.Item label="Time only">
+        <DatePicker
+          picker="time"
+          format="HH:mm"
+          value={value}
+          onChange={setValue}
+          style={{ inlineSize: '100%' }}
+        />
+      </Form.Item>
+
+      <Form.Item label="Date only" style={{ marginBottom: 0 }}>
+        <DatePicker
+          format="YYYY-MM-DD"
+          value={value}
+          onChange={setValue}
+          style={{ inlineSize: '100%' }}
+        />
+      </Form.Item>
+    </Form>
+  );
+};
+```
+
+## Locale
+
+The `format` prop decides how the value is written in the field. The words in
+the panel - month names, the first day of the week - come from the locale, set
+once for the whole application:
+
+```tsx
+import { ConfigProvider } from 'antd';
+import de from 'antd/locale/de_DE';
+import 'dayjs/locale/de';
+
+<ConfigProvider locale={de}>{/* ... */}</ConfigProvider>
+```
+
+Formats vary by country more than people expect. `01/02/2026` is January the
+second in one place and the first of February in another, and neither reader
+will suspect the other reading.
+
+```tsx interactive
+import React from 'react';
+import { DatePicker, Form } from 'antd';
+import dayjs from 'dayjs';
+
+export default () => {
+  const [value, setValue] = React.useState(dayjs());
+
+  const shared = { value: value, onChange: setValue, style: { inlineSize: '100%' } };
+
+  return (
+    <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+      <Form.Item label="ISO 8601 - unambiguous everywhere">
+        <DatePicker format="YYYY-MM-DD" {...shared} />
+      </Form.Item>
+
+      <Form.Item label="Day first">
+        <DatePicker format="DD/MM/YYYY" {...shared} />
+      </Form.Item>
+
+      <Form.Item label="Month first">
+        <DatePicker format="MM/DD/YYYY" {...shared} />
+      </Form.Item>
+
+      <Form.Item label="Written out" style={{ marginBottom: 0 }}>
+        <DatePicker format="D MMMM YYYY" {...shared} />
+      </Form.Item>
+    </Form>
+  );
+};
+```
+
+## Only allow specific dates and times
+
+A range can be given as a limit, and individual dates or times can be taken out
+of it.
+
+Prefer disabling to validating. A date the reader cannot pick never becomes an
+error message they have to read and undo.
+
+```tsx interactive
+import React from 'react';
+import { DatePicker, Form } from 'antd';
+import dayjs from 'dayjs';
+
+export default () => {
+  const [value, setValue] = React.useState(dayjs());
+  const today = dayjs();
+
+  return (
+    <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+      <Form.Item label="No earlier than today">
+        <DatePicker
+          value={value}
+          onChange={setValue}
+          disabledDate={(d) => d.isBefore(today, 'day')}
+          style={{ inlineSize: '100%' }}
+        />
+      </Form.Item>
+
+      <Form.Item label="No later than a week from today">
+        <DatePicker
+          value={value}
+          onChange={setValue}
+          disabledDate={(d) => d.isAfter(today.add(7, 'day'), 'day')}
+          style={{ inlineSize: '100%' }}
+        />
+      </Form.Item>
+
+      <Form.Item label="Within the coming week only">
+        <DatePicker
+          value={value}
+          onChange={setValue}
+          disabledDate={(d) => d.isBefore(today, 'day') || d.isAfter(today.add(7, 'day'), 'day')}
+          style={{ inlineSize: '100%' }}
+        />
+      </Form.Item>
+
+      <Form.Item label="Weekends excluded">
+        <DatePicker
+          value={value}
+          onChange={setValue}
+          disabledDate={(d) => d.day() === 0 || d.day() === 6}
+          style={{ inlineSize: '100%' }}
+        />
+      </Form.Item>
+
+      <Form.Item label="Working hours only" style={{ marginBottom: 0 }}>
+        <DatePicker
+          showTime
+          format="YYYY-MM-DD HH:mm"
+          value={value}
+          onChange={setValue}
+          disabledTime={() => ({
+            disabledHours: () => [...Array(9).keys()].concat([18, 19, 20, 21, 22, 23]),
+          })}
+          style={{ inlineSize: '100%' }}
+        />
+      </Form.Item>
+    </Form>
+  );
+};
+```
+
+## Open to a specific date
+
+The panel can open somewhere other than today - the month a booking falls in,
+the start of the quarter being reported on.
+
+This is a display decision, not a value: nothing is selected until the reader
+selects it.
+
+```tsx interactive
+import React from 'react';
+import { DatePicker, Form } from 'antd';
+import dayjs from 'dayjs';
+
+export default () => (
+  <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+    <Form.Item
+      label="Opens three months ahead"
+      extra="Nothing is selected - only the month shown has changed."
+      style={{ marginBottom: 0 }}
+    >
+      <DatePicker defaultPickerValue={dayjs().add(3, 'month')} style={{ inlineSize: '100%' }} />
+    </Form.Item>
+  </Form>
+);
+```
+
+## Custom input
+
+The thing that opens the calendar does not have to be a field. Any control can
+carry it, which is useful where the date is shown some other way already - in a
+heading, on a chart.
+
+```tsx interactive
+import React from 'react';
+import { Button, DatePicker, Space, Typography } from 'antd';
+import dayjs from 'dayjs';
+
+export default () => {
+  const [value, setValue] = React.useState(dayjs());
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <Space size={16} align="center">
+      <Typography.Text strong>{value.format('D MMMM YYYY')}</Typography.Text>
+
+      <div style={{ position: 'relative' }}>
+        <Button onClick={() => setOpen((o) => !o)}>Change date</Button>
+        <DatePicker
+          open={open}
+          value={value}
+          onChange={(d) => {
+            if (d) setValue(d);
+            setOpen(false);
+          }}
+          onOpenChange={setOpen}
+          style={{ visibility: 'hidden', position: 'absolute', insetInlineStart: 0, insetBlockEnd: 0 }}
+        />
+      </div>
+    </Space>
+  );
+};
+```
+
+## UTC offsets
+
+A date without a zone is a date in whoever's zone is reading it. Where the value
+means a moment - a log entry, a scheduled run - the offset has to travel with
+it.
+
+```tsx interactive
+import React from 'react';
+import { DatePicker, Form, Select, Space, Typography } from 'antd';
+import dayjs from 'dayjs';
+
+export default () => {
+  const [value, setValue] = React.useState(dayjs());
+  const [offset, setOffset] = React.useState(0);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <Form layout="vertical">
+        <Form.Item label="Date and time">
+          <DatePicker
+            showTime
+            format="YYYY-MM-DD HH:mm"
+            value={value}
+            onChange={setValue}
+            style={{ inlineSize: '100%' }}
+          />
+        </Form.Item>
+
+        <Form.Item label="UTC offset" style={{ marginBottom: 0 }}>
+          <Select
+            value={offset}
+            onChange={setOffset}
+            options={[-8, -5, 0, 1, 5, 9].map((o) => ({
+              value: o,
+              label: `UTC${o >= 0 ? '+' : ''}${o}`,
+            }))}
+            style={{ inlineSize: '100%' }}
+          />
+        </Form.Item>
+      </Form>
+
+      <Typography.Text type="secondary">
+        {value ? value.add(offset, 'hour').format('YYYY-MM-DD HH:mm') : 'No date selected'} at the
+        chosen offset
+      </Typography.Text>
+    </Space>
+  );
+};
+```
+
+## Inline display
+
+The calendar can sit on the page rather than in a popover. Use it where picking
+the date is the task - a booking screen, a report range - and not where it is
+one field among many.
+
+```tsx interactive
+import React from 'react';
+import { Card, DatePicker, Space, Switch } from 'antd';
+import dayjs from 'dayjs';
+
+export default () => {
+  const [framed, setFramed] = React.useState(true);
+  const [showTime, setShowTime] = React.useState(false);
+  const [value, setValue] = React.useState(dayjs());
+
+  const calendar = (
+    <DatePicker
+      open
+      showTime={showTime}
+      value={value}
+      onChange={setValue}
+      getPopupContainer={(k) => k.parentElement}
+      style={{ visibility: 'hidden', blockSize: 0, padding: 0, border: 0 }}
+    />
+  );
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={16} wrap>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={framed} onChange={setFramed} />
+          Shadow
+        </label>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={showTime} onChange={setShowTime} />
+          Show time
+        </label>
+      </Space>
+
+      {framed ? (
+        <Card size="small" style={{ display: 'inline-block' }}>
+          <div style={{ position: 'relative' }}>{calendar}</div>
+        </Card>
+      ) : (
+        <div style={{ position: 'relative' }}>{calendar}</div>
+      )}
+    </Space>
+  );
+};
+```
+
+## Custom classes
+
+Ant Design has no per-part class props. Everything the calendar draws is styled
+through the theme, and where one instance needs to differ, a class on the
+control is enough to reach the rest:
+
+- the field is `.ant-picker`,
+- the panel is `.ant-picker-panel`,
+- a day is `.ant-picker-cell`,
+- the popover is `.ant-picker-dropdown`.
+
+That is the deliberate trade: fewer props, and one place where a change applies
+to every date picker rather than to the ones that remembered to pass it.
+
+<FormUsage />

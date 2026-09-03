@@ -1,0 +1,273 @@
+---
+title: Badge
+description: Ant Design Tag and Badge
+antd_components: [Tag, Badge]
+---
+
+# Badge
+
+A badge highlights a key piece of information. Badges space themselves when
+several stand together, but a group around them is better: it makes them wrap
+properly when the room runs out.
+
+Ant Design splits into two what is often one component:
+
+- `Tag` for a labelled badge - the common case.
+- `Badge` for a count on top of something.
+
+## Components
+
+### Default
+
+```tsx interactive
+import React from 'react';
+import { Tag } from 'antd';
+
+export default () => <Tag>Default badge</Tag>;
+```
+
+### Notification badge
+
+A notification badge is a count. It sits on the thing it counts, not beside it,
+and it says how many are waiting rather than that something is.
+
+```tsx interactive
+import React from 'react';
+import { Badge, Button, Space } from 'antd';
+
+export default () => (
+  <Space size={24}>
+    <Badge count={4}>
+      <Button color="primary" variant="filled">Notifications</Button>
+    </Badge>
+
+    <Badge count={40}>
+      <Button color="primary" variant="filled">Many</Button>
+    </Badge>
+
+    <Badge count={0} showZero>
+      <Button color="primary" variant="filled">None</Button>
+    </Badge>
+  </Space>
+);
+```
+
+### Beta badge
+
+A beta badge marks something not yet finished. Unlike the others it is not part
+of the content - it is a note about the content's status, so it takes a hollow
+treatment rather than a filled one.
+
+```tsx interactive
+import React from 'react';
+import { Space, Tag, Tooltip, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Space size={8}>
+      <Tag>Beta</Tag>
+      <Tag color="processing">Lab</Tag>
+      <Tag variant="filled">Tech preview</Tag>
+    </Space>
+
+    <Space size={8}>
+      <Tooltip title="This module is not GA. Please help us by reporting any bugs.">
+        <Tag>Beta</Tag>
+      </Tooltip>
+      <Tooltip title="This feature is experimental and may change.">
+        <Tag color="processing">Lab</Tag>
+      </Tooltip>
+      <Tooltip title="A title can be given to the tooltip as well.">
+        <Tag>Beta</Tag>
+      </Tooltip>
+    </Space>
+
+    <Space size={8} align="center">
+      <Typography.Text>A badge can also stand beside a heading</Typography.Text>
+      <Tag>Beta</Tag>
+      <Tag color="processing">Lab</Tag>
+      <Tag variant="filled">Tech preview</Tag>
+      <Tag>Beta</Tag>
+    </Space>
+  </Space>
+);
+```
+
+## Usage
+
+### Color options
+
+A badge takes a semantic colour, or one of its own. The colour is a surface, and
+the text on it has to be readable against it - which is why a badge with a
+custom colour needs its text colour chosen too, not inherited.
+
+```tsx interactive
+import React from 'react';
+import { Space, Tag } from 'antd';
+
+export default () => (
+  <Space size={8} wrap>
+    <Tag>default</Tag>
+    <Tag variant="filled">hollow</Tag>
+    <Tag color="#8144CC">a colour of its own</Tag>
+  </Space>
+);
+```
+
+### Badge with Icon
+
+An icon can sit before or after the label. Where the badge is only an icon, it
+still needs a label of its own - a shape without a name is not information.
+
+```tsx interactive
+import React from 'react';
+import { Space, Tag } from 'antd';
+import { CheckOutlined, ClockCircleOutlined, RollbackOutlined, ThunderboltOutlined } from '@ant-design/icons';
+
+export default () => (
+  <Space size={8} wrap>
+    <Tag icon={<ThunderboltOutlined />}>Icon before</Tag>
+    <Tag>
+      Icon after <RollbackOutlined />
+    </Tag>
+    <Tag color="success" icon={<CheckOutlined />}>Passed</Tag>
+    <Tag aria-label="Pending" icon={<ClockCircleOutlined />} />
+  </Space>
+);
+```
+
+### Badge with onClick events
+
+A badge can be clicked, or carry a small control of its own for removing it. The
+two are different: clicking the badge acts on what it labels, clicking the
+control acts on the badge.
+
+Where both are present, the removing control needs its own label naming the
+badge - otherwise a list of them all says "close".
+
+```tsx interactive
+import React from 'react';
+import { Space, Tag } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(['One', 'Two', 'Three']);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={8} wrap>
+        <Tag onClick={() => {}} style={{ cursor: 'pointer' }}>
+          Clickable badge
+        </Tag>
+        <Tag color="processing" onClick={() => {}} style={{ cursor: 'pointer' }}>
+          Clickable primary
+        </Tag>
+      </Space>
+
+      <Space size={8} wrap>
+        <Tag
+          closable
+          closeIcon={<span aria-label="Remove this badge">&times;</span>}
+          onClose={() => setOpen((o) => o.slice(1))}
+        >
+          {open[0] ?? 'All removed'}
+        </Tag>
+        <Tag closable onClick={() => {}} style={{ cursor: 'pointer' }}>
+          Both at once
+        </Tag>
+      </Space>
+    </Space>
+  );
+};
+```
+
+### Badge for health status
+
+For the state of a thing, a badge in the semantic colour reads faster than a
+sentence. Keep to the semantic set here - a custom colour has no agreed meaning,
+and a status is exactly where meaning matters.
+
+```tsx interactive
+import React from 'react';
+import { Space, Tag } from 'antd';
+
+export default () => (
+  <Space size={8} wrap>
+    <Tag color="success">Healthy</Tag>
+    <Tag color="warning">Warning</Tag>
+    <Tag color="error">Failed</Tag>
+    <Tag>Unknown</Tag>
+  </Space>
+);
+```
+
+### Badge with href
+
+A badge can be a link. Then it must look like one on hover and take keyboard
+focus - a link that only responds to a mouse is not a link.
+
+```tsx interactive
+import React from 'react';
+import { Space, Tag } from 'antd';
+
+export default () => (
+  <Space size={8} wrap>
+    <Tag>
+      <a href="#" style={{ color: 'inherit' }}>
+        badge as an anchor
+      </a>
+    </Tag>
+    <Tag color="processing">
+      <a href="#" style={{ color: 'inherit' }}>
+        primary as an anchor
+      </a>
+    </Tag>
+    <Tag color="success">
+      <a href="#" style={{ color: 'inherit' }}>
+        success as an anchor
+      </a>
+    </Tag>
+    <Tag closable>
+      <a href="#" style={{ color: 'inherit' }}>
+        an anchor that can also be removed
+      </a>
+    </Tag>
+  </Space>
+);
+```
+
+### Badge groups and truncation
+
+A badge is always a single line: the text does not wrap, it truncates when the
+badge reaches the width of what contains it.
+
+For that reason the full text is also put on the element itself, so the browser
+can show it on hover. And a group around several badges is what makes them wrap,
+truncate and space correctly together.
+
+```tsx interactive
+import React from 'react';
+import { Card, Space, Tag } from 'antd';
+
+const longText = 'A very long badge that will truncate when it runs out of room';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 300 }}>
+    <Card size="small">
+      <Space size={[8, 8]} wrap>
+        <Tag>One</Tag>
+        <Tag>Two</Tag>
+        <Tag>Three</Tag>
+        <Tag>Four</Tag>
+      </Space>
+    </Card>
+
+    <Card size="small">
+      <Tag
+        style={{ maxInlineSize: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }}
+      >
+        {longText}
+      </Tag>
+    </Card>
+  </Space>
+);
+```

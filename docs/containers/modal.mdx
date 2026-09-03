@@ -1,0 +1,318 @@
+---
+title: Modal
+description: Ant Design Modal and Popconfirm
+antd_components: [Modal]
+---
+
+# Modal
+
+A modal is for a **small** amount of content and a decision to be made about it.
+It interrupts the current task on purpose and blocks what is underneath.
+
+If the content is complex or the task takes a while, a flyout is the better
+container - a modal that has to be scrolled has outgrown its form.
+
+In Ant Design this is `Modal`. Rather than composing it from a fixed sequence
+of parts - header, body, footer - Ant Design takes them as props, so the order
+cannot be got wrong.
+
+## Components
+
+The modal needs a title that names it, so that a screen reader announces what
+opened.
+
+### Default
+
+A modal darkens what lies beneath it.
+
+```tsx interactive
+import React from 'react';
+import { Button, Modal, Typography } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <>
+      <Button color="primary" variant="filled" onClick={() => setOpen(true)}>Show modal</Button>
+
+      <Modal
+        open={open}
+        title="Modal title"
+        onCancel={() => setOpen(false)}
+        onOk={() => setOpen(false)}
+        cancelText="Cancel"
+        okText="Save"
+      >
+        <Typography>
+          <p>
+            This modal has the following text: You can place any content here.
+          </p>
+        </Typography>
+      </Modal>
+    </>
+  );
+};
+```
+
+### Focus management
+
+A modal manages focus for keyboard and screen-reader use. It moves focus into
+itself when it opens, keeps focus inside while it is open, and returns focus to
+whatever opened it when it closes.
+
+Where the element that opened the modal is removed while the modal is still
+open, focus would otherwise be lost to the page body. In that case it has to be
+returned by hand.
+
+Ant Design does the first three itself. The fourth is set through
+`afterClose`.
+
+```tsx
+<Modal
+  open={open}
+  afterClose={() => {
+    // The trigger is gone; put focus somewhere sensible.
+    andereStelle.current?.focus();
+  }}
+/>
+```
+
+### Confirm modal
+
+A confirm modal asks for a decision and nothing else. It is the same modal with
+its common parts already filled in: a message, a confirm button and a cancel
+button. The confirm button reads as neutral by default and as destructive when
+the action cannot be undone.
+
+```tsx interactive
+import React from 'react';
+import { Button, Modal, Space } from 'antd';
+
+export default () => {
+  const [simple, setSimple] = React.useState(false);
+  const [danger, setDanger] = React.useState(false);
+
+  return (
+    <Space size={16}>
+      <Button color="primary" variant="filled" onClick={() => setSimple(true)}>Show confirm modal</Button>
+      <Button color="primary" variant="filled" onClick={() => setDanger(true)}>Show dangerous confirm modal</Button>
+
+      <Modal
+        open={simple}
+        width={600}
+        title="Update subscription to Platinum?"
+        okText="Update subscription"
+        cancelText="Cancel"
+        onOk={() => setSimple(false)}
+        onCancel={() => setSimple(false)}
+      >
+        <p>
+          Your subscription and benefits increase immediately. If you change to a
+          lower subscription later, it will not take affect until the next
+          billing cycle.
+        </p>
+      </Modal>
+
+      <Modal
+        open={danger}
+        title="Discard dashboard changes?"
+        okText="Discard changes"
+        okButtonProps={{ danger: true }}
+        cancelText="Keep editing"
+        onOk={() => setDanger(false)}
+        onCancel={() => setDanger(false)}
+      >
+        <p>You will lose all unsaved changes made to this dashboard.</p>
+      </Modal>
+    </Space>
+  );
+};
+```
+
+The confirm button can wait: disabled until the reader has supplied something,
+and loading while the answer is being sent. Both say that the decision has not
+been taken yet.
+
+```tsx interactive
+import React from 'react';
+import { Button, Form, Input, Modal } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+
+  const confirm = () => {
+    setLoading(true);
+    window.setTimeout(() => {
+      setLoading(false);
+      setOpen(false);
+      setValue('');
+    }, 1000);
+  };
+
+  return (
+    <>
+      <Button color="primary" variant="filled" onClick={() => setOpen(true)}>Show loading confirm modal</Button>
+
+      <Modal
+        open={open}
+        title="Delete this repository?"
+        okText="Delete"
+        okButtonProps={{
+          danger: true,
+          disabled: value.toLowerCase() !== 'delete',
+          loading: loading,
+        }}
+        cancelText="Cancel"
+        onOk={confirm}
+        onCancel={() => setOpen(false)}
+      >
+        <Form layout="vertical">
+          <Form.Item
+            label="Type the word 'delete' to confirm"
+            style={{ marginBottom: 0 }}
+          >
+            <Input
+              name="delete"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </>
+  );
+};
+```
+
+## Usage
+
+### Configuring forms
+
+Where a modal's parts are a fixed sequence, only the body can be wrapped in a
+`<form>`; the submit button in the footer is then tied to it by id.
+
+Ant Design has the same constraint for the same reason - the footer is a
+separate prop - and the same remedy.
+
+```tsx interactive
+import React from 'react';
+import { Button, Form, Input, Modal, Select } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+  const formId = 'modal-formStyle';
+
+  return (
+    <>
+      <Button color="primary" variant="filled" onClick={() => setOpen(true)}>Show form modal</Button>
+
+      <Modal
+        open={open}
+        title="Modal title"
+        onCancel={() => setOpen(false)}
+        footer={[
+          <Button key="c" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>,
+          <Button key="s" type="primary" htmlType="submit" form={formId}>
+            Save
+          </Button>,
+        ]}
+      >
+        <Form
+          id={formId}
+          layout="vertical"
+          onFinish={() => setOpen(false)}
+        >
+          <Form.Item label="A text field">
+            <Input />
+          </Form.Item>
+          <Form.Item label="A select" style={{ marginBottom: 0 }}>
+            <Select
+              defaultValue="1"
+              options={[
+                { value: '1', label: 'Option one' },
+                { value: '2', label: 'Option two' },
+                { value: '3', label: 'Option three' },
+              ]}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </>
+  );
+};
+```
+
+### Setting width
+
+A modal starts wide enough for a form row and grows with its contents up to a
+maximum. Where that is not enough, a width can be set - remembering that a modal
+always shrinks to fit the window.
+
+```tsx interactive
+import React from 'react';
+import { Button, Modal, Typography } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <>
+      <Button color="primary" variant="filled" onClick={() => setOpen(true)}>Show modal with custom width</Button>
+
+      <Modal
+        open={open}
+        width={800}
+        title="Modal title"
+        onCancel={() => setOpen(false)}
+        onOk={() => setOpen(false)}
+        okText="Save"
+        cancelText="Cancel"
+      >
+        <Typography>
+          <p>
+            This modal has a width of 800px. It will still shrink to fit a
+            narrower window.
+          </p>
+        </Typography>
+      </Modal>
+    </>
+  );
+};
+```
+
+### Confirming an action
+
+Interrupt the reader with a modal when a decision has to be made before anything
+else can happen.
+
+The title states the action, the body states its consequence, and the confirming
+button repeats the action rather than saying "OK" - a button that says "OK"
+leaves the reader to remember what they were agreeing to.
+
+### Confirming a destructive action
+
+A deletion follows the same pattern with two additions:
+
+- The confirming button names the thing being deleted and takes the danger
+  colour.
+- The body says plainly what will not be recoverable.
+
+Where the consequence is grave, ask for the action to be typed out. Use a
+generic word - "delete" - that can be typed easily and still reminds the reader
+what they are doing.
+
+:::note[Omitted: the design figures]
+
+**Affects:** 0 specimens - illustrations, not modals.
+
+These two patterns are usually illustrated with figures from a design file
+rather than with running examples: a "Generic confirmation modal" and a
+"Confirmation modal for a destructive action". The guidance is carried over; the
+figures are not ours to copy.
+
+:::

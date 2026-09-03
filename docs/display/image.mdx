@@ -1,0 +1,189 @@
+---
+title: Image
+description: Ant Design Image
+antd_components: [Image]
+---
+
+# Image
+
+An image places a static picture into a page, with an optional caption.
+
+Write alt text that says what the image *shows*, not that it is an image. Where
+a picture is decoration and carries no information, an empty alt is the correct
+answer - a screen reader then passes over it instead of announcing a filename.
+
+In Ant Design this is `Image`.
+
+```tsx interactive
+import React from 'react';
+import { Image, Typography } from 'antd';
+
+export default () => (
+  <figure style={{ margin: 0 }}>
+    <Image
+      src="https://picsum.photos/id/13/600/300"
+      alt="A beach with a rocky outcrop"
+      preview={false}
+    />
+    <figcaption>
+      <Typography.Text type="secondary">
+        A randomized image of a beach
+      </Typography.Text>
+    </figcaption>
+  </figure>
+);
+```
+
+## Click an image for a fullscreen version
+
+An image can be made clickable so that it opens at full size. The control that
+does so needs enough contrast against the picture behind it - a dark icon on a
+bright photograph, a light one on a dark.
+
+```tsx interactive
+import React from 'react';
+import { Image, Space, Typography } from 'antd';
+
+export default () => (
+  <Space size={24} align="start" style={{ display: 'flex' }}>
+    <figure style={{ margin: 0, flex: 1 }}>
+      <Image
+        src="https://picsum.photos/id/29/400/200"
+        alt="A dark forest"
+        width="100%"
+      />
+      <figcaption>
+        <Typography.Text type="secondary">Click me for fullscreen</Typography.Text>
+      </figcaption>
+    </figure>
+
+    <figure style={{ margin: 0, flex: 1 }}>
+      <Image
+        src="https://picsum.photos/id/1005/400/200"
+        alt="A bright portrait"
+        width="100%"
+      />
+      <figcaption>
+        <Typography.Text type="secondary">
+          A darker control against a light image
+        </Typography.Text>
+      </figcaption>
+    </figure>
+  </Space>
+);
+```
+
+## Images can be sized
+
+A size sets the **maximum length of the longest edge**, whether that is the
+height or the width, and scales the rest to match. The named sizes also enlarge
+a picture that is smaller than they are.
+
+```tsx interactive
+import React from 'react';
+import { Image, Radio, Space, Typography } from 'antd';
+
+const sizes = {
+  s: 100,
+  m: 200,
+  l: 360,
+  xl: 600,
+  original: undefined,
+  fullWidth: '100%',
+  custom: 250,
+};
+
+export default () => {
+  const [size, setSize] = React.useState('m');
+  const g = sizes[size];
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Radio.Group
+        value={size}
+        onChange={(e) => setSize(e.target.value)}
+        optionType="button"
+        options={Object.keys(sizes).map((k) => ({ value: k, label: k }))}
+      />
+
+      <Image src="https://picsum.photos/id/13/600/300" alt="A beach" width={g} preview={false} />
+      <Image src="https://picsum.photos/id/29/600/300" alt="A forest" width={g} preview={false} />
+      <Image src="https://picsum.photos/id/57/600/300" alt="A city" width={g} preview={false} />
+      <Image src="https://picsum.photos/id/1005/600/300" alt="A portrait" width={g} preview={false} />
+      <Image src="https://picsum.photos/id/24/600/300" alt="A shelf of books" width={g} preview={false} />
+      <Image src="https://picsum.photos/id/40/600/300" alt="A mountain" width={g} preview={false} />
+      <Image src="https://picsum.photos/id/48/600/300" alt="A harbour" width={g} preview={false} />
+
+      <Typography.Text type="secondary">
+        The chosen size is the maximum for the longest edge.
+      </Typography.Text>
+    </Space>
+  );
+};
+```
+
+## Supporting SVG images
+
+An SVG without a width or a view box will not show up. That is not a bug in the
+image component - it is the SVG behaving as specified.
+
+Give such an image a size. Where it should also open at full size, give it a
+width as well.
+
+```tsx interactive
+import React from 'react';
+import { Image } from 'antd';
+
+const svg =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">' +
+      '<rect width="200" height="100" fill="%230B64DD"/>' +
+      '<text x="100" y="58" font-family="sans-serif" font-size="18" fill="white" text-anchor="middle">SVG</text>' +
+      '</svg>'
+  );
+
+export default () => (
+  <Image src={svg} alt="A blue rectangle labelled SVG" width={200} />
+);
+```
+
+## Float images within text
+
+Inside a long passage an image can be floated to one side so the text runs
+around it. A float wants a margin as well, or the text sits against the picture.
+
+Only float within **large** bodies of text. In a short passage the float has
+nothing to flow around and the layout breaks instead.
+
+```tsx interactive
+import React from 'react';
+import { Image, Typography } from 'antd';
+
+const paragraph =
+  'Far out in the uncharted backwaters of the unfashionable end of the western spiral arm of the Galaxy lies a small unregarded yellow sun. Orbiting this at a distance of roughly ninety-two million miles is an utterly insignificant little blue-green planet.';
+
+export default () => (
+  <Typography>
+    <Image
+      src="https://picsum.photos/id/13/200/200"
+      alt="A beach"
+      width={200}
+      preview={false}
+      style={{ float: 'left', marginInlineEnd: 16, marginBlockEnd: 8 }}
+    />
+    <p>{paragraph}</p>
+    <p>{paragraph}</p>
+
+    <Image
+      src="https://picsum.photos/id/29/200/200"
+      alt="A forest"
+      width={200}
+      preview={false}
+      style={{ float: 'right', marginInlineStart: 16, marginBlockEnd: 8 }}
+    />
+    <p>{paragraph}</p>
+    <p style={{ marginBottom: 0 }}>{paragraph}</p>
+  </Typography>
+);
+```

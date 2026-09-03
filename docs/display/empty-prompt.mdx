@@ -1,0 +1,217 @@
+---
+title: Empty prompt
+description: Ant Design Empty
+antd_components: [Empty]
+---
+
+# Empty prompt
+
+An empty prompt stands where content would be if there were any. It says what is
+missing, why, and what to do about it - in that order.
+
+An empty state that only says "no results" wastes the one moment when the reader
+is asking a question.
+
+In Ant Design this is `Empty`.
+
+## Component
+
+```tsx interactive
+import React from 'react';
+import { Button, Empty, Typography } from 'antd';
+
+export default () => (
+  <Empty
+    description={
+      <div>
+        <Typography.Title level={3}>Start adding cases</Typography.Title>
+        <Typography.Text type="secondary">
+          Add a new case or change your filter settings.
+        </Typography.Text>
+      </div>
+    }
+  >
+    <Button type="primary">Add a case</Button>
+  </Empty>
+);
+```
+
+## Usage
+
+### Less content, more actions
+
+Where the reader already knows what the page is, the prompt can drop to a line
+and an action. Two actions at most, and the second one plainly secondary -
+otherwise the empty state becomes a decision.
+
+```tsx interactive
+import React from 'react';
+import { Button, Empty, Space, Typography } from 'antd';
+
+export default () => (
+  <Empty
+    description={<Typography.Title level={4}>Start adding cases</Typography.Title>}
+  >
+    <Space size={8}>
+      <Button type="primary">Add a case</Button>
+      <Button type="text">Read the docs</Button>
+    </Space>
+  </Empty>
+);
+```
+
+### Panel options
+
+The prompt can sit on a surface or on nothing. On a page of its own it needs no
+panel; inside a card that already has edges, a second panel would be a box in a
+box.
+
+```tsx interactive
+import React from 'react';
+import { Card, Empty, Radio, Space, Typography } from 'antd';
+
+export default () => {
+  const [surface, setSurface] = React.useState('none');
+
+  const content = (
+    <Empty description={<Typography.Text>The prompt itself does not change</Typography.Text>} />
+  );
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Radio.Group
+        size="small"
+        value={surface}
+        onChange={(e) => setSurface(e.target.value)}
+        optionType="button"
+        options={[
+          { value: 'none', label: 'no panel' },
+          { value: 'plain', label: 'panel' },
+          { value: 'subdued', label: 'subdued' },
+        ]}
+      />
+
+      {surface === 'none' ? (
+        content
+      ) : (
+        <Card
+          data-variante={surface === 'subdued' ? 'surface' : undefined}
+          variant={surface === 'subdued' ? 'borderless' : undefined}
+          style={surface === 'subdued' ? { background: 'var(--ant-color-bg-layout)' } : undefined}
+        >
+          {content}
+        </Card>
+      )}
+    </Space>
+  );
+};
+```
+
+### Title sizes and icon colors
+
+The heading takes the sizes of a title, and the icon can take a semantic colour.
+Use the colour where the emptiness means something - an error, a warning - and
+leave it alone where the page is simply new.
+
+```tsx interactive
+import React from 'react';
+import { Empty, Space, Typography } from 'antd';
+
+export default () => (
+  <Empty
+    description={
+      <div>
+        <Typography.Title level={3}>A large title</Typography.Title>
+        <Typography.Text type="secondary">
+          The heading takes the sizes of a title; the icon can take a semantic
+          colour.
+        </Typography.Text>
+      </div>
+    }
+  />
+);
+```
+
+### Loading and error prompts
+
+An empty prompt also covers the two states either side of empty: still loading,
+and failed. They differ in what the reader should do - wait, or act.
+
+```tsx interactive
+import React from 'react';
+import { Button, Empty, Space, Spin, Typography } from 'antd';
+
+export default () => (
+  <Space size={32} align="start" wrap>
+    <Empty
+      image={<Spin size="large" aria-label="Loading" />}
+      description={<Typography.Title level={4}>Loading dashboards</Typography.Title>}
+    />
+
+    <Empty
+      description={
+        <div>
+          <Typography.Title level={4} style={{ color: 'var(--ant-color-error-text)' }}>
+            Unable to load your dashboards
+          </Typography.Title>
+          <Typography.Text type="secondary">
+            There was an error loading the Dashboard application.
+          </Typography.Text>
+        </div>
+      }
+    >
+      <Button type="primary" danger>
+        Try again
+      </Button>
+    </Empty>
+  </Space>
+);
+```
+
+### Layout
+
+The parts can stack or stand side by side. Side by side suits a prompt with an
+illustration wide enough to carry it; stacked suits everything else.
+
+```tsx interactive
+import React from 'react';
+import { Button, Empty, Typography } from 'antd';
+
+export default () => (
+  <Empty
+    className="stackread-empty-waagerecht"
+    description={
+      <div style={{ textAlign: 'start' }}>
+        <Typography.Title level={3}>Upgrade your license to use Machine Learning</Typography.Title>
+        <Typography.Text type="secondary">
+          Machine learning is not available with your current subscription.
+        </Typography.Text>
+      </div>
+    }
+  >
+    <Button type="primary">Upgrade</Button>
+  </Empty>
+);
+```
+
+### More types of empty states
+
+The same shape covers several situations: no data yet, no permission, no results
+for a filter, an error. What changes is the sentence and the action, not the
+layout.
+
+That is the point of having one component for all of them - a reader who has
+learned to read one empty state has learned to read the rest.
+
+### Using in a page template
+
+:::note[Omitted: the page template]
+
+**Affects:** 0 specimens - a page layout, not a prompt.
+
+An empty prompt is usually centred inside a page template that supplies the
+surrounding chrome. Ant Design's `Layout` is the nearest thing and has its
+own page; putting one inside the other here would document the layout rather
+than the prompt.
+
+:::

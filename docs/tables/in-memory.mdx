@@ -1,0 +1,452 @@
+---
+title: In-memory table
+description: Ant Design Table doing its own sorting, filtering and paging
+antd_components: [Table]
+sidebar_position: 3
+---
+
+# In-memory tables
+
+There are two ways to build this: a basic table that only shows the controls,
+and an in-memory one that also does the work - selection, search, sorting and paging,
+over the whole set of data it is given.
+
+Ant Design has one `Table` that does both. Give a column a comparator and it
+sorts; give the pagination an object and it pages; leave those out and the page
+does the work itself.
+
+The distinction is therefore not which component you reach for but where the
+data lives. In memory means the table has every row and can answer any question
+about them. Over an API it has one page and must ask.
+
+:::warning[Column identity has to be stable]
+
+Sorting compares columns by identity. A column definition rebuilt on every
+render - a `title` that is a new JSX node each time, a `sorter` defined inline -
+gives the table a different column each pass, and the sort state has nothing to
+attach to.
+
+Define the columns outside the render, or memoise them.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Table, Tag, Typography } from 'antd';
+
+const people = [
+  { key: '1', vorname: 'Mira', nachname: 'Holt', github: 'mholt', ort: 'Berlin', online: true },
+  { key: '2', vorname: 'Jonas', nachname: 'Frey', github: 'jfrey', ort: 'Lyon', online: false },
+  { key: '3', vorname: 'Ada', nachname: 'Sole', github: 'asole', ort: 'Porto', online: true },
+  { key: '4', vorname: 'Nils', nachname: 'Brandt', github: 'nbrandt', ort: 'Aarhus', online: false },
+  { key: '5', vorname: 'Ines', nachname: 'Weber', github: 'iweber', ort: 'Basel', online: true },
+];
+
+const columns = [
+  { title: 'First Name', dataIndex: 'vorname', sorter: (a, b) => a.vorname.localeCompare(b.vorname) },
+  { title: 'Last Name', dataIndex: 'nachname', sorter: (a, b) => a.nachname.localeCompare(b.nachname) },
+  {
+    title: 'Github',
+    dataIndex: 'github',
+    render: (n) => <Typography.Link href="#">{n}</Typography.Link>,
+  },
+  {
+    title: 'Online',
+    dataIndex: 'online',
+    render: (an) => <Tag color={an ? 'green' : 'red'}>{an ? 'Online' : 'Offline'}</Tag>,
+  },
+];
+
+export default () => (
+  <Table dataSource={people} columns={columns} pagination={{ pageSize: 3 }} />
+);
+```
+
+## Table selection
+
+Selection needs two things: a stable identifier per row, and somewhere for the
+selection to live.
+
+Let the table keep it where nothing else touches it. Hold it yourself where
+something else on the page can change it - a "select all matching" control, a
+filter that ought to clear the selection, an action that removes rows.
+
+The same place is where the empty state, the loading state and the error state
+belong. A table with no rows is saying one of three different things - none
+yet, not loaded, or failed - and only the page knows which.
+
+## Searching
+
+### Search bar
+
+A search bar above the table filters the rows as they are typed.
+
+Say what is being searched. A bar over a table of users that only matches the
+name will look broken to whoever types an email address into it.
+
+```tsx interactive
+import React from 'react';
+import { Input, Space, Table, Typography } from 'antd';
+
+const people = [
+  { key: '1', name: 'Mira Holt', ort: 'Berlin', jobRole: 'Engineer' },
+  { key: '2', name: 'Jonas Frey', ort: 'Lyon', jobRole: 'Designer' },
+  { key: '3', name: 'Ada Sole', ort: 'Porto', jobRole: 'Engineer' },
+  { key: '4', name: 'Nils Brandt', ort: 'Aarhus', jobRole: 'Manager' },
+];
+
+const columns = [
+  { title: 'Name', dataIndex: 'name' },
+  { title: 'Location', dataIndex: 'ort' },
+  { title: 'Role', dataIndex: 'jobRole' },
+];
+
+export default () => {
+  const [query, setQuery] = React.useState('');
+
+  const matches = people.filter((z) =>
+    `${z.name} ${z.ort} ${z.jobRole}`.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Input.Search
+        placeholder="Search name, location or role"
+        allowClear
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        style={{ maxInlineSize: 320 }}
+      />
+
+      <Table
+        dataSource={matches}
+        columns={columns}
+        pagination={false}
+        locale={{ emptyText: <Typography.Text type="secondary">No matches</Typography.Text> }}
+      />
+    </Space>
+  );
+};
+```
+
+### Search callback
+
+The search value can be intercepted rather than applied, so that the filtering
+is done by something else - a server, an index, a query language of your own.
+
+Where it is, the table should say it is working. A search that takes half a
+second and shows nothing looks like a search that found nothing.
+
+```tsx interactive
+import React from 'react';
+import { Input, Space, Table, Typography } from 'antd';
+
+const everything = [
+  { key: '1', name: 'Mira Holt', ort: 'Berlin' },
+  { key: '2', name: 'Jonas Frey', ort: 'Lyon' },
+  { key: '3', name: 'Ada Sole', ort: 'Porto' },
+];
+
+export default () => {
+  const [rows, setRows] = React.useState(everything);
+  const [loading, setLoading] = React.useState(false);
+  const run = React.useRef(0);
+
+  const runSearch = (text) => {
+    const mine = ++run.current;
+    setLoading(true);
+    window.setTimeout(() => {
+      if (run.current !== mine) return;
+      setRows(everything.filter((z) => z.name.toLowerCase().includes(text.toLowerCase())));
+      setLoading(false);
+    }, 500);
+  };
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Input.Search
+        placeholder="Searched somewhere else"
+        allowClear
+        onChange={(e) => runSearch(e.target.value)}
+        style={{ maxInlineSize: 320 }}
+      />
+
+      <Table
+        dataSource={rows}
+        loading={loading}
+        pagination={false}
+        columns={[
+          { title: 'Name', dataIndex: 'name' },
+          { title: 'Location', dataIndex: 'ort' },
+        ]}
+        locale={{ emptyText: <Typography.Text type="secondary">No matches</Typography.Text> }}
+      />
+    </Space>
+  );
+};
+```
+
+### External state
+
+Some filters belong to the table and some to the page. A search bar above the
+table is the table's; a filter chosen in a sidebar, or read from the URL, is
+not.
+
+Both can be in use at once, and when they are, the reader has to be able to see
+both. A table filtered by something off screen is a table showing the wrong
+number of rows for no visible reason.
+
+```tsx interactive
+import React from 'react';
+import { Input, Segmented, Space, Table, Tag } from 'antd';
+
+const people = [
+  { key: '1', name: 'Mira Holt', jobRole: 'Engineer' },
+  { key: '2', name: 'Jonas Frey', jobRole: 'Designer' },
+  { key: '3', name: 'Ada Sole', jobRole: 'Engineer' },
+  { key: '4', name: 'Nils Brandt', jobRole: 'Manager' },
+];
+
+export default () => {
+  const [query, setQuery] = React.useState('');
+  const [jobRole, setJobRole] = React.useState('All');
+
+  const matches = people
+    .filter((z) => (jobRole === 'All' ? true : z.jobRole === jobRole))
+    .filter((z) => z.name.toLowerCase().includes(query.toLowerCase()));
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={16} wrap>
+        <Input.Search
+          placeholder="Search names"
+          allowClear
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          style={{ inlineSize: 240 }}
+        />
+
+        <Segmented
+          value={jobRole}
+          onChange={setJobRole}
+          aria-label="Role filter, held outside the table"
+          options={['All', 'Engineer', 'Designer', 'Manager']}
+        />
+      </Space>
+
+      {jobRole !== 'All' ? <Tag closable onClose={() => setJobRole('All')}>Role: {jobRole}</Tag> : null}
+
+      <Table
+        dataSource={matches}
+        pagination={false}
+        columns={[
+          { title: 'Name', dataIndex: 'name' },
+          { title: 'Role', dataIndex: 'jobRole' },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+## Custom sort values
+
+What a column shows and what it should sort by are not always the same. A date
+written as "3 days ago", a size written as "1.2 GB", a status written as a
+word - all sort wrongly if sorted as text.
+
+Give the column a comparator that works on the underlying value instead of the
+one on screen.
+
+```tsx interactive
+import React from 'react';
+import { Table } from 'antd';
+
+const files = [
+  { key: '1', name: 'report.pdf', bytes: 1_240_000, modified: 3 },
+  { key: '2', name: 'export.csv', bytes: 84_000, modified: 1 },
+  { key: '3', name: 'archive.zip', bytes: 902_000_000, modified: 21 },
+];
+
+const readable = (b) =>
+  b > 1e9 ? `${(b / 1e9).toFixed(1)} GB` : b > 1e6 ? `${(b / 1e6).toFixed(1)} MB` : `${Math.round(b / 1e3)} kB`;
+
+const columns = [
+  { title: 'Name', dataIndex: 'name', sorter: (a, b) => a.name.localeCompare(b.name) },
+  {
+    title: 'Size',
+    dataIndex: 'bytes',
+    align: 'right',
+    render: readable,
+    sorter: (a, b) => a.bytes - b.bytes,
+  },
+  {
+    title: 'Modified',
+    dataIndex: 'modified',
+    align: 'right',
+    render: (t) => `${t} days ago`,
+    sorter: (a, b) => a.modified - b.modified,
+  },
+];
+
+export default () => <Table dataSource={files} columns={columns} pagination={false} />;
+```
+
+## Controlled pagination
+
+By default the table returns to the first page when the rows change. That is
+right for a new query and wrong for an update of the same data - the reader
+loses their place for no reason.
+
+Hold the page index yourself where the data refreshes on its own, and the page
+stays put while the rows underneath change.
+
+```tsx interactive
+import React from 'react';
+import { Table, Tag } from 'antd';
+
+const first = Array.from({ length: 9 }, (_, i) => ({
+  key: String(i),
+  name: `Person ${i + 1}`,
+  online: i % 2 === 0,
+}));
+
+export default () => {
+  const [rows, setRows] = React.useState(first);
+  const [page, setPage] = React.useState(2);
+
+  React.useEffect(() => {
+    const t = window.setInterval(() => {
+      setRows((z) =>
+        z.map((r) => (Math.random() > 0.7 ? { ...r, online: !r.online } : r))
+      );
+    }, 1000);
+    return () => window.clearInterval(t);
+  }, []);
+
+  return (
+    <Table
+      dataSource={rows}
+      pagination={{ current: page, pageSize: 3, onChange: setPage }}
+      columns={[
+        { title: 'Name', dataIndex: 'name' },
+        {
+          title: 'Online',
+          dataIndex: 'online',
+          render: (an) => <Tag color={an ? 'green' : 'red'}>{an ? 'Online' : 'Offline'}</Tag>,
+        },
+      ]}
+    />
+  );
+};
+```
+
+## Panelled layout
+
+A table can sit on a surface of its own, with a rounded border round the whole
+thing and a subdued pagination bar beneath it. It separates the table and its
+controls from the page around them.
+
+Do it only where the table is not already inside something with edges. A panel
+inside a card is a box in a box, and the second border adds nothing but a line.
+
+```tsx interactive
+import React from 'react';
+import { Table } from 'antd';
+
+const people = [
+  { key: '1', name: 'Mira Holt', ort: 'Berlin' },
+  { key: '2', name: 'Jonas Frey', ort: 'Lyon' },
+  { key: '3', name: 'Ada Sole', ort: 'Porto' },
+  { key: '4', name: 'Nils Brandt', ort: 'Aarhus' },
+];
+
+export default () => (
+  <div
+    style={{
+      border: '1px solid var(--ant-color-border)',
+      borderRadius: 6,
+      overflow: 'hidden',
+      background: 'var(--ant-color-bg-container)',
+    }}
+  >
+    <Table
+      dataSource={people}
+      pagination={{ pageSize: 2, style: { background: 'var(--ant-color-bg-layout)', margin: 0, padding: 8 } }}
+      columns={[
+        { title: 'Name', dataIndex: 'name' },
+        { title: 'Location', dataIndex: 'ort' },
+      ]}
+    />
+  </div>
+);
+```
+
+### Custom panels
+
+Toolbars of your own can go above or below the table on the same surface -
+a count, a set of bulk actions, a view switcher.
+
+Keep them on the table's surface rather than floating above it. A toolbar that
+looks separate reads as belonging to the page, and its actions will be taken to
+apply to more than the rows below.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Table, Typography } from 'antd';
+
+const people = [
+  { key: '1', name: 'Mira Holt', ort: 'Berlin' },
+  { key: '2', name: 'Jonas Frey', ort: 'Lyon' },
+  { key: '3', name: 'Ada Sole', ort: 'Porto' },
+];
+
+export default () => {
+  const [selected, setSelected] = React.useState([]);
+
+  return (
+    <div
+      style={{
+        border: '1px solid var(--ant-color-border)',
+        borderRadius: 6,
+        overflow: 'hidden',
+        background: 'var(--ant-color-bg-container)',
+      }}
+    >
+      <Space
+        size={16}
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          padding: 8,
+          background: 'var(--ant-color-bg-layout)',
+          borderBlockEnd: '1px solid var(--ant-color-split)',
+        }}
+      >
+        <Typography.Text type="secondary">
+          {selected.length ? `${selected.length} selected` : `${people.length} people`}
+        </Typography.Text>
+
+        <Space size={8}>
+          <Button size="small" disabled={!selected.length}>
+            Export
+          </Button>
+          <Button size="small" danger disabled={!selected.length}>
+            Delete
+          </Button>
+        </Space>
+      </Space>
+
+      <Table
+        dataSource={people}
+        pagination={false}
+        rowSelection={{ selectedRowKeys: selected, onChange: setSelected }}
+        columns={[
+          { title: 'Name', dataIndex: 'name' },
+          { title: 'Location', dataIndex: 'ort' },
+        ]}
+      />
+    </div>
+  );
+};
+```

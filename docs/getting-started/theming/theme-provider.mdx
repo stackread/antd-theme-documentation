@@ -1,0 +1,79 @@
+---
+title: Theme provider
+description: The three layers, and which one to edit
+sidebar_position: 1
+audit: true
+---
+
+# Theme provider
+
+Three layers, and the reason there are three.
+
+```
+  tokens.ts                 the vocabulary
+       │                    the only place a value is written
+       ├──────────────┬──────────────┐
+       ▼              ▼              ▼
+  antd-theme.ts   variables.ts   theme.css
+   --ant-*         --stackread-*   the 55 deviations
+```
+
+## What each layer is for
+
+**`tokens.ts`** is the vocabulary: `color.primaryLight`, `metrics.stepIcon`,
+`motion.durationSlow`. It is the only place a value is written. You will not
+find a colour literal anywhere else in the package - not as a convenience rule,
+but because that is what makes the vocabulary the single place to change.
+
+**`antd-theme.ts`** hands the vocabulary to Ant Design as a `ThemeConfig`.
+Every map token is set explicitly rather than derived, and the dark appearance
+has its own written values rather than a derivation algorithm.
+
+**`variables.ts`** writes what Ant Design has no name for onto the document
+root as `--stackread-*`: the LIGHT level of a meaning, the risk meaning, the
+autofilled field, the skeleton's angle and duration.
+
+**`theme.css`** holds what neither layer can reach, because Ant Design fixes
+the value in its own stylesheet.
+
+## Which layer to edit
+
+| you want to change | edit |
+|---|---|
+| a value, everywhere it is used | `tokens.ts` |
+| what Ant Design does with a value | `antd-theme.ts` or `components.ts` |
+| something Ant Design has no token for | `theme.css` |
+
+## Why the deviations are a file and not a comment
+
+`theme.css` holds 55 numbered rules, each with the count of places it affects.
+Two examples of why a token could not carry the value:
+
+- **The loading indicator.** The ring is made of four border colours. Ant
+  Design draws an SVG arc, and no token turns a path into a border - so the
+  glyph is hidden and the ring is painted on its parent.
+- **The autofilled field.** Chrome paints its own yellow behind a value it
+  filled in, and sets it so no `background-color` reaches it. The only way
+  through is an inset shadow large enough to cover the field.
+
+Every deviation carries its number in the source, so a rule can be traced back
+to the measurement that justified it.
+
+## Specificity
+
+Ant Design v6 writes its rules as `:where(.hash).ant-skeleton.ant-skeleton-active
+.ant-skeleton-title`. `:where()` contributes nothing, so that is three classes -
+and an override with two loses silently.
+
+Every rule in `theme.css` matches or exceeds that depth, usually by repeating
+the last class. A rule that does not is not a weaker rule; it is no rule at
+all.
+
+## The Docusaurus shell
+
+`@stackread/docusaurus-theme` is a separate package. It maps the vocabulary
+onto Docusaurus' own `--ifm-*` variables, so that components and the shell
+around them agree. A React application does not need it; these pages do.
+
+The split is deliberate: `@stackread/antd-theme` knows nothing about any host. A
+theme that knew where it was being worn could only be worn there.

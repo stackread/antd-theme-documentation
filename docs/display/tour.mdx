@@ -1,0 +1,461 @@
+---
+title: Tour
+description: Ant Design Tour
+antd_components: [Tour]
+---
+
+# Tour
+
+A tour walks the reader through a page in order, pointing at things that are
+already there. It adds nothing to the interface and takes nothing away - it
+only says, one at a time, what is worth looking at.
+
+In Ant Design this is `Tour`.
+
+:::note
+
+The examples on this page start their tour from a button rather than on load,
+so that the page can be read without one opening in front of it.
+
+:::
+
+## Usage
+
+### Wrap target element
+
+A step needs two things: something to point at, and something to say. The
+target is given as a function returning the element, so that the tour reads it
+when it opens rather than when it is defined.
+
+Title, text and buttons are all the step's own.
+
+```tsx interactive
+import React from 'react';
+import { Button, Input, Space, Tour } from 'antd';
+
+export default () => {
+  const target = React.useRef(null);
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Button onClick={() => setOpen(true)}>Start tour</Button>
+
+      <div ref={target} style={{ maxInlineSize: 240 }}>
+        <Input placeholder="Enter a name" aria-label="Name" />
+      </div>
+
+      <Tour
+        open={open}
+        onClose={() => setOpen(false)}
+        steps={[
+          {
+            title: 'Title of the current step',
+            description: 'The tour step points at the field beneath it.',
+            target: () => target.current,
+          },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+### Anchor to DOM element
+
+The target does not have to be wrapped. Anything the function can return will
+do: a ref, an element found by a selector, or a node held elsewhere.
+
+That matters where the thing being pointed at is not yours to wrap - a control
+inside another component, or an element rendered by something else entirely.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Tour, Typography } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Button onClick={() => setOpen(true)}>Anchor by selector</Button>
+
+      <Typography>
+        <p style={{ marginBottom: 0 }}>
+          The tour points at{' '}
+          <strong id="stackread-tour-anchor">this word</strong> without wrapping
+          it.
+        </p>
+      </Typography>
+
+      <Tour
+        open={open}
+        onClose={() => setOpen(false)}
+        steps={[
+          {
+            title: 'DOM selector as anchor location',
+            description: 'The target is found in the document, not wrapped.',
+            target: () => document.getElementById('stackread-tour-anchor'),
+          },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+The same, given the element directly rather than looked up:
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Tour } from 'antd';
+
+export default () => {
+  const [button, setButton] = React.useState(null);
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <Space size={16}>
+      <Button onClick={() => setOpen(true)}>Start tour</Button>
+      <Button ref={setButton} color="primary" variant="filled">
+        The anchor
+      </Button>
+
+      <Tour
+        open={open}
+        onClose={() => setOpen(false)}
+        steps={[
+          {
+            title: 'React ref as anchor location',
+            description: 'The element itself was handed to the step.',
+            target: () => button,
+          },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+### Guided tour
+
+In a guided tour the reader moves on without having to do anything on the page
+underneath. Where that is so, give both a way forward and a way out: **Next**
+and **Close tour**, both visible at every step.
+
+A tour with only a Next button is a tour the reader cannot leave.
+
+```tsx interactive
+import React from 'react';
+import { Button, Card, Space, Tour } from 'antd';
+
+export default () => {
+  const one = React.useRef(null);
+  const two = React.useRef(null);
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Button onClick={() => setOpen(true)}>Start guided tour</Button>
+
+      <Space size={16}>
+        <Card ref={one} size="small">
+          The first thing.
+        </Card>
+        <Card ref={two} size="small">
+          The second thing.
+        </Card>
+      </Space>
+
+      <Tour
+        open={open}
+        onClose={() => setOpen(false)}
+        steps={[
+          {
+            title: 'Step 1',
+            description: 'Read this, then move on. Nothing has to be done here.',
+            target: () => one.current,
+            nextButtonProps: { children: 'Next' },
+          },
+          {
+            title: 'Step 2',
+            description: 'And this is the second. The tour ends after it.',
+            target: () => two.current,
+            nextButtonProps: { children: 'Finish' },
+          },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+### Standalone steps
+
+A step can also be driven from outside, with the page deciding when to advance
+- typically when the reader has actually done the thing the step asked for.
+
+Here the tour only moves on once the field has something in it.
+
+```tsx interactive
+import React from 'react';
+import { Button, Form, Input, Space, Tour } from 'antd';
+
+export default () => {
+  const field = React.useRef(null);
+  const button = React.useRef(null);
+  const [open, setOpen] = React.useState(false);
+  const [step, setStep] = React.useState(0);
+  const [value, setValue] = React.useState('');
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <Button
+        onClick={() => {
+          setStep(0);
+          setOpen(true);
+        }}
+      >
+        Start tour
+      </Button>
+
+      <Form layout="vertical">
+        <Form.Item label="Your query">
+          <div ref={field}>
+            <Input
+              value={value}
+              onChange={(e) => {
+                setValue(e.target.value);
+                if (e.target.value && step === 0) setStep(1);
+              }}
+              placeholder="Type something"
+            />
+          </div>
+        </Form.Item>
+
+        <div ref={button}>
+          <Button type="primary" disabled={!value}>
+            Save
+          </Button>
+        </div>
+      </Form>
+
+      <Tour
+        open={open}
+        current={step}
+        onChange={setStep}
+        onClose={() => setOpen(false)}
+        steps={[
+          {
+            title: 'Step 1',
+            description: 'Type something into the field. The tour waits for you.',
+            target: () => field.current,
+          },
+          {
+            title: 'Step 2',
+            description: 'Now the query can be saved.',
+            target: () => button.current,
+          },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+### The tour state as a hook
+
+A hook could keep the step state for you; here the state is `current` plus
+`onChange` - two props, held wherever it suits the page.
+
+The state can therefore live where the page needs it: in a store, in the URL,
+or, as here, in the component.
+
+```tsx interactive
+import React from 'react';
+import { Button, Card, Space, Tour, Typography } from 'antd';
+
+const steps = [
+  { title: 'Step 1', text: 'The state is held outside the tour.' },
+  { title: 'Step 2', text: 'Which means the page can move it.' },
+  { title: 'Step 3', text: 'And can read where the tour has got to.' },
+];
+
+export default () => {
+  const target = React.useRef(null);
+  const [open, setOpen] = React.useState(false);
+  const [step, setStep] = React.useState(0);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={8}>
+        <Button
+          onClick={() => {
+            setStep(0);
+            setOpen(true);
+          }}
+        >
+          Start tour
+        </Button>
+        <Button onClick={() => setStep((s) => Math.min(s + 1, steps.length - 1))}>
+          Advance from outside
+        </Button>
+      </Space>
+
+      <Card ref={target} size="small">
+        <Typography.Text type="secondary">
+          The tour is at step {step + 1} of {steps.length}.
+        </Typography.Text>
+      </Card>
+
+      <Tour
+        open={open}
+        current={step}
+        onChange={setStep}
+        onClose={() => setOpen(false)}
+        steps={steps.map((s) => ({
+          title: s.title,
+          description: s.text,
+          target: () => target.current,
+        }))}
+      />
+    </Space>
+  );
+};
+```
+
+### The tour state as a component
+
+:::note[Omitted: the render prop form, and steps as elements]
+
+**Affects:** 7 specimens - one shape, counted several times.
+
+Two things differ, and both come from the same place.
+
+Each step could be an element in the tree, so that a tour of four steps is four
+components. Ant Design takes them as entries in a `steps` array: a tour
+of four steps is one element. The examples above build the same tours, but each
+one counts once.
+
+The same state management is sometimes offered twice - once as a hook, once as
+a render prop component for class components. Here there is neither: the
+state is `current` and `onChange`, and where it lives is the page's business.
+
+:::
+
+The class-component case the render prop was for has an equivalent here, since
+`current` and `onChange` are ordinary props:
+
+```tsx interactive
+import React from 'react';
+import { Button, Card, Space, Tour } from 'antd';
+
+class GuidedTour extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { open: false, step: 0 };
+    this.target = React.createRef();
+  }
+
+  render() {
+    return (
+      <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+        <Button onClick={() => this.setState({ open: true, step: 0 })}>
+          Start tour
+        </Button>
+
+        <Card ref={this.target} size="small">
+          A class component holds the state itself.
+        </Card>
+
+        <Tour
+          open={this.state.open}
+          current={this.state.step}
+          onChange={(s) => this.setState({ step: s })}
+          onClose={() => this.setState({ open: false })}
+          steps={[
+            {
+              title: 'Step 1',
+              description: 'No render prop is needed for this.',
+              target: () => this.target.current,
+            },
+            {
+              title: 'Step 2',
+              description: 'The props are the same either way.',
+              target: () => this.target.current,
+            },
+          ]}
+        />
+      </Space>
+    );
+  }
+}
+
+export default () => <GuidedTour />;
+```
+
+### Tour demo
+
+A tour in something closer to a real page, where the steps point at different
+parts of an interface rather than at one element.
+
+```tsx interactive
+import React from 'react';
+import { Button, Card, Input, Space, Statistic, Tour, Typography } from 'antd';
+
+export default () => {
+  const query = React.useRef(null);
+  const numberStyle = React.useRef(null);
+  const saveRef = React.useRef(null);
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 520 }}>
+      <Space size={16} align="center">
+        <Typography.Title level={4} style={{ marginBottom: 0 }}>
+          Dashboard
+        </Typography.Title>
+        <Button size="small" onClick={() => setOpen(true)}>
+          Take the tour
+        </Button>
+      </Space>
+
+      <div ref={query}>
+        <Input.Search placeholder="Search your data" aria-label="Search" />
+      </div>
+
+      <Card size="small" ref={numberStyle}>
+        <Statistic value="22,123" />
+        <Typography.Text type="secondary">Queries</Typography.Text>
+      </Card>
+
+      <div ref={saveRef}>
+        <Button type="primary">Save this view</Button>
+      </div>
+
+      <Tour
+        open={open}
+        onClose={() => setOpen(false)}
+        steps={[
+          {
+            title: 'Start here',
+            description: 'Everything on the page follows from what you search for.',
+            target: () => query.current,
+          },
+          {
+            title: 'What came back',
+            description: 'The numbers update as the query changes.',
+            target: () => numberStyle.current,
+          },
+          {
+            title: 'Keep it',
+            description: 'A view you will want again is worth saving.',
+            target: () => saveRef.current,
+            nextButtonProps: { children: 'Finish' },
+          },
+        ]}
+      />
+    </Space>
+  );
+};
+```

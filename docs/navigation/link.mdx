@@ -1,0 +1,207 @@
+---
+title: Link
+description: Ant Design Typography.Link
+antd_components: [Typography]
+---
+
+# Link
+
+A link is an anchor - or, occasionally, a button - made to sit inside a block
+of text without disturbing it.
+
+That is the whole design brief: it has to be visible enough to be found while
+reading and quiet enough not to be read first. Underline on hover rather than
+always, colour that carries into the surrounding line height, and a focus ring
+that a keyboard user can actually see.
+
+```tsx interactive
+import React from 'react';
+import { Typography } from 'antd';
+
+export default () => (
+  <Typography>
+    <p>
+      Any anchor can be a <Typography.Link href="#">link</Typography.Link>, and so can a{' '}
+      <Typography.Link onClick={() => {}}>button</Typography.Link> where the thing being
+      done is not navigation.
+    </p>
+
+    <p style={{ marginBottom: 0 }}>
+      Use a link for going somewhere and a button for doing something. A{' '}
+      <Typography.Link href="#">link that deletes a record</Typography.Link> is a link the
+      reader can open in a new tab.
+    </p>
+  </Typography>
+);
+```
+
+## External links
+
+A link that opens a new window should say so before it is clicked. An icon
+after the text does that, and it is the only warning a reader gets - the tab
+that appears is otherwise a surprise.
+
+Opening in a new window also needs `rel="noreferrer"`, since the new page would
+otherwise be handed a reference back to yours.
+
+```tsx interactive
+import React from 'react';
+import { Typography } from 'antd';
+import { ExportOutlined } from '@ant-design/icons';
+
+const external = (
+  <span aria-hidden style={{ marginInlineStart: 4, fontSize: '0.85em' }}>
+    <ExportOutlined />
+  </span>
+);
+
+export default () => (
+  <Typography>
+    <p>
+      An{' '}
+      <Typography.Link href="https://example.com" target="_blank" rel="noreferrer">
+        external link{external}
+      </Typography.Link>{' '}
+      opens in a new window, and says so.
+    </p>
+
+    <p style={{ marginBottom: 0 }}>
+      The icon can also be added by hand where the new window is opened{' '}
+      <Typography.Link onClick={() => {}}>some other way{external}</Typography.Link>.
+    </p>
+  </Typography>
+);
+```
+
+## Coloring links
+
+A link takes the same colours as a button. Use them for the same reasons:
+`danger` where following the link leads somewhere destructive, `success` rarely,
+the default everywhere else.
+
+A colour meant for a dark background stays light whatever the theme, so it
+belongs only where the background is guaranteed dark - a banner, an overlay -
+and nowhere else.
+
+```tsx interactive
+import React from 'react';
+import { Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Typography>
+      <p style={{ marginBottom: 0 }}>
+        A <Typography.Link href="#">primary link</Typography.Link> and a{' '}
+        <Typography.Link href="#" type="danger">
+          danger link
+        </Typography.Link>{' '}
+        in running text.
+      </p>
+    </Typography>
+
+    <div
+      style={{
+        padding: 16,
+        borderRadius: 4,
+        background: 'var(--ant-color-text)',
+      }}
+    >
+      <Typography.Text style={{ color: 'var(--ant-color-bg-container)' }}>
+        On a dark surface a link has to stay light:{' '}
+        <a href="#" style={{ color: 'var(--ant-color-bg-container)', textDecoration: 'underline' }}>
+          a ghost link
+        </a>
+        .
+      </Typography.Text>
+    </div>
+  </Space>
+);
+```
+
+## Disabled links
+
+A link with a click handler and no destination can be disabled: the handler
+stops firing and the link styling comes off.
+
+A link with an `href` cannot be. There is no way to stop a browser following an
+anchor that has somewhere to go, so where the destination should be unreachable,
+do not render the anchor.
+
+```tsx interactive
+import React from 'react';
+import { Space, Switch, Typography } from 'antd';
+
+export default () => {
+  const [disabled, setDisabled] = React.useState(true);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={disabled} onChange={setDisabled} />
+        Disabled
+      </label>
+
+      <Typography>
+        <p>
+          A{' '}
+          <Typography.Link disabled={disabled} onClick={() => {}}>
+            link with a handler
+          </Typography.Link>{' '}
+          can be disabled.
+        </p>
+
+        <p>
+          A{' '}
+          <Typography.Link href="#" disabled={disabled}>
+            link with a destination
+          </Typography.Link>{' '}
+          only looks disabled - the browser will still follow it.
+        </p>
+
+        <p style={{ marginBottom: 0 }}>
+          <Typography.Text type="secondary">
+            Where the destination must be unreachable, render{' '}
+            <Typography.Link disabled onClick={() => {}}>
+              no anchor at all
+            </Typography.Link>
+            .
+          </Typography.Text>
+        </p>
+      </Typography>
+    </Space>
+  );
+};
+```
+
+## Link validation
+
+A destination beginning with `javascript:` is not a destination; it is code
+handed to the page by whoever supplied the string.
+
+Where an `href` comes from data - a user profile, an imported document, an API
+response - check the protocol before rendering it, and render plain text where
+the check fails. Anything else is a cross-site scripting hole with a nice
+underline.
+
+```tsx interactive
+import React from 'react';
+import { Space, Typography } from 'antd';
+
+const allowed = (target) => /^(https?:|mailto:|\/|#)/i.test(target);
+
+const Target = ({ href, children }) =>
+  allowed(href) ? (
+    <Typography.Link href={href}>{children}</Typography.Link>
+  ) : (
+    <Typography.Text type="secondary" title={`Blocked: ${href}`}>
+      {children}
+    </Typography.Text>
+  );
+
+export default () => (
+  <Space orientation="vertical" size={8} style={{ display: 'flex' }}>
+    <Target href="https://example.com">An allowed destination</Target>
+    <Target href="javascript:alert(1)">A blocked destination, rendered as text</Target>
+  </Space>
+);
+```

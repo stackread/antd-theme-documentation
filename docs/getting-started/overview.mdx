@@ -1,0 +1,67 @@
+---
+title: Overview
+description: What this theme is, and what it is not
+sidebar_position: 1
+audit: true
+---
+
+# Overview
+
+An Ant Design theme with a complete, explicitly written token set.
+
+Not a component library. Ant Design supplies the components; this supplies the
+values they are drawn with - every colour, size, radius, shadow and duration.
+There is no `<StackreadButton>`. There is `<Button>`, drawn a particular way.
+
+## Written, not derived
+
+Both appearances are written out. Light and dark are two sets of stated values,
+not one set plus an algorithm - which is why a colour in dark mode is a
+decision someone made rather than a computation nobody checked.
+
+Where Ant Design has no token for something, that is written down as a
+deviation with a count of how many places it affects - currently 55 of them. A
+deviation is not a failure; an unrecorded one is.
+
+## What it is not
+
+**Not a component gallery.** These pages carry examples, in real components,
+with the real values. Where Ant Design has no equivalent for something, the
+page says so and says what was left out.
+
+**Not final.** Getting the values exactly right is what makes it possible to
+know what you are changing when you change them.
+
+## Where to start
+
+<div className="cards">
+
+**[Setup](./setup)** - the theme in an application, in nine lines.
+
+**[Theme provider](./theming/theme-provider)** - the three layers, and which
+one you should be editing.
+
+**[Colors](./tokens/colors)** - Rule A, the four levels, the seven meanings.
+The single page that explains why anything is the colour it is.
+
+**[Components](/containers/accordion)** - 72 pages, one per component.
+
+</div>
+
+## How it is checked
+
+Four kinds of check run over every page, in both appearances:
+
+| | what it asks |
+|---|---|
+| Target values | is this the value the vocabulary says? |
+| Alpha search | is this Ant Design's black overlay, which we replaced? |
+| Variable sweep | is there an `--ant-color-*` we never set? |
+| Foreign colours | is anything painted a colour that is not ours? |
+
+659 expectations, 0 findings. Two more suites check that every example still
+renders and that four states the value audit cannot reach - hover, autofill,
+reduced motion - carry the right values.
+
+None of them can tell you a page looks right. They tell you it is not
+accidentally wrong, which is a different and smaller claim.

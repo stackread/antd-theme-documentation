@@ -1,0 +1,498 @@
+---
+title: Button group
+description: Ant Design Space.Compact and Segmented
+antd_components: [Space, Segmented]
+sidebar_position: 2
+---
+
+# Button group
+
+Related buttons belong together, and there are two reasons to put them
+together, which produce two different controls.
+
+- **A row of actions.** Several things that can be done, arranged side by side.
+  Ant Design joins these with `Space.Compact`.
+- **A choice.** One of several options, or several of them - a radio group or a
+  set of checkboxes wearing buttons. That is `Segmented` for one choice, and a
+  `Radio.Group` or `Checkbox.Group` in button form for the rest.
+
+The distinction is not cosmetic. A row of actions is pressed; a choice is
+selected, and something stays selected afterwards. Building one out of the
+other is how a control ends up with no state the reader can see.
+
+:::note[Accessibility recommendation]
+
+A group needs a name. A row of actions takes `role="group"` and an
+`aria-label`; a choice takes a `fieldset` with a `legend`.
+
+Without one, a screen reader reads a run of buttons with nothing to say what
+they have to do with each other.
+
+:::
+
+## Children API
+
+The first kind: buttons written out as children, joined into one frame. Size
+and disabled state belong to the group, so that the row stays consistent.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Switch, Tooltip } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
+
+export default () => {
+  const [compressed, setCompressed] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(false);
+
+  const shared = { size: compressed ? 'small' : 'middle', disabled: disabled };
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={16} wrap>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={compressed} onChange={setCompressed} />
+          Compressed
+        </label>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={disabled} onChange={setDisabled} />
+          Disabled
+        </label>
+      </Space>
+
+      <Space.Compact role="group" aria-label="Row actions">
+        <Button {...shared}>Copy</Button>
+        <Button {...shared}>Edit</Button>
+        <Tooltip title="Delete">
+          <Button {...shared} aria-label="Delete">
+            <DeleteOutlined />
+          </Button>
+        </Tooltip>
+      </Space.Compact>
+    </Space>
+  );
+};
+```
+
+### Gutter size
+
+The gap between the buttons is a property of the row, not of each button. Give
+them a gap and they read as separate actions that belong together; take it away
+and they read as one control.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
+
+export default () => {
+  const [gap, setGap] = React.useState(8);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={8}>
+        {[0, 4, 8, 16].map((a) => (
+          <Button key={a} size="small" type={a === gap ? 'primary' : 'default'} onClick={() => setGap(a)}>
+            {a === 0 ? 'none' : `${a}px`}
+          </Button>
+        ))}
+      </Space>
+
+      <Space size={gap} role="group" aria-label="Row actions">
+        <Button>Copy</Button>
+        <Button>Edit</Button>
+        <Button aria-label="Delete">
+          <DeleteOutlined />
+        </Button>
+      </Space>
+    </Space>
+  );
+};
+```
+
+### Segmented
+
+With no gap at all the row becomes one connected control: the buttons sit flush
+and share a single outline.
+
+Two constraints come with it. Everything in the row must be the same kind of
+button - all with labels, or all icons - and an empty button has no place in it,
+since it has no surface to join to.
+
+A divider between the segments helps where the labels are short enough that the
+boundaries are otherwise hard to see.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Switch, Tooltip } from 'antd';
+
+export default () => {
+  const [dividers, setDividers] = React.useState(true);
+
+  const edge = dividers ? undefined : { borderInlineColor: 'transparent' };
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={dividers} onChange={setDividers} />
+        Show dividers
+      </label>
+
+      <Space.Compact role="group" aria-label="Text alignment">
+        <Button style={edge}>Left</Button>
+        <Button style={edge}>Center</Button>
+        <Button style={edge}>Right</Button>
+      </Space.Compact>
+
+      <Space.Compact role="group" aria-label="Text style">
+        <Tooltip title="Bold">
+          <Button aria-label="Bold" style={edge}>
+            <strong aria-hidden>B</strong>
+          </Button>
+        </Tooltip>
+        <Tooltip title="Italic">
+          <Button aria-label="Italic" style={edge}>
+            <em aria-hidden>I</em>
+          </Button>
+        </Tooltip>
+        <Tooltip title="Underline">
+          <Button aria-label="Underline" style={edge}>
+            <u aria-hidden>U</u>
+          </Button>
+        </Tooltip>
+      </Space.Compact>
+    </Space>
+  );
+};
+```
+
+#### Vertical layout
+
+The same control stacked in a column. Use it only for icon buttons: a column of
+labelled buttons is a menu, and should be one.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Tooltip } from 'antd';
+import { MinusOutlined, ReloadOutlined } from '@ant-design/icons';
+
+const names = { zoomIn: 'Zoom in', zoomOut: 'Zoom out', reset: 'Reset' };
+
+export default () => (
+  <Space.Compact
+    orientation="vertical"
+    role="group"
+    aria-label="Map controls"
+    style={{ inlineSize: 40 }}
+  >
+    <Tooltip title={names.zoomIn} placement="right">
+      <Button aria-label={names.zoomIn}>
+        <span aria-hidden>+</span>
+      </Button>
+    </Tooltip>
+    <Tooltip title={names.zoomOut} placement="right">
+      <Button aria-label={names.zoomOut}>
+        <MinusOutlined />
+      </Button>
+    </Tooltip>
+    <Tooltip title={names.reset} placement="right">
+      <Button aria-label={names.reset}>
+        <ReloadOutlined />
+      </Button>
+    </Tooltip>
+  </Space.Compact>
+);
+```
+
+### Selection
+
+The second kind: a group where something stays selected.
+
+`Segmented` is the single-choice form - exactly one option at a time, and the
+selection is visible in the control itself rather than in a state the reader has
+to remember.
+
+For several at once, the group is a set of toggles, each carrying its own
+pressed state.
+
+```tsx interactive
+import React from 'react';
+import { Button, Segmented, Space } from 'antd';
+
+export default () => {
+  const [single, setSingle] = React.useState('day');
+  const [many, setMany] = React.useState({ bold: true, italic: false, underline: false });
+
+  const styleFor = (key, name) => ({
+    'aria-label': name,
+    'aria-pressed': many[key],
+    color: many[key] ? 'primary' : 'default',
+    variant: many[key] ? 'filled' : 'outlined',
+    onClick: () => setMany((z) => ({ ...z, [key]: !z[key] })),
+  });
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Segmented
+        value={single}
+        onChange={setSingle}
+        options={[
+          { value: 'day', label: 'Day' },
+          { value: 'week', label: 'Week' },
+          { value: 'month', label: 'Month' },
+        ]}
+      />
+
+      <Segmented
+        value={single}
+        onChange={setSingle}
+        size="small"
+        options={[
+          { value: 'day', label: 'Day' },
+          { value: 'week', label: 'Week' },
+          { value: 'month', label: 'Month' },
+        ]}
+      />
+
+      <Segmented
+        block
+        value={single}
+        onChange={setSingle}
+        options={[
+          { value: 'day', label: 'Day' },
+          { value: 'week', label: 'Week' },
+          { value: 'month', label: 'Month' },
+        ]}
+      />
+
+      <Space.Compact role="group" aria-label="Text style">
+        <Button {...styleFor('bold', 'Bold')}>
+          <strong aria-hidden>B</strong>
+        </Button>
+        <Button {...styleFor('italic', 'Italic')}>
+          <em aria-hidden>I</em>
+        </Button>
+        <Button {...styleFor('underline', 'Underline')}>
+          <u aria-hidden>U</u>
+        </Button>
+      </Space.Compact>
+    </Space>
+  );
+};
+```
+
+## Options API
+
+Where the group is generated from a list rather than written out, the options
+carry the labels and the group carries the value.
+
+:::note[Accessibility recommendation]
+
+For a group to be announced as a group with a title, it needs a `legend`. That
+is purely for accessibility, so it may be visually hidden - but it may not be
+absent.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Card, Segmented, Space, Typography } from 'antd';
+
+const options = [
+  { value: 'day', label: 'Day' },
+  { value: 'week', label: 'Week' },
+  { value: 'month', label: 'Month' },
+];
+
+export default () => {
+  const [value, setValue] = React.useState('week');
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Card size="small">
+        <Typography.Title level={5} style={{ marginBlockStart: 0 }}>
+          Single selection
+        </Typography.Title>
+        <Segmented aria-label="Time range" value={value} onChange={setValue} options={options} />
+      </Card>
+
+      <Card size="small">
+        <Typography.Title level={5} style={{ marginBlockStart: 0 }}>
+          Full width
+        </Typography.Title>
+        <Segmented
+          block
+          aria-label="Time range, full width"
+          value={value}
+          onChange={setValue}
+          options={options}
+        />
+      </Card>
+    </Space>
+  );
+};
+```
+
+### Icon only button group
+
+Where the options are icons, each still needs a name of its own. The icon is
+what is seen; the label is what is announced, and the two have to agree.
+
+```tsx interactive
+import React from 'react';
+import { Segmented, Space, Tooltip } from 'antd';
+
+const withGlyph = (name, glyphe) => ({
+  value: name.toLowerCase(),
+  label: (
+    <Tooltip title={name}>
+      <span aria-label={name} role="img">
+        {glyphe}
+      </span>
+    </Tooltip>
+  ),
+});
+
+export default () => {
+  const [value, setValue] = React.useState('list');
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Segmented
+        aria-label="View mode"
+        value={value}
+        onChange={setValue}
+        options={[withGlyph('List', '☰'), withGlyph('Grid', '▦'), withGlyph('Table', '⌸')]}
+      />
+
+      <Segmented
+        size="small"
+        aria-label="View mode, compressed"
+        value={value}
+        onChange={setValue}
+        options={[withGlyph('List', '☰'), withGlyph('Grid', '▦'), withGlyph('Table', '⌸')]}
+      />
+    </Space>
+  );
+};
+```
+
+### Button group tooltips
+
+A tooltip on an option explains what it does. Where the option is an icon, that
+is not optional - a shape with no name is not information.
+
+Note that a disabled option cannot be focused, and so cannot show its tooltip
+to a keyboard user. Where the reason for disabling matters, the option has to
+stay focusable and be disabled by attribute instead.
+
+```tsx interactive
+import React from 'react';
+import { Segmented, Space, Switch, Tooltip } from 'antd';
+
+export default () => {
+  const [disabled, setDisabled] = React.useState(false);
+  const [value, setValue] = React.useState('day');
+
+  const withGlyph = (name, hint) => ({
+    value: name.toLowerCase(),
+    label: <Tooltip title={hint}>{name}</Tooltip>,
+  });
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={disabled} onChange={setDisabled} />
+        Disabled
+      </label>
+
+      <Segmented
+        aria-label="Time range with tooltips"
+        value={value}
+        onChange={setValue}
+        disabled={disabled}
+        options={[
+          withGlyph('Day', 'The last twenty-four hours'),
+          withGlyph('Week', 'The last seven days'),
+          withGlyph('Month', 'The last thirty days'),
+        ]}
+      />
+
+      <Segmented
+        aria-label="Time range without tooltips"
+        value={value}
+        onChange={setValue}
+        disabled={disabled}
+        options={[
+          { value: 'day', label: 'Day' },
+          { value: 'week', label: 'Week' },
+          { value: 'month', label: 'Month' },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+### Button group in forms
+
+In a compressed form, the group takes the small size to match the fields around
+it, and fills the width so that its edges line up with theirs.
+
+An icon-only group is the exception: stretching three icons across a form's
+width leaves three small marks in a wide bar.
+
+```tsx interactive
+import React from 'react';
+import { Card, Form, Input, Segmented } from 'antd';
+import { AlignCenterOutlined, AlignLeftOutlined, AlignRightOutlined } from '@ant-design/icons';
+
+export default () => {
+  const [width, setWidth] = React.useState('auto');
+  const [alignment, setAlignment] = React.useState('left');
+
+  return (
+    <Card size="small" style={{ maxInlineSize: 400 }}>
+      <Form
+        layout="horizontal"
+        size="small"
+        labelCol={{ flex: '110px' }}
+        wrapperCol={{ flex: 1 }}
+        labelAlign="left"
+      >
+        <Form.Item label="Name">
+          <Input />
+        </Form.Item>
+
+        <Form.Item label="Width">
+          <Segmented
+            block
+            size="small"
+            aria-label="Width"
+            value={width}
+            onChange={setWidth}
+            options={[
+              { value: 'auto', label: 'Auto' },
+              { value: 'fixed', label: 'Fixed' },
+              { value: 'fill', label: 'Fill' },
+            ]}
+          />
+        </Form.Item>
+
+        <Form.Item label="Align" style={{ marginBottom: 0 }}>
+          <Segmented
+            size="small"
+            aria-label="Alignment"
+            value={alignment}
+            onChange={setAlignment}
+            options={[
+              { value: 'left', label: <AlignLeftOutlined aria-label="Left" /> },
+              { value: 'center', label: <AlignCenterOutlined aria-label="Center" /> },
+              { value: 'right', label: <AlignRightOutlined aria-label="Right" /> },
+            ]}
+          />
+        </Form.Item>
+      </Form>
+    </Card>
+  );
+};
+```

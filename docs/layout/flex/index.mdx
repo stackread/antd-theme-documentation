@@ -1,0 +1,122 @@
+---
+title: Flex
+description: Ant Design Flex
+antd_components: [Flex]
+sidebar_position: 1
+---
+
+# Flex
+
+Flex layouts arrange things in a row or a column and decide how the space
+between them is shared.
+
+Ant Design has one component for it, `Flex`, where other systems have three.
+The group and the grid are both `Flex` - a grid is a wrapping flex row with items
+of equal width - and there is **no item component at all**: a flex child is
+whatever element you put there.
+
+That last part is the useful difference. A child does not have to opt into
+being laid out, which means anything can be a flex child without a wrapper
+around it.
+
+## Use cases
+
+- A **row** for single-line layouts, and for lining a few things up quickly.
+- A **grid** for repeating rows of same-width items.
+- A **column** where the same rules should apply top to bottom.
+
+## Shared behavior
+
+Whatever the direction, the same three questions are being answered: how the
+children are spaced along the axis, how they are aligned across it, and which
+of them may grow.
+
+```tsx
+<Flex
+  vertical={false}      // row or column
+  justify="space-between" // spacing along the axis
+  align="center"        // alignment across it
+  gap={8}               // the space between children
+  wrap                  // whether a row breaks into several
+>
+  <div>One</div>
+  <div style={{ flex: 1 }}>Two - this one grows</div>
+  <div>Three</div>
+</Flex>
+```
+
+`gap` is worth singling out. It could be a named size on the group; here it is
+a number of pixels, so it comes from the same scale as
+every other space on the page rather than from a list of its own.
+
+### Nesting flex layouts
+
+Flex layouts nest indefinitely, and mixing a row with a wrapping grid inside it
+is the usual reason to.
+
+:::warning[A flex child is not automatically a flex container]
+
+Some systems make every item a flex container, so that stretching passes
+through. Ant Design does not: a child is whatever element you gave it.
+
+That is usually what you want, and occasionally it means the thing inside a
+child does not stretch. Where it matters, make that child a `Flex` of its own.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Flex, Typography } from 'antd';
+
+const boxStyle = {
+  padding: '8px 12px',
+  background: 'var(--ant-color-bg-layout)',
+  border: '1px solid var(--ant-color-border)',
+  borderRadius: 4,
+};
+
+export default () => (
+  <Flex gap={24} align="flex-start">
+    <div>
+      <Typography.Text strong>Flex row</Typography.Text>
+      <Flex gap={8} style={{ marginBlockStart: 8 }}>
+        <div style={boxStyle}>Nested row one</div>
+        <div style={boxStyle}>Nested row two</div>
+      </Flex>
+    </div>
+
+    <div>
+      <Typography.Text strong>Flex grid</Typography.Text>
+      <Flex wrap gap={8} style={{ marginBlockStart: 8, maxInlineSize: 260 }}>
+        <div style={{ ...boxStyle, flex: '1 1 100px' }}>Nested grid one</div>
+        <div style={{ ...boxStyle, flex: '1 1 100px' }}>Nested grid two</div>
+        <div style={{ ...boxStyle, flex: '1 1 100px' }}>Nested grid three</div>
+        <div style={{ ...boxStyle, flex: '1 1 100px' }}>Nested grid four</div>
+      </Flex>
+    </div>
+  </Flex>
+);
+```
+
+### Overriding output component type
+
+The rendered element can be changed from the default `div` to any tag or
+component.
+
+Use it where the semantics matter: a `<form>` that is also a flex row, a
+`<span>` where a block element would be invalid markup, a `<ul>` whose items
+are laid out side by side.
+
+```tsx interactive
+import React from 'react';
+import { Flex } from 'antd';
+
+export default () => (
+  <p style={{ margin: 0 }}>
+    <Flex component="span" gap={8}>
+      <span>These items are inside a paragraph tag,</span>
+      <span>so they use inline spans to stay valid markup.</span>
+    </Flex>
+  </p>
+);
+```

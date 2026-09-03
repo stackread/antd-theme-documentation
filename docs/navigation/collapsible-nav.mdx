@@ -1,0 +1,269 @@
+---
+title: Collapsible nav
+description: Ant Design Drawer and Collapse as a navigation pane
+antd_components: [Drawer, Collapse]
+---
+
+# Collapsible nav
+
+A navigation pane in a flyout. It is opened and closed by the application, not
+by itself, and it can be **docked** - fixed open, with the page content pushed
+aside to make room.
+
+Docking is the difference between a flyout and a column. Undocked it covers the
+page and is dismissed; docked it becomes part of the layout.
+
+:::warning
+
+Do not dock on a small screen. There is not enough width for both the nav and
+the content, and taking it from the content is taking it from the thing the
+reader came for.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Button, Drawer, Menu, Space, Switch, Typography } from 'antd';
+
+export default () => {
+  const [open, setOpen] = React.useState(false);
+  const [docked, setDocked] = React.useState(false);
+  const heading = 'Navigation';
+
+  const content = (
+    <Menu
+      mode="inline"
+      aria-label="Collapsible navigation"
+      defaultSelectedKeys={['home']}
+      style={{ borderInlineEnd: 0 }}
+      items={[
+        { key: 'home', label: 'Home' },
+        { key: 'dashboards', label: 'Dashboards' },
+        { key: 'discover', label: 'Discover' },
+        { key: 'management', label: 'Management' },
+      ]}
+    />
+  );
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={16} wrap>
+        <Button color="primary" variant="filled" onClick={() => setOpen(true)}>
+          Toggle nav
+        </Button>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Switch size="small" checked={docked} onChange={setDocked} />
+          Docked
+        </label>
+      </Space>
+
+      <div style={{ display: 'flex', gap: 16, minBlockSize: 160 }}>
+        {docked ? (
+          <div
+            style={{
+              inlineSize: 220,
+              borderInlineEnd: '1px solid var(--ant-color-split)',
+              paddingInlineEnd: 8,
+            }}
+          >
+            {content}
+          </div>
+        ) : null}
+
+        <Typography.Paragraph type="secondary" style={{ flex: 1 }}>
+          {docked
+            ? 'Docked: the nav is part of the layout, and the content has moved over to make room.'
+            : 'Undocked: the nav covers the page and is dismissed when the reader is done with it.'}
+        </Typography.Paragraph>
+      </div>
+
+      <Drawer
+        open={open && !docked}
+        onClose={() => setOpen(false)}
+        placement="left"
+        size="default"
+        title={heading}
+      >
+        {content}
+      </Drawer>
+    </Space>
+  );
+};
+```
+
+## Collapsible nav group
+
+The pane is made of groups. A group has a border and a background - none,
+light, or dark - and optionally a title with an icon.
+
+A group can also collapse, in which case the title is what the reader clicks,
+so it is required: there is nothing else left to press.
+
+```tsx interactive
+import React from 'react';
+import { Collapse, Space, Typography } from 'antd';
+import { SettingOutlined } from '@ant-design/icons';
+
+const text = (t) => <Typography.Text type="secondary">{t}</Typography.Text>;
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 320 }}>
+    <Collapse
+      variant="borderless"
+      items={[{ key: '1', label: 'No background', children: text('A group with no surface of its own.') }]}
+    />
+
+    <Collapse
+      style={{ background: 'var(--ant-color-bg-layout)' }}
+      items={[{ key: '1', label: 'Light background', children: text('A group on a subdued surface.') }]}
+    />
+
+    <Collapse
+      defaultActiveKey={['1']}
+      items={[
+        {
+          key: '1',
+          label: 'Open to begin with',
+          children: text('A collapsible group needs a title - it is what the reader clicks.'),
+        },
+      ]}
+    />
+
+    <Collapse
+      items={[
+        {
+          key: '1',
+          label: (
+            <span>
+              <SettingOutlined />
+              With an icon
+            </span>
+          ),
+          children: text('The icon belongs to the title, not to the group.'),
+        },
+      ]}
+    />
+  </Space>
+);
+```
+
+## Nav groups with lists and other content
+
+A group takes any children. In practice it takes a list - and often a list
+whose entries can be pinned, so that the ones the reader uses stay at the top
+whatever else is in the nav.
+
+```tsx interactive
+import React from 'react';
+import { Button, Collapse, Space, Tooltip, Typography } from 'antd';
+
+const ItemList = ({ entries, pinned, toggle }) => (
+  <div>
+    {entries.map((e) => (
+      <div
+        key={e}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '4px 0',
+        }}
+      >
+        <a href="#">{e}</a>
+        <Tooltip title={pinned.includes(e) ? 'Unpin' : 'Pin'}>
+          <Button
+            type="text"
+            size="small"
+            aria-label={`${pinned.includes(e) ? 'Unpin' : 'Pin'} ${e}`}
+            onClick={() => toggle(e)}
+          >
+            <span aria-hidden>{pinned.includes(e) ? '★' : '☆'}</span>
+          </Button>
+        </Tooltip>
+      </div>
+    ))}
+  </div>
+);
+
+export default () => {
+  const [pinned, setPinned] = React.useState(['Dashboards']);
+  const everything = ['Dashboards', 'Discover', 'Visualize', 'Canvas'];
+
+  const toggle = (e) =>
+    setPinned((a) => (a.includes(e) ? a.filter((x) => x !== e) : [...a, e]));
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 320 }}>
+      <Collapse
+        defaultActiveKey={['1']}
+        items={[
+          {
+            key: '1',
+            label: 'Pinned',
+            children: pinned.length ? (
+              <ItemList entries={pinned} pinned={pinned} toggle={toggle} />
+            ) : (
+              <Typography.Text type="secondary">Nothing pinned yet.</Typography.Text>
+            ),
+          },
+        ]}
+      />
+
+      <Collapse
+        defaultActiveKey={['1']}
+        items={[
+          {
+            key: '1',
+            label: 'Dashboards',
+            children: <ItemList entries={everything} pinned={pinned} toggle={toggle} />,
+          },
+        ]}
+      />
+
+      <Collapse
+        items={[
+          {
+            key: '1',
+            label: 'Security',
+            children: (
+              <Typography.Text type="secondary">
+                A group whose contents are only worth showing when asked for.
+              </Typography.Text>
+            ),
+          },
+        ]}
+      />
+
+      <Collapse
+        variant="borderless"
+        items={[
+          {
+            key: '1',
+            label: 'Help',
+            children: (
+              <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                Plain text is a perfectly good thing for a group to contain -{' '}
+                <a href="#">with a link</a> where one is useful.
+              </Typography.Paragraph>
+            ),
+          },
+        ]}
+      />
+    </Space>
+  );
+};
+```
+
+## Full pattern with header and saved pins
+
+### Putting it all together
+
+The full pattern is a header with a control that opens the nav, several groups
+inside it, and the open, closed and pinned state of each one kept between
+visits.
+
+That last part is what makes it useful rather than merely present. A nav that
+forgets what the reader pinned is a nav they will stop pinning things in.
+
+Treat it as a pattern rather than a component: which groups exist, and where
+the state is kept, are decisions that belong to the application.

@@ -1,0 +1,270 @@
+---
+title: Context menu
+description: Ant Design Dropdown and Menu
+antd_components: [Dropdown, Menu]
+---
+
+# Context menu
+
+A nested menu, for navigating a tree of actions without filling the screen with
+them. It lives inside a popover, which can hang off anything - most often a
+button.
+
+Nesting is what makes it worth having. A flat list of twenty actions is a wall;
+the same twenty in four groups of five is a menu.
+
+:::note[Omitted: the item as an element]
+
+**Affects:** 6 specimens - menu items are entries in an array, not elements.
+
+A menu can be built out of components: a panel, and an item for each entry.
+Ant Design takes the whole menu as data - an array of objects with keys,
+labels and children.
+
+The difference shows up in what can be styled and what can be measured. In the
+reference an item is a thing in the tree; here it is a row the menu renders.
+Anything a theme wants to say about items has to be said through the menu's own
+tokens.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Button, Dropdown } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
+export default () => (
+  <Dropdown
+    trigger={['click']}
+    menu={{
+      items: [
+        { key: 'add', label: 'Add a filter' },
+        { key: 'edit', label: 'Edit the query' },
+        { type: 'divider' },
+        {
+          key: 'share',
+          label: 'Share this dashboard',
+          children: [
+            { key: 'link', label: 'Copy a link' },
+            { key: 'embed', label: 'Embed the code' },
+            {
+              key: 'pdf',
+              label: 'Export as PDF',
+              children: [
+                { key: 'pdf-now', label: 'Generate now' },
+                { key: 'pdf-later', label: 'Schedule it' },
+              ],
+            },
+          ],
+        },
+        { type: 'divider' },
+        { key: 'delete', label: 'Delete', danger: true },
+      ],
+    }}
+  >
+    <Button color="primary" variant="filled">
+      Open a nested menu <DownOutlined />
+    </Button>
+  </Dropdown>
+);
+```
+
+## With single panel
+
+For a menu with no nesting, one flat list is enough. No title, no back button,
+nothing to navigate.
+
+:::note[Accessibility recommendation]
+
+Mark the current item with `aria-current="true"`. Highlighting it is not enough
+- a screen reader has no way to see that one row looks different.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Menu } from 'antd';
+
+const pages = ['1 row', '2 rows', '5 rows', '10 rows'];
+
+export default () => {
+  const [selected, setSelected] = React.useState('5 rows');
+
+  return (
+    <Menu
+      selectedKeys={[selected]}
+      onClick={({ key }) => setSelected(key)}
+      style={{ inlineSize: 180, borderInlineEnd: 0 }}
+      items={pages.map((s) => ({
+        key: s,
+        label: <span aria-current={s === selected ? 'true' : undefined}>{s}</span>,
+      }))}
+    />
+  );
+};
+```
+
+## With scrollable panel
+
+A menu long enough to run off the screen needs a fixed height and a scrolling
+area inside it.
+
+The title stays put while the items move. That matters more than it sounds: a
+title that scrolls away leaves the reader in a list with no idea what it is a
+list of.
+
+```tsx interactive
+import React from 'react';
+import { Button, Dropdown, Typography } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
+const entries = Array.from({ length: 40 }, (_, i) => ({
+  key: `index-${i}`,
+  label: `logs-2026.08.${String(i + 1).padStart(2, '0')}`,
+}));
+
+export default () => (
+  <Dropdown
+    trigger={['click']}
+    menu={{ items: entries, style: { maxBlockSize: 200, overflowY: 'auto', boxShadow: 'none' } }}
+    popupRender={(menu) => (
+      <div
+        style={{
+          background: 'var(--ant-color-bg-elevated)',
+          borderRadius: 4,
+          boxShadow: 'var(--stackread-shadow-m)',
+        }}
+      >
+        <Typography.Text
+          strong
+          style={{ display: 'block', padding: '8px 12px', borderBlockEnd: '1px solid var(--ant-color-split)' }}
+        >
+          Indices
+        </Typography.Text>
+        {menu}
+      </div>
+    )}
+  >
+    <Button color="primary" variant="filled">
+      Open a scrollable menu <DownOutlined />
+    </Button>
+  </Dropdown>
+);
+```
+
+## Displaying custom elements
+
+Where the content is not a list of options, the popover can hold anything - a
+form, a search field, a short piece of text.
+
+Once it does, it stops being a menu: arrow keys no longer move between rows,
+and it should not be announced as one.
+
+```tsx interactive
+import React from 'react';
+import { Button, Dropdown, Input, Space, Typography } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
+export default () => (
+  <Dropdown
+    trigger={['click']}
+    popupRender={() => (
+      <div
+        style={{
+          inlineSize: 260,
+          padding: 16,
+          background: 'var(--ant-color-bg-elevated)',
+          borderRadius: 4,
+          boxShadow: 'var(--stackread-shadow-m)',
+        }}
+      >
+        <Typography.Title level={5} style={{ marginBlockStart: 0 }}>
+          Add a filter
+        </Typography.Title>
+
+        <Space orientation="vertical" size={8} style={{ display: 'flex' }}>
+          <Input placeholder="Field" aria-label="Field" />
+          <Input placeholder="Value" aria-label="Value" />
+          <Button type="primary" block>
+            Add
+          </Button>
+        </Space>
+      </div>
+    )}
+  >
+    <Button color="primary" variant="filled">
+      Open custom content <DownOutlined />
+    </Button>
+  </Dropdown>
+);
+```
+
+## Using panels with mixed items & content
+
+### Custom panels
+
+A panel can carry arbitrary content instead of a list. It is rendered as given -
+nothing is added, and nothing is arranged for you.
+
+Where the panels differ in width, set a width explicitly. A menu that changes
+size as the reader moves between its levels is a menu that feels unstable even
+when it is not.
+
+### Custom items
+
+Two ways to break out of a plain list without leaving it.
+
+A separator marks a group boundary - the destructive action below the rest, the
+recent items above them.
+
+A rendered item lets one row be drawn by hand: a row with a status, a count, a
+keyboard shortcut. Keep it the same height as the rest, or the list stops
+reading as a list.
+
+```tsx interactive
+import React from 'react';
+import { Button, Dropdown, Menu, Space, Typography } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
+const row = (text, rechts) => (
+  <Space size={16} style={{ display: 'flex', justifyContent: 'space-between' }}>
+    <span>{text}</span>
+    <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+      {rechts}
+    </Typography.Text>
+  </Space>
+);
+
+export default () => (
+  <Space size={24} align="start" wrap style={{ display: 'flex' }}>
+    <Dropdown
+      trigger={['click']}
+      menu={{
+        items: [
+          { key: 'copy', label: row('Copy', '⌘C') },
+          { key: 'paste', label: row('Paste', '⌘V') },
+          { type: 'divider' },
+          { key: 'delete', label: row('Delete', '⌫'), danger: true },
+        ],
+      }}
+    >
+      <Button color="primary" variant="filled">
+        Rendered items <DownOutlined />
+      </Button>
+    </Dropdown>
+
+    <Menu
+      style={{ inlineSize: 220, borderInlineEnd: 0 }}
+      selectable={false}
+      items={[
+        { key: 'recent', label: 'Recent', type: 'group', children: [
+          { key: 'one', label: row('production-eu', '2h') },
+          { key: 'two', label: row('staging', '1d') },
+        ] },
+        { type: 'divider' },
+        { key: 'all', label: 'See all deployments' },
+      ]}
+    />
+  </Space>
+);
+```

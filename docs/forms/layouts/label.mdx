@@ -1,0 +1,151 @@
+---
+title: Form labels
+description: Ant Design Form.Item label and fieldset
+antd_components: [Form]
+sidebar_position: 4
+---
+
+# Form labels
+
+The best way to give a control an accessible name is the row's own `label`.
+Some controls need more care than that, and a few need none at all.
+
+A control that carries its own label - a switch, a button, a link - does not
+want a second one from the row. Two labels on one control is not twice as
+clear; a screen reader reads both, and the reader has to work out which is the
+name.
+
+```tsx interactive
+import React from 'react';
+import { Button, Form, Switch, Typography } from 'antd';
+
+export default () => (
+  <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+    <Form.Item
+      label="Settings"
+      extra="The switch below carries its own label, so the row does not name it a second time."
+    >
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch />
+        Dark mode
+      </label>
+    </Form.Item>
+
+    <Form.Item
+      label="Your cluster data"
+      extra="The name of this button is the text inside it, not the label above."
+    >
+      <Button>Download</Button>
+    </Form.Item>
+
+    <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+      The same applies to a link used as a control.
+    </Typography.Paragraph>
+  </Form>
+);
+```
+
+## Implicit titles for the first form control
+
+Where the control's name is shown some other way - a heading above a group, a
+piece of running text - the control still has to be tied to it. Either:
+
+- repeat the text as the control's `aria-label`, or
+- give the text an `id` and point at it with `aria-labelledby`.
+
+The second is better where the text is already on screen, since the two cannot
+then drift apart.
+
+```tsx interactive
+import React from 'react';
+import { Button, Form, Input, Typography, Upload } from 'antd';
+
+const title = 'Single text field';
+
+export default () => (
+  <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+    <div style={{ flex: '1 1 240px' }}>
+      <Typography.Title level={5} id="stackread-label-title" style={{ marginBlockStart: 0 }}>
+        {title}
+      </Typography.Title>
+      <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+        The heading names the first control, so the row does not repeat it.
+      </Typography.Paragraph>
+    </div>
+
+    <Form layout="vertical" style={{ flex: '2 1 320px' }}>
+      <Form.Item extra="This field points at the heading with aria-labelledby.">
+        <Input aria-labelledby="stackread-label-title" />
+      </Form.Item>
+
+      <Form.Item extra="This one repeats the heading text as its own aria-label.">
+        <Upload beforeUpload={() => false}>
+          <Button aria-label={title}>Select a file</Button>
+        </Upload>
+      </Form.Item>
+    </Form>
+  </div>
+);
+```
+
+## More complicated form labels
+
+Some controls are simply hard. A list that behaves as a single field, a widget
+built from several elements - these usually need naming by hand, and the only
+way to know it worked is to listen to it.
+
+```tsx interactive
+import React from 'react';
+import { Form, Select } from 'antd';
+
+const label = 'How do you feel today?';
+
+export default () => (
+  <Form layout="vertical" style={{ maxInlineSize: 400 }}>
+    <Form.Item
+      label={label}
+      extra="A composite control needs its own aria-label or aria-labelledby - the row's label alone does not reach inside it."
+    >
+      <Select
+        aria-label={label}
+        options={[
+          { value: 'gut', label: 'Good' },
+          { value: 'mittel', label: 'So-so' },
+          { value: 'invalidOnes', label: 'Bad' },
+        ]}
+      />
+    </Form.Item>
+  </Form>
+);
+```
+
+## Fieldset and legend
+
+Where several controls belong together and their own labels do not say enough
+on their own, group them in a `fieldset` with a `legend`.
+
+Checkboxes and radios are the usual case - "Option one" means nothing without
+the question above it - but the same holds for any set of inputs that share one
+description.
+
+```tsx interactive
+import React from 'react';
+import { Space, Switch } from 'antd';
+
+export default () => (
+  <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
+    <legend style={{ fontSize: 12, marginBottom: 8 }}>Enable these objects</legend>
+
+    <Space orientation="vertical" size={8}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch />
+        Object 1
+      </label>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch defaultChecked />
+        Object 2
+      </label>
+    </Space>
+  </fieldset>
+);
+```

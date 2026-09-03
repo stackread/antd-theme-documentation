@@ -1,0 +1,154 @@
+---
+title: Filter group
+description: Filter buttons joined into one bar
+antd_components: [Button, Space]
+sidebar_position: 4
+---
+
+# Filter group
+
+## Filter buttons
+
+A filter group is a row of buttons joined into one bar, sized to sit beside a
+search field.
+
+They are used in two ways. The simplest is on and off: the button shows whether
+a filter is applied. The other is a button that opens a list of values to
+filter by.
+
+Joining them matters. Separate buttons read as separate controls; one bar reads
+as one set of choices about the same thing.
+
+An active filter has to look active. A filter that is on but looks like a
+filter that is off is how a reader ends up staring at an empty result set.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space } from 'antd';
+
+export default () => {
+  const [on, setOn] = React.useState({ open: true, closed: false, mine: false });
+
+  const styleFor = (key) => ({
+    'aria-pressed': on[key],
+    color: on[key] ? 'primary' : 'default',
+    variant: on[key] ? 'filled' : 'outlined',
+    onClick: () => setOn((z) => ({ ...z, [key]: !z[key] })),
+  });
+
+  return (
+    <Space.Compact>
+      <Button {...styleFor('open')}>Open</Button>
+      <Button {...styleFor('closed')}>Closed</Button>
+      <Button {...styleFor('mine')}>Assigned to me</Button>
+    </Space.Compact>
+  );
+};
+```
+
+## Multi-select
+
+For a long list of values, put the filter button in a popover and the values in
+a searchable list. The button then says which filter it is; the popover says
+what it is set to.
+
+### Indicating number of filters
+
+Show how many values there are and how many are active. "Status" tells the
+reader nothing about the state of the page; "Status 2/4" tells them the list
+they are looking at is filtered, and by how much.
+
+A percentage instead of a count is occasionally the honest number - when the
+values are ranges rather than items - but it needs a reason.
+
+```tsx interactive
+import React from 'react';
+import { Badge, Button, Checkbox, Input, Popover, Space } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
+const values = ['Open', 'In progress', 'On hold', 'Closed'];
+
+export default () => {
+  const [active, setActive] = React.useState(['Open', 'Closed']);
+  const [query, setQuery] = React.useState('');
+
+  const matches = values.filter((w) => w.toLowerCase().includes(query.toLowerCase()));
+
+  return (
+    <Space.Compact>
+      <Popover
+        trigger="click"
+        placement="bottomLeft"
+        content={
+          <Space orientation="vertical" size={8} style={{ display: 'flex', inlineSize: 220 }}>
+            <Input.Search
+              placeholder="Search statuses"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              size="small"
+            />
+            <Checkbox.Group
+              value={active}
+              onChange={setActive}
+              options={matches}
+              style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
+            />
+          </Space>
+        }
+      >
+        <Button
+          aria-pressed={active.length > 0}
+          color={active.length ? 'primary' : 'default'}
+          variant={active.length ? 'filled' : 'outlined'}
+        >
+          <Space size={8}>
+            Status
+            <Badge
+              count={`${active.length}/${values.length}`}
+              style={{ background: 'var(--ant-color-fill-secondary)', color: 'var(--ant-color-text)' }}
+            />
+            <DownOutlined />
+          </Space>
+        </Button>
+      </Popover>
+    </Space.Compact>
+  );
+};
+```
+
+## Layout
+
+The bar is as wide as its contents. Where it should line up with a field above
+or below it, let it fill the width instead, and let the buttons share that
+width between them.
+
+A button that should stay its own size - an icon, a short toggle - can be kept
+from growing while the others take the room.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Switch } from 'antd';
+
+export default () => {
+  const [fullWidth, setFullWidth] = React.useState(true);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 480 }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={fullWidth} onChange={setFullWidth} />
+        Full width
+      </label>
+
+      <Space.Compact style={fullWidth ? { display: 'flex', inlineSize: '100%' } : undefined}>
+        <Button style={fullWidth ? { flex: 1 } : undefined}>Open</Button>
+        <Button style={fullWidth ? { flex: 1 } : undefined}>Closed</Button>
+        <Button style={fullWidth ? { flex: 1 } : undefined}>Assigned to me</Button>
+        <Button style={fullWidth ? { flex: 1 } : undefined}>Recently updated</Button>
+        <Button aria-label="Clear all filters">
+          <span aria-hidden>&times;</span>
+        </Button>
+      </Space.Compact>
+    </Space>
+  );
+};
+```

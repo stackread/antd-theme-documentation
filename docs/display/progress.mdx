@@ -1,0 +1,210 @@
+---
+title: Progress
+description: Ant Design Progress
+antd_components: [Progress]
+---
+
+# Progress
+
+A progress bar says how far along something is. Where the amount is known, show
+it - a bar that fills is a promise a spinner cannot make.
+
+Without a value the bar becomes indeterminate: it still says "working", but it
+no longer says "nearly there".
+
+In Ant Design this is `Progress`.
+
+```tsx interactive
+import React from 'react';
+import { Progress } from 'antd';
+
+export default () => (
+  <Progress data-variante="plain" percent={100} showInfo={false} status="active" />
+);
+```
+
+## Progress with values
+
+With a maximum and a current value the bar fills accordingly. A label can be
+placed above it, and the value beside that - together they read as one sentence
+rather than as a bar with numbers stuck to it.
+
+```tsx interactive
+import React from 'react';
+import { Button, Progress, Space, Typography } from 'antd';
+
+export default () => {
+  const [value, setValue] = React.useState(0);
+
+  React.useEffect(() => {
+    const t = window.setInterval(() => {
+      setValue((v) => (v >= 100 ? 0 : v + 10));
+    }, 500);
+    return () => window.clearInterval(t);
+  }, []);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Typography.Text>Fabric</Typography.Text>
+          <Typography.Text type="secondary">{value} / 100</Typography.Text>
+        </div>
+        <Progress percent={value} showInfo={false} />
+      </div>
+
+      <Button size="small" onClick={() => setValue(0)}>
+        Reset
+      </Button>
+    </Space>
+  );
+};
+```
+
+## Progress can have absolute or fixed positions
+
+A progress bar can be pinned to the top of a container - or of the window - so
+that it reports on the whole of what is below it rather than on one part.
+
+Fixed to the window, it becomes the page's own loading bar. That is a strong
+claim: use it when the whole page is waiting, not one section of it.
+
+```tsx interactive
+import React from 'react';
+import { Alert, Button, Progress, Space } from 'antd';
+
+export default () => {
+  const [show, setShow] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <div style={{ position: 'relative', padding: 24, border: '1px solid var(--ant-color-border)' }}>
+        <Progress
+          percent={40}
+          showInfo={false}
+          size="small"
+          style={{ position: 'absolute', insetBlockStart: 0, insetInline: 0, lineHeight: 0 }}
+        />
+        <Alert
+          showIcon
+          type="info"
+          title="Look up!"
+          description="The bar sits at the top edge of this container."
+        />
+      </div>
+
+      <Button size="small" onClick={() => setShow(!show)}>
+        {show ? 'Hide' : 'Show'} the fixed bar
+      </Button>
+
+      {show && (
+        <div style={{ position: 'relative', padding: 24, border: '1px solid var(--ant-color-border)' }}>
+          <Progress
+            percent={70}
+            showInfo={false}
+            size="small"
+            style={{ position: 'absolute', insetBlockStart: 0, insetInline: 0, lineHeight: 0 }}
+          />
+          <Progress
+            percent={70}
+            showInfo={false}
+            size="small"
+            style={{ position: 'absolute', insetBlockEnd: 0, insetInline: 0, lineHeight: 0 }}
+          />
+          <Alert
+            showIcon
+            type="warning"
+            title="Look up!"
+            description="A bar fixed to the window says the whole page is waiting."
+          />
+        </div>
+      )}
+    </Space>
+  );
+};
+```
+
+## Sizes
+
+The bar comes in several thicknesses. A thin one is a hint at the edge of
+something; a thick one is the subject of the screen.
+
+```tsx interactive
+import React from 'react';
+import { Progress, Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Typography.Text type="secondary">extra extra small</Typography.Text>
+    <Progress percent={60} showInfo={false} size={{ height: 2 }} />
+
+    <Typography.Text type="secondary">extra small</Typography.Text>
+    <Progress percent={60} showInfo={false} size={{ height: 4 }} />
+
+    <Typography.Text type="secondary">small</Typography.Text>
+    <Progress percent={60} showInfo={false} size="small" />
+
+    <Typography.Text type="secondary">medium</Typography.Text>
+    <Progress percent={60} showInfo={false} />
+
+    <Typography.Text type="secondary">large</Typography.Text>
+    <Progress percent={60} showInfo={false} size={{ height: 16 }} />
+  </Space>
+);
+```
+
+## Colors
+
+The bar can carry a semantic colour. Use it where the colour says something
+about the outcome - a failing import is not simply "in progress".
+
+```tsx interactive
+import React from 'react';
+import { Progress, Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+    <Typography.Text type="secondary">primary</Typography.Text>
+    <Progress percent={60} showInfo={false} />
+
+    <Typography.Text type="secondary">success</Typography.Text>
+    <Progress percent={60} showInfo={false} strokeColor="var(--ant-color-success)" />
+
+    <Typography.Text type="secondary">warning</Typography.Text>
+    <Progress percent={60} showInfo={false} strokeColor="var(--ant-color-warning)" />
+
+    <Typography.Text type="secondary">danger</Typography.Text>
+    <Progress percent={60} showInfo={false} status="exception" />
+  </Space>
+);
+```
+
+## Progress for charts
+
+A row of small bars can stand in for a chart, where the point is the comparison
+between a handful of values rather than their exact shape.
+
+```tsx interactive
+import React from 'react';
+import { Progress, Space, Typography } from 'antd';
+
+export default () => (
+  <Space orientation="vertical" size={12} style={{ display: 'flex' }}>
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Typography.Text>Dashboards</Typography.Text>
+        <Typography.Text type="secondary">90%</Typography.Text>
+      </div>
+      <Progress percent={90} showInfo={false} size="small" />
+    </div>
+
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Typography.Text>Search</Typography.Text>
+        <Typography.Text type="secondary">65%</Typography.Text>
+      </div>
+      <Progress percent={65} showInfo={false} size="small" />
+    </div>
+  </Space>
+);
+```

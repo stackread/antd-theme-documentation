@@ -1,0 +1,82 @@
+---
+title: File picker
+description: Ant Design Upload
+antd_components: [Upload]
+sidebar_position: 1
+---
+
+# File picker
+
+A styled `<input type="file">`. It takes files by click and by drag, and hands
+back a `FileList` - the browser's own object, so everything a file has (name,
+size, type) is there without a wrapper.
+
+Like any other control it can sit in a form row to get a label.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Switch, Typography, Upload } from 'antd';
+
+export default () => {
+  const [many, setMany] = React.useState(false);
+  const [files, setFiles] = React.useState([]);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={many} onChange={setMany} />
+        Allow multiple files
+      </label>
+
+      <Upload
+        multiple={many}
+        beforeUpload={() => false}
+        fileList={files}
+        onChange={({ fileList }) => setFiles(many ? fileList : fileList.slice(-1))}
+      >
+        <Button>Select or drag and drop a file</Button>
+      </Upload>
+
+      <Typography.Text type="secondary">
+        {files.length
+          ? files.map((d) => `${d.name} (${d.size} bytes)`).join(', ')
+          : 'No files selected.'}
+      </Typography.Text>
+    </Space>
+  );
+};
+```
+
+## Removing files programmatically
+
+The selection is state the page holds, so clearing it is setting that state
+back to empty - there is no method on the control to call.
+
+That is worth having: a page can add to the list, remove one entry, or restore
+a previous selection, all without touching the control.
+
+```tsx interactive
+import React from 'react';
+import { Button, Space, Upload } from 'antd';
+
+export default () => {
+  const [files, setFiles] = React.useState([]);
+
+  return (
+    <Space size={16} align="start">
+      <Upload
+        multiple
+        beforeUpload={() => false}
+        fileList={files}
+        onChange={({ fileList }) => setFiles(fileList)}
+      >
+        <Button>Select files</Button>
+      </Upload>
+
+      <Button onClick={() => setFiles([])} disabled={files.length === 0}>
+        Remove all
+      </Button>
+    </Space>
+  );
+};
+```

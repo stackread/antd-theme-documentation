@@ -1,0 +1,308 @@
+/*
+ * Forked from @stackread/docusaurus-theme - a deliberate fork:
+ * this site freezes the look it has; the package evolves for guide sites.
+ */
+/*
+ * Only what cannot be said with a variable.
+ *
+ * Colours, type and measurements come from `shell.ts`, which sets them from
+ * the theme's tokens. What is left here are the places where Docusaurus
+ * writes a fixed value that no variable reaches.
+ */
+
+/*
+ * Docusaurus hard-codes `.markdown > h1 { font-size: 3rem }` - 42px at a 14px
+ * root. `--ifm-h1-font-size` is not read there. The same kind of fixed value
+ * sits on h2 and h3.
+ *
+ * The reference renders 30 / 24 / 20.
+ */
+.markdown > h1,
+.markdown h1:first-child {
+  /* Not `--ifm-h1-font-size` - Docusaurus shadows it at this selector. */
+  font-size: var(--stackread-heading-1);
+}
+.markdown > h2 {
+  font-size: var(--ifm-h2-font-size);
+}
+.markdown > h3 {
+  font-size: var(--ifm-h3-font-size);
+}
+.markdown > h1,
+.markdown > h2,
+.markdown > h3,
+.markdown > h4,
+.markdown > h5,
+.markdown > h6 {
+  font-weight: var(--ifm-heading-font-weight);
+  color: var(--ifm-heading-color);
+}
+
+/*
+ * Prose is 16px, the root font size 14px. `--ifm-font-size-base` cannot
+ * express that, because it sets the root.
+ */
+.markdown {
+  font-size: var(--stackread-body-font-size);
+}
+
+/*
+ * The sidebar. The reference sets the active entry semibold; Docusaurus
+ * leaves it at the normal weight.
+ */
+.menu__link--active {
+  font-weight: 600;
+}
+
+/*
+ * The table of contents. Docusaurus colours the active entry with the primary
+ * colour; the reference uses its text variant there.
+ */
+.table-of-contents__link--active,
+.table-of-contents__link--active code {
+  color: var(--stackread-text-primary);
+}
+
+/*
+ * Docusaurus hard-codes `.table-of-contents { font-size: 0.8rem }` - 11.2px at
+ * a 14px root. The reference renders 12px.
+ */
+.table-of-contents {
+  font-size: var(--stackread-toc-font-size);
+}
+
+/*
+ * The anchor beside a heading.
+ *
+ * Docusaurus puts a `#` there at the heading's own size - 30px on an h1. The
+ * reference uses a link glyph instead: a 16px icon in a 24x24 surface, 4px
+ * radius, body text colour, and on hover the same tinted overlay a plain
+ * button takes.
+ *
+ * `font-size: 0` removes the `#` without touching Docusaurus' rule - its
+ * `content` stays declared but is no longer drawn.
+ */
+.hash-link {
+  font-size: 0;
+  padding-left: 8px;
+  vertical-align: middle;
+}
+.hash-link::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background-image: var(--stackread-icon-anchor);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+}
+.hash-link:hover::before {
+  background-color: var(--stackread-hover-text);
+}
+
+/*
+ * The sidebar.
+ *
+ * Docusaurus computes its measurements in `rem`. At a 14px root that produces
+ * fractional values that read visibly tighter than the reference:
+ *
+ *                    Docusaurus at 14px    reference
+ *   padding          5.25px / 10.5px       6px / 8px
+ *   line height      17.5px                20px
+ *   entry height     28px                  32px
+ *   radius           3.5px                 4px
+ *
+ * A quarter of a pixel sounds like nothing and is a visibly different rhythm
+ * over twenty entries.
+ */
+.menu__link {
+  padding: 6px 8px;
+  line-height: 20px;
+  border-radius: 4px;
+}
+
+/*
+ * A category label is dark in the reference, not blue. Blue is reserved for
+ * the active entry - a blue category with a blue entry under it would be two
+ * emphases for one statement.
+ */
+.menu__link--sublist {
+  color: var(--ifm-menu-color);
+}
+
+/*
+ * The table of contents: 16px line height rather than 18, and a 2px rule
+ * rather than 1.
+ */
+.table-of-contents__link {
+  line-height: 16px;
+}
+
+/*
+ * The segmented rule.
+ *
+ * The container's continuous line goes; in its place each top-level entry
+ * carries a border, so the segment of the section being read can turn blue.
+ * The hook for that is the `<span>` from `theme/TOCItems/Tree.tsx`.
+ *
+ * `:has()` carries the weight: the active class sits on the link, and the span
+ * around it has to be coloured. Without that selector this would need a swizzle
+ * carrying its own state.
+ */
+.table-of-contents__left-border {
+  border-left: 0;
+  padding-left: 0;
+}
+
+.table-of-contents > li > .tree-item__inner {
+  display: block;
+  border-left: 2px solid var(--ifm-toc-border-color);
+  padding-left: 12px;
+}
+
+.table-of-contents > li > .tree-item__inner:has(.table-of-contents__link--active) {
+  border-left-color: var(--stackread-text-primary);
+}
+
+/* Deeper levels carry no border of their own - they sit inside the segment. */
+.table-of-contents .tree-item__inner .tree-item__inner {
+  border-left: 0;
+  padding-left: 0;
+}
+
+/*
+ * Prose links are underlined AT REST.
+ *
+ * This corrects a rule that had it backwards. "Underline on hover" is right -
+ * for links INSIDE a component. For prose it is not.
+ *
+ * Measured across four of the reference's pages:
+ *
+ *   prose paragraph   underline   at rest
+ *   callout body      underline   at rest
+ *   link component    none        at rest
+ *
+ * The reference distinguishes by context, not by state. In running text colour
+ * alone does not carry clickability - it is also the colour of everything else
+ * that happens to be blue. Inside a component it does, because there the
+ * surroundings supply the meaning.
+ *
+ * A callout counts as prose, not as a component: its content is Markdown, and
+ * the reference treats it the same way.
+ */
+.theme-doc-markdown a:not(.anchor):not(.ant-btn):not(.card) {
+  text-decoration: underline;
+}
+
+/*
+ * The focus ring applies to prose links as well - one ring on the whole
+ * page, not the browser's on links and the theme's on controls.
+ */
+.theme-doc-markdown a:not(.anchor):focus-visible {
+  outline: var(--stackread-focus-width, 3px) solid var(--stackread-focus-color);
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+
+/*
+ * The search field.
+ *
+ * Surface and type come from `shell.ts` through the `--ifm-*` variables. What
+ * cannot go there is here: Docusaurus rounds the field to a pill with `2rem`,
+ * and this theme has ONE radius. A 28px-rounded field beside a 4px-rounded
+ * button is the most visible foreign body a navbar can have.
+ *
+ * The border likewise: the field has none by default and lives on its fill. In
+ * the reference an input always carries a border.
+ */
+.navbar__search-input {
+  /*
+   * `--ifm-*`, not `--ant-*`.
+   *
+   * Ant Design's variables are NOT on the root element: they are set per
+   * component, on a `css-var-*` element. Outside a component
+   * `var(--ant-color-border)` is empty - and `border: 1px solid` then falls
+   * back to `currentColor`, which gave the field a dark blue border in the
+   * text colour instead of the light one it should have.
+   *
+   * `shell.ts` sets `--ifm-color-emphasis-300` from the border token, and THAT
+   * is on the root.
+   */
+  border-radius: 4px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  block-size: 32px;
+  font-family: var(--ifm-font-family-base);
+  font-size: 14px;
+}
+.navbar__search-input:focus-visible {
+  outline: var(--stackread-focus-width, 2px) solid var(--stackread-focus-color);
+  outline-offset: 1px;
+}
+
+/*
+ * The sidebar's inset.
+ *
+ * Measured: `ul.theme-doc-sidebar-menu` carries `padding: 0 8px` in the
+ * reference and `0` by default. The entry then starts at x=15 rather than x=7
+ * and is 235 rather than 251 wide.
+ *
+ * The entry itself was never wrong - 4px radius, 6/8 padding, 32px tall, the
+ * right surface. It simply stood at the edge, and a rounded box at an edge
+ * does not look rounded.
+ *
+ * Nested lists do NOT get the inset: they already sit inside the root list,
+ * and a second inset would indent the second level by 16px instead of the 8
+ * the reference shows.
+ */
+ul.theme-doc-sidebar-menu {
+  padding-inline: var(--stackread-sidebar-inset);
+}
+
+/*
+ * Docusaurus stripes tables that are not its own.
+ *
+ * It stripes every `<table>` on a page, and that catches not only the tables in
+ * prose but the ones a component draws itself - a date picker's calendar, a
+ * description list, a data table.
+ *
+ * So this rule does not correct Ant Design; it defends against the HOST. It
+ * belongs to this package for exactly that reason, and not to the Ant Design
+ * theme: outside Docusaurus it would do nothing, because Ant Design paints the
+ * header on `th` and the rows on `td`, not on `thead` and `tr`.
+ *
+ * It surfaced as `rgba(0, 0, 0, .03)` on a description row - reported as an
+ * unreplaced library default, which is what it was, only Docusaurus' rather
+ * than Ant Design's.
+ */
+.ant-table table tr,
+.ant-table table thead,
+.ant-descriptions table tr,
+.ant-descriptions table thead,
+.ant-picker-panel table tr,
+.ant-picker-panel table thead {
+  background-color: transparent;
+}
+
+/*
+ * The sidebar caret.
+ *
+ * Docusaurus draws it as a background image at `2rem 2rem` in a `1.25rem` box
+ * - at a 14px root that is a 28px glyph cropped into 17.5px. It reads visibly
+ * heavier than the reference's.
+ *
+ * The reference renders a real 12x12 SVG and swaps the path between the two
+ * states rather than rotating one. Swapping the path is not worth a swizzle;
+ * the size is, and it is the whole of the visible difference.
+ *
+ *   reference   12 x 12, fill #1D2A3E, no transform
+ *   before      28 x 28 background in a 17.5px box, rotated
+ */
+.menu__link--sublist-caret::after,
+.menu__caret::before {
+  background-size: 12px 12px;
+  inline-size: 12px;
+  block-size: 12px;
+  min-inline-size: 12px;
+}

@@ -1,0 +1,204 @@
+---
+title: Description list
+description: Ant Design Descriptions
+antd_components: [Descriptions]
+---
+
+# Description list
+
+A description list pairs pieces of information: a name and what it holds.
+
+In Ant Design this is `Descriptions`, which takes the pairs as `items`. The
+markup it produces is a real description list, so the pairing survives for a
+screen reader rather than only for the eye.
+
+```tsx interactive
+import React from 'react';
+import { Descriptions, Space } from 'antd';
+
+const entries = [
+  { key: '1', label: 'Dota 2', children: 'A videogame that I have spent way too much time on over the years.' },
+  { key: '2', label: 'Kimchi', children: 'A classic Korean dish made of preserved vegetables that is often served as a side dish.' },
+  { key: '3', label: 'Rugby Union', children: 'A sport played between two teams of fifteen players, with an oval-shaped ball.' },
+];
+
+export default () => (
+  <Space orientation="vertical" size={24} style={{ display: 'flex' }}>
+    <Descriptions column={1} items={entries} />
+    <Descriptions column={1} items={entries} bordered size="small" />
+  </Space>
+);
+```
+
+## Reverse style
+
+The pair can be turned around, so that the value is read first and the name
+explains it. That suits a list of measurements, where the numbers are the
+subject and the labels are the units.
+
+```tsx interactive
+import React from 'react';
+import { Descriptions } from 'antd';
+
+export default () => (
+  <Descriptions
+    column={1}
+    className="stackread-beschreibung-umgekehrt"
+    items={[
+      { key: '1', label: 'A videogame I have spent too long on', children: 'Dota 2' },
+      { key: '2', label: 'A classic Korean dish', children: 'Kimchi' },
+      { key: '3', label: 'A sport with an oval ball', children: 'Rugby Union' },
+    ]}
+  />
+);
+```
+
+## As columns
+
+Set side by side, the names form a column of their own and the values line up
+against it. The name column can be given a width - a narrow one keeps long
+values readable, a wide one keeps long names from wrapping.
+
+```tsx interactive
+import React from 'react';
+import { Descriptions, Space } from 'antd';
+
+const entries = [
+  { key: '1', label: 'Name', children: 'The Elder Scrolls: Morrowind' },
+  { key: '2', label: 'Game style', children: 'Open-world, fantasy, action role-playing' },
+  { key: '3', label: 'Release date', children: '2002' },
+];
+
+export default () => (
+  <Space orientation="vertical" size={24} style={{ display: 'flex' }}>
+    <Descriptions column={1} layout="horizontal" items={entries} />
+
+    <Descriptions
+      column={1}
+      layout="horizontal"
+      items={entries}
+      styles={{ label: { inlineSize: '25%' } }}
+    />
+
+    <Descriptions
+      column={1}
+      layout="horizontal"
+      items={[{ key: '1', label: '25% width', children: 'The label column can be given a width of its own.' }]}
+    />
+  </Space>
+);
+```
+
+## Inline
+
+Inline, the pairs run within a line of text - a compact form for metadata that
+belongs beside something rather than beneath it.
+
+```tsx interactive
+import React from 'react';
+import { Descriptions } from 'antd';
+
+export default () => (
+  <Descriptions
+    size="small"
+    column={3}
+    items={[
+      { key: '1', label: 'Name', children: 'TIE Fighter' },
+      { key: '2', label: 'Game style', children: 'Space combat simulator' },
+      { key: '3', label: 'Release date', children: '1994' },
+    ]}
+  />
+);
+```
+
+## Customizing appearance
+
+#### Alignment & Compression
+
+The pairs can be centred rather than aligned to the leading edge, and the whole
+list can be tightened up.
+
+#### Vertical spacing
+
+The gap between rows is what separates one pair from the next. Too little and
+the list reads as one block; too much and the pairing is lost.
+
+#### Horizontal spacing
+
+Between the name and the value, the gap does the same work in the other
+direction.
+
+```tsx interactive
+import React from 'react';
+import { Descriptions, Radio, Space } from 'antd';
+
+const entries = [
+  { key: '1', label: 'Quake 2', children: 'A first-person shooter from 1997.' },
+  { key: '2', label: 'TIE Fighter', children: 'A space combat simulator from 1994.' },
+];
+
+export default () => {
+  const [packed, setPacked] = React.useState('large');
+  const [middle, setMiddle] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={16}>
+        <Radio.Group
+          value={packed}
+          onChange={(e) => setPacked(e.target.value)}
+          optionType="button"
+          size="small"
+          options={[
+            { value: 'large', label: 'default' },
+            { value: 'small', label: 'compressed' },
+          ]}
+        />
+        <Radio.Group
+          value={middle ? 'center' : 'left'}
+          onChange={(e) => setMiddle(e.target.value === 'center')}
+          optionType="button"
+          size="small"
+          options={[
+            { value: 'left', label: 'left' },
+            { value: 'center', label: 'center' },
+          ]}
+        />
+      </Space>
+
+      <Descriptions
+        column={1}
+        size={packed}
+        items={entries}
+        style={{ textAlign: middle ? 'center' : 'start' }}
+      />
+
+      <Descriptions column={1} size={packed} layout="vertical" items={entries} />
+
+      <Descriptions column={2} size={packed} items={entries} />
+    </Space>
+  );
+};
+```
+
+## Passing className
+
+A class can be put on the list, on a name, or on a value. Which of the three it
+lands on decides what it can reach - a class on the list cannot style one pair
+differently.
+
+```tsx interactive
+import React from 'react';
+import { Descriptions } from 'antd';
+
+export default () => (
+  <Descriptions
+    column={1}
+    className="stackread-beschreibung-eigen"
+    items={[
+      { key: '1', label: 'Name', children: 'The class sits on the list', labelStyle: { fontWeight: 600 } },
+      { key: '2', label: 'Release date', children: '2002' },
+    ]}
+  />
+);
+```

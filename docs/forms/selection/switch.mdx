@@ -1,0 +1,168 @@
+---
+title: Switch
+description: Ant Design Switch
+antd_components: [Switch]
+sidebar_position: 6
+---
+
+# Switch
+
+A switch stands in for a checkbox where the label really is a true/false state
+- something that is on or off, not something that is ticked.
+
+The difference matters at submit time. A checkbox is a choice you are making
+now, applied when the form is saved; a switch reads as something that takes
+effect the moment it moves. Where that is not true, the switch is lying.
+
+```tsx interactive
+import React from 'react';
+import { Checkbox, Space, Switch } from 'antd';
+
+export default () => {
+  const [compressed, setCompressed] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={16} wrap>
+        <Checkbox checked={compressed} onChange={(e) => setCompressed(e.target.checked)}>
+          Compressed
+        </Checkbox>
+        <Checkbox checked={disabled} onChange={(e) => setDisabled(e.target.checked)}>
+          Disabled
+        </Checkbox>
+      </Space>
+
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size={compressed ? 'small' : 'medium'} disabled={disabled} />
+        Malware protection
+      </label>
+    </Space>
+  );
+};
+```
+
+Give the switch a label, and put the switch inside it. The label is then part
+of the clickable area - which matters more than it sounds, since the switch
+itself is a small target - and a screen reader reads it when the control takes
+focus.
+
+Where something else already names the switch - a form row, a table column
+header - the visible label can go. It has to be replaced, not simply dropped:
+without one the control announces itself as "switch, on" and nothing more.
+
+:::note[Accessibility requirement]
+
+Where the label says the *state* rather than the setting, tie it to the switch
+with `aria-describedby` pointing at the label's `id`. The name says what the
+switch is for; the description says where it currently stands.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Form, Space, Switch, Typography } from 'antd';
+
+export default () => {
+  const [on, setOn] = React.useState(false);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex', maxInlineSize: 400 }}>
+      <Form layout="vertical">
+        <Form.Item label="Malware protection" style={{ marginBottom: 0 }}>
+          <Space size={8} align="center">
+            <Switch
+              checked={on}
+              onChange={setOn}
+              aria-label="Malware protection"
+              aria-describedby="stackread-toggles-state"
+            />
+            <Typography.Text id="stackread-toggles-state" type="secondary">
+              {on ? 'On' : 'Off'}
+            </Typography.Text>
+          </Space>
+        </Form.Item>
+      </Form>
+    </Space>
+  );
+};
+```
+
+## Usage
+
+### Labels
+
+The label should be static, describe the feature, and not change when the
+switch moves. A label that reads "Log enabled" while on and "Log disabled"
+while off makes the reader check twice: is that what it is, or what it will
+become?
+
+Name the setting, not the verb. "Enable" alone says nothing about what is being
+enabled.
+
+Where a verb genuinely helps - "Use recommended defaults" - keep it and put the
+detail in help text beneath.
+
+```tsx interactive
+import React from 'react';
+import { Card, Space, Switch, Typography } from 'antd';
+
+const Guideline = ({ kind, text, children }) => (
+  <Card
+    size="small"
+    style={{ flex: '1 1 240px' }}
+    styles={{ body: { display: 'flex', flexDirection: 'column', gap: 12 } }}
+  >
+    {children}
+    <Typography.Text
+      style={{ color: kind === 'do' ? 'var(--ant-color-success-text)' : 'var(--ant-color-error-text)' }}
+    >
+      <strong>{kind === 'do' ? 'Do. ' : 'Do not. '}</strong>
+      {text}
+    </Typography.Text>
+  </Card>
+);
+
+const Line = ({ text, hilfe }) => (
+  <div>
+    <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+      <Switch />
+      {text}
+    </label>
+    {hilfe ? (
+      <div>
+        <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+          {hilfe}
+        </Typography.Text>
+      </div>
+    ) : null}
+  </div>
+);
+
+export default () => (
+  <Space size={16} align="start" wrap style={{ display: 'flex' }}>
+    <Guideline kind="do" text="Use a static noun describing the setting.">
+      <Line text="Malware protection" />
+    </Guideline>
+
+    <Guideline kind="dont" text="Start with “If true” or “If enabled”.">
+      <Line text="If enabled, uses malware protection" />
+    </Guideline>
+
+    <Guideline kind="do" text="Where a verb helps, add help text with the detail.">
+      <Line
+        text="Use recommended defaults"
+        hilfe="Rollover when an index is 30 days old or reaches 50 gigabytes."
+      />
+    </Guideline>
+
+    <Guideline kind="dont" text="Use a bare verb. It leaves the setting unnamed.">
+      <Line text="Enable" />
+    </Guideline>
+  </Space>
+);
+```
+
+Past tense belongs only where the switch labels something already created - a
+column called "Enabled" in a table of existing items. There the word describes
+the rows, not the control.

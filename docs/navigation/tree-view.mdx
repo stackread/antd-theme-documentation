@@ -1,0 +1,146 @@
+---
+title: Tree view
+description: Ant Design Tree
+antd_components: [Tree]
+---
+
+# Tree view
+
+A tree renders a recursive structure - a file directory, a mapping, a
+hierarchy of objects.
+
+It is not navigation. For the menu down the side of a page, use a
+[side nav](/navigation/side-nav): a tree is for looking at a structure, a nav
+is for moving between pages, and the two behave differently under the keyboard.
+
+The content is an array of nodes rather than children. Each node needs a label
+and a key that is unique in the whole tree; nesting is a node's own `children`.
+
+## Component
+
+:::note[Accessibility recommendation]
+
+Give each tree an `aria-label`. Keyboard navigation comes with the component -
+arrows to move and open, space and enter to select - and it only helps if the
+reader can find the tree in the first place.
+
+:::
+
+```tsx interactive
+import React from 'react';
+import { Tree } from 'antd';
+import { FileOutlined, FolderOutlined } from '@ant-design/icons';
+
+const glyph = (g) => <span aria-hidden>{g}</span>;
+
+export default () => (
+  <Tree
+    aria-label="Directory tree"
+    defaultExpandedKeys={['dashboards']}
+    style={{ maxInlineSize: 320 }}
+    treeData={[
+      {
+        key: 'dashboards',
+        title: 'Dashboards',
+        icon: glyph(<FolderOutlined />),
+        children: [
+          { key: 'metrics', title: 'Metrics', icon: glyph(<FileOutlined />), isLeaf: true },
+          { key: 'logs', title: 'Logs', icon: glyph(<FileOutlined />), isLeaf: true },
+        ],
+      },
+      {
+        key: 'visualisations',
+        title: 'Visualizations',
+        icon: glyph(<FolderOutlined />),
+        children: [
+          { key: 'pie', title: 'Pie chart', icon: glyph(<FileOutlined />), isLeaf: true },
+          {
+            key: 'nested',
+            title: 'Nested',
+            icon: glyph(<FolderOutlined />),
+            children: [{ key: 'deep', title: 'Deeply nested', icon: glyph(<FileOutlined />), isLeaf: true }],
+          },
+        ],
+      },
+      { key: 'readme', title: 'README.md', icon: glyph(<FileOutlined />), isLeaf: true },
+    ]}
+  />
+);
+```
+
+## Usage
+
+### Optional styling
+
+A compressed tree tightens the row height, for a structure deep enough that the
+default spacing pushes the interesting part off the screen. Use smaller icons
+with it, or the icons and the rows stop lining up.
+
+Expansion arrows are worth adding wherever the node icons do not themselves say
+"there is more inside" - a folder icon does, a document icon does not.
+
+A tree can also start fully open. That suits a small structure the reader is
+meant to take in at once, and suits nothing else: opening a thousand nodes is
+not a view, it is a wall.
+
+```tsx interactive
+import React from 'react';
+import { Space, Switch, Tree } from 'antd';
+import { FolderOutlined, FontSizeOutlined } from '@ant-design/icons';
+
+const glyph = (g) => <span aria-hidden>{g}</span>;
+
+const daten = [
+  {
+    key: 'types',
+    title: 'Types',
+    icon: glyph(<FolderOutlined />),
+    children: [
+      { key: 'string', title: 'string', icon: glyph(<FontSizeOutlined />), isLeaf: true },
+      { key: 'number', title: 'number', icon: glyph('#️⃣'), isLeaf: true },
+      {
+        key: 'object',
+        title: 'object',
+        icon: glyph(<FolderOutlined />),
+        children: [{ key: 'nested', title: 'nested', icon: glyph(<FontSizeOutlined />), isLeaf: true }],
+      },
+    ],
+  },
+];
+
+export default () => {
+  const [dense, setDense] = React.useState(true);
+  const [arrows, setArrows] = React.useState(true);
+  const [open, setOpen] = React.useState(true);
+
+  const toggles = [
+    ['Compressed', dense, setDense],
+    ['Expansion arrows', arrows, setArrows],
+    ['Expand by default', open, setOpen],
+  ];
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Space size={16} wrap>
+        {toggles.map(([name, value, setIt]) => (
+          <label key={name} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <Switch size="small" checked={value} onChange={setIt} />
+            {name}
+          </label>
+        ))}
+      </Space>
+
+      <Tree
+        key={`${open}`}
+        aria-label="Mapping tree"
+        treeData={daten}
+        showIcon
+        showLine={arrows}
+        switcherIcon={arrows ? undefined : null}
+        defaultExpandAll={open}
+        style={{ maxInlineSize: 320, fontSize: dense ? 12 : 14 }}
+      />
+    </Space>
+  );
+};
+```

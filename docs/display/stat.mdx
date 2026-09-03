@@ -1,0 +1,174 @@
+---
+title: Stat
+description: Ant Design Statistic
+antd_components: [Statistic]
+---
+
+# Stat
+
+A stat shows a prominent value with a label. It is two pieces of text - the
+number and what the number is about - styled so the first is read first.
+
+In Ant Design this is `Statistic`, with `value` and `title`. Note the naming:
+what other systems call the *title* is the value here, and what they call the
+*description* is the title.
+
+```tsx interactive
+import React from 'react';
+import { Space, Statistic } from 'antd';
+
+export default () => (
+  <Space size={48}>
+    <Statistic value="7,600 mm" title="Total people" />
+  </Space>
+);
+```
+
+## Color variants
+
+The value can take a colour. Only a limited set is offered, because a number
+that cannot be read against its background is worse than one without emphasis.
+
+```tsx interactive
+import React from 'react';
+import { Space, Statistic } from 'antd';
+
+export default () => (
+  <Space size={32} wrap>
+    <Statistic value="1" title="Default color" />
+    <Statistic value="10" title="Subdued color" styles={{ content: { color: 'var(--ant-color-text-description)' } }} />
+    <Statistic value="100" title="Primary color" styles={{ content: { color: 'var(--ant-color-primary-text)' } }} />
+    <Statistic value="100,000" title="Success color" styles={{ content: { color: 'var(--ant-color-success-text)' } }} />
+    <Statistic value="10,000" title="Danger color" styles={{ content: { color: 'var(--ant-color-error-text)' } }} />
+    <Statistic value="1,000" title="Accent color" styles={{ content: { color: 'var(--ant-color-magenta)' } }} />
+    <Statistic value="1,000" title="Warning color" styles={{ content: { color: 'var(--ant-color-warning-text)' } }} />
+  </Space>
+);
+```
+
+## Text alignment
+
+The block can be aligned. Left is the default, and in a row of stats it is
+usually the right answer - aligned numbers can be compared down the column.
+
+```tsx interactive
+import React from 'react';
+import { Space, Statistic } from 'antd';
+
+export default () => (
+  <Space size={48}>
+    <Statistic value="$ 1,000.00" title="Left align" style={{ textAlign: 'left' }} />
+    <Statistic value="99.9999" title="Center align" style={{ textAlign: 'center' }} />
+    <Statistic value="1,000.00 €" title="Right align" style={{ textAlign: 'right' }} />
+  </Space>
+);
+```
+
+## Title size
+
+The value takes the sizes of a title. Large is the default. The label does not
+resize with it - it is the constant against which the value is read.
+
+```tsx interactive
+import React from 'react';
+import { Space, Statistic } from 'antd';
+
+export default () => (
+  <Space size={32} wrap align="end">
+    <Statistic value="1,000,000" title="Large size" styles={{ content: { fontSize: 30 } }} />
+    <Statistic value="1,000,000" title="Medium size" styles={{ content: { fontSize: 24 } }} />
+    <Statistic value="1,000,000" title="Small size" styles={{ content: { fontSize: 20 } }} />
+    <Statistic value="1,000,000" title="Extra small size" styles={{ content: { fontSize: 16 } }} />
+    <Statistic value="1,000,000" title="Extra extra small size" styles={{ content: { fontSize: 14 } }} />
+    <Statistic value="1,000,000" title="Extra extra extra small size" styles={{ content: { fontSize: 12 } }} />
+  </Space>
+);
+```
+
+## Reverse the order
+
+The label sits above the value by default. It can be swapped, which suits a
+dashboard tile where the number should be the first thing seen.
+
+```tsx interactive
+import React from 'react';
+import { Space, Statistic } from 'antd';
+
+export default () => (
+  <Space size={48}>
+    <Statistic
+      value="10,000"
+      title="Description underneath"
+      className="stackread-stat-umgekehrt"
+    />
+  </Space>
+);
+```
+
+## Stat loading
+
+While the value is being fetched, it is replaced by two flashing dashes. That
+keeps the block the same height, so the layout does not jump when the number
+arrives.
+
+```tsx interactive
+import React from 'react';
+import { Space, Statistic, Switch } from 'antd';
+
+export default () => {
+  const [loading, setLoading] = React.useState(true);
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <Switch size="small" checked={loading} onChange={setLoading} />
+        Loading
+      </label>
+
+      <Statistic value={loading ? '--' : '7,600 mm'} title="Total people" />
+    </Space>
+  );
+};
+```
+
+## Component variants
+
+Put together, these pieces make the summary tiles a dashboard is built from: a
+value, what it is about, and whether it is going the right way.
+
+```tsx interactive
+import React from 'react';
+import { Card, Space, Statistic, Typography } from 'antd';
+import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
+
+export default () => (
+  <Space size={24} align="start" wrap>
+    <Card style={{ inlineSize: 200 }}>
+      <Statistic
+        value="22,550"
+        title="Great news"
+        styles={{ content: { color: 'var(--ant-color-success-text)' } }}
+        prefix={<ArrowUpOutlined />}
+      />
+    </Card>
+
+    <Card style={{ inlineSize: 200 }}>
+      <Statistic
+        value="1,554"
+        title="Good news"
+        styles={{ content: { color: 'var(--ant-color-error-text)' } }}
+        prefix={<ArrowDownOutlined />}
+      />
+    </Card>
+
+    <Card style={{ inlineSize: 200 }}>
+      <Statistic value="8,888" title="Total People" />
+      <Typography.Text type="secondary">since last month</Typography.Text>
+    </Card>
+
+    <Card style={{ inlineSize: 200 }}>
+      <Statistic value="2,000" title="Total people" suffix="%" />
+    </Card>
+  </Space>
+);
+```

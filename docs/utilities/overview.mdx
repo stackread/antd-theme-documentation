@@ -1,0 +1,66 @@
+---
+title: Overview
+description: What is here, and what is deliberately not
+sidebar_position: 1
+audit: true
+---
+
+# Utilities
+
+A utilities section can run to two dozen pages. Three of them are here.
+
+That is not a backlog. Most such utilities are React helpers belonging to a
+component library - `html-id-generator`, `mutation-observer`,
+`outside-click-detector`, `resize-observer`, `window-events`. They document how
+that library is built, not what it looks like. A theme has nothing to say about
+them.
+
+What is here follows one rule: **a page belongs in Utilities if it shows a
+value we carry, without a component in between.**
+
+<div className="cards">
+
+**[Color palette](./color-palette)** - the whole vocabulary, rendered from the
+running document.
+
+**[CSS utility classes](./css-utility-classes)** - what `--stackread-*` and
+`--ant-*` give you directly.
+
+**[Accessibility](./accessibility)** - the helpers, not the rules. The focus
+ring, visually hidden text, `aria-*` on our own examples.
+
+</div>
+
+## Deliberately not here
+
+Naming them is the point. An omitted page and a forgotten one look the same
+from outside.
+
+| page | why not here |
+|---|---|
+| `auto-sizer` | a React helper for virtualized lists |
+| `container-queries` | a CSS feature, not a value |
+| `copy` | Ant Design has it: `<Typography.Text copyable>` |
+| `delay` | a hook |
+| `error-boundary` | React's own feature since 16 |
+| `focus-trap` | Ant Design's `Modal` and `Drawer` do it themselves |
+| `highlight-and-mark` | Ant Design has it: `<Typography.Text mark>` |
+| `html-id-generator` | React's own `useId` |
+| `i18n` | Ant Design has it: `ConfigProvider locale` |
+| `inner-text` | a hook |
+| `mutation-observer` | a browser API |
+| `outside-click-detector` | a React helper |
+| `overlay-mask` | Ant Design's `Modal` mask |
+| `portal` | React's own `createPortal` |
+| `pretty-duration` | a date library's job |
+| `provider` | ours is [Theme provider](/getting-started/theming/theme-provider) |
+| `resize-observer` | a browser API |
+| `scroll` | a browser API |
+| `text-diff` | no equivalent, and not a theming concern |
+| `text-truncation` | Ant Design has it: `<Typography.Text ellipsis>` |
+| `window-events` | a browser API |
+
+Five of the twenty-one have an Ant Design equivalent and are documented on the
+component page that carries it. The rest are library internals or browser
+features, and reproducing them would mean writing a page about somebody else's
+code.

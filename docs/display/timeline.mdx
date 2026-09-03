@@ -1,0 +1,157 @@
+---
+title: Timeline
+description: Ant Design Timeline
+antd_components: [Timeline]
+---
+
+# Timeline
+
+A timeline standardises how a thread of events is shown. It takes a list of
+items and threads them on a vertical line.
+
+For two common cases there are better fits:
+
+- **Steps** for instructions that have to be done in order, with progress shown.
+- **Comment list** for comments or logged actions by a person or a system.
+
+Items must sit inside a timeline rather than stand alone, and the timeline needs
+a descriptive label - a bare line of dots tells a screen reader nothing.
+
+In Ant Design this is `Timeline`, with `items`.
+
+```tsx interactive
+import React from 'react';
+import { Timeline, Typography } from 'antd';
+import { EditOutlined, FolderOutlined, MailOutlined } from '@ant-design/icons';
+
+export default () => (
+  <Timeline
+    aria-label="Timeline example"
+    items={[
+      {
+        icon: <MailOutlined aria-label="Invitation" />,
+        content: (
+          <Typography>
+            <p style={{ marginBottom: 0 }}>
+              <strong>janed@example.com</strong> was invited to the project.
+            </p>
+          </Typography>
+        ),
+      },
+      {
+        icon: <EditOutlined aria-label="Edited" />,
+        content: (
+          <Typography>
+            <p style={{ marginBottom: 0 }}>
+              The project was <strong>edited</strong> by janed@example.com.
+            </p>
+          </Typography>
+        ),
+      },
+      {
+        icon: <FolderOutlined aria-label="Project closed" />,
+        content: (
+          <Typography>
+            <p style={{ marginBottom: 0 }}>
+              The project was <strong>closed</strong>.
+            </p>
+          </Typography>
+        ),
+      },
+    ]}
+  />
+);
+```
+
+## Timeline item
+
+An item has two parts: an icon on the leading side and the event on the other.
+
+Keep the icon small - anything larger than about 40 by 40 stops reading as a
+marker on a line and starts reading as a picture beside it.
+
+```tsx interactive
+import React from 'react';
+import { Timeline, Typography } from 'antd';
+
+export default () => (
+  <Timeline
+    aria-label="Timeline item example"
+    items={[
+      {
+        content: (
+          <Typography>
+            <p style={{ marginBottom: 0 }}>
+              I&rsquo;m the <Typography.Text code>content</Typography.Text> and
+              you can find the <Typography.Text code>icon</Typography.Text> on
+              the left side.
+            </p>
+          </Typography>
+        ),
+      },
+    ]}
+  />
+);
+```
+
+## A timeline thread with multiple items
+
+Several items in one timeline make a thread. Keeping them in one component is
+what gives the line its continuity and the markup its meaning.
+
+Two things to weigh when filling them:
+
+- **Icons of the same size** read as one sequence; mixed sizes read as unrelated
+  events that happen to be stacked.
+- **One line of text** needs no wrapper beyond running text. Several lines want
+  a panel, so that the block has an edge. Anything larger - an editor, a form -
+  goes in without a wrapper at all.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Card, Switch, Timeline, Typography } from 'antd';
+import { CheckOutlined, SettingOutlined } from '@ant-design/icons';
+
+export default () => {
+  const [done, setDone] = React.useState(false);
+  const heading = 'A panel holds multi-line content';
+
+  return (
+    <Timeline
+      aria-label="Timeline thread example"
+      items={[
+        {
+          icon: <Avatar size="small" style={{ flex: 'none' }} aria-label="Jane Doe">J</Avatar>,
+          content: (
+            <Typography>
+              <p style={{ marginBottom: 0 }}>
+                <strong>janed</strong> added a comment
+              </p>
+            </Typography>
+          ),
+        },
+        {
+          icon: <Avatar size="small" style={{ flex: 'none' }} aria-label="System"><SettingOutlined /></Avatar>,
+          content: (
+            <Card size="small" styles={{ header: { background: 'var(--ant-color-bg-layout)' } }} title={heading}>
+              <Typography>
+                <p>Several lines of content want an edge around them.</p>
+                <p style={{ marginBottom: 0 }}>Otherwise they run into the line.</p>
+              </Typography>
+            </Card>
+          ),
+        },
+        {
+          icon: <Avatar size="small" style={{ flex: 'none' }} aria-label="Checklist"><CheckOutlined /></Avatar>,
+          content: (
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <Switch size="small" checked={done} onChange={setDone} />
+              Mark this step as done
+            </label>
+          ),
+        },
+      ]}
+    />
+  );
+};
+```

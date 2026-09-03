@@ -1,0 +1,79 @@
+/*
+ * The demo frame, measured on the running page:
+ *
+ *   Outer     1px border, radius 8px, margin-block 32px
+ *   Preview   24px padding
+ *   Toolbar   1px top border, 8px padding, radius 0 0 7px 7px
+ *
+ * The inner radius is deliberately 7px and not 8: it sits inside a 1px border,
+ * and is therefore computed exactly that one pixel smaller. The same care as
+ * the callout's accent bar.
+ */
+
+.frame {
+  border: 1px solid var(--ifm-toc-border-color);
+  border-radius: 8px;
+  margin-block: 32px;
+  word-break: break-word;
+}
+
+.preview {
+  padding: 24px;
+  /*
+   * Stated, not inherited - the ground an alpha tint blends into must not
+   * change with the page hosting the example. See the variable's comment in
+   * the theme's shell.
+   */
+  background: var(--stackread-example-surface);
+  /*
+   * The preview area falls back to the components' own font size.
+   *
+   * This documentation sets its running text to 16px. Without this line every
+   * example inherits that - and a label beside a switch would stand larger
+   * here than in any application using the component.
+   *
+   * The same separation as the callout's paragraph spacing: what is inside the
+   * component belongs to the component, not to the page demonstrating it.
+   */
+  font-size: var(--ant-font-size, 14px);
+  line-height: var(--ant-line-height, 1.5);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-top: 1px solid var(--ifm-toc-border-color);
+  border-radius: 0 0 7px 7px;
+  /*
+   * The measured value here is `darken(body, 0.05)` = #F3F6F9 - a computed
+   * value, not a token, so it is not in the value layer. This takes `body`
+   * itself; the difference is 1.5 % lightness. Logged as a deviation.
+   *
+   * `--stackread-*`, not `--ant-*`: Ant Design v6 keeps its variables in a
+   * scope of its own and the toolbar stands outside it. The fallback would
+   * therefore always win - and it was the light one, on all 72 pages, in the
+   * dark appearance too.
+   */
+  background: var(--stackread-example-toolbar);
+}
+
+.source {
+  border-top: 1px solid var(--ifm-toc-border-color);
+}
+
+.source :global(.theme-code-block) {
+  margin: 0;
+  border-radius: 0;
+}
+
+.error {
+  padding: 16px;
+  border-top: 1px solid var(--ifm-toc-border-color);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 12px;
+  white-space: pre-wrap;
+  color: var(--ant-color-error-text, #a71627);
+  background: var(--ant-color-error-bg, #fff3f1);
+}

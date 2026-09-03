@@ -1,0 +1,372 @@
+---
+title: Comment list
+description: Composed from Timeline, Avatar and Card
+antd_components: [Timeline, Avatar, Card]
+---
+
+# Comment list
+
+A comment list is a timeline: it shows comments or logged actions that a person
+or a system has performed, threaded on a vertical line.
+
+**Ant Design has no comment component.** It had one until v5, where it was
+removed. What follows is composed from `Timeline`, `Avatar` and `Card` - the
+timeline supplies the line and the dots, the avatar replaces the dot, and a card
+holds the body where there is one.
+
+The composition is deliberate rather than a workaround: a comment list is a
+timeline with an author and a body per entry.
+
+Give the list a descriptive label, and every avatar one too - a dot without a
+name tells a screen reader nothing.
+
+## Basic comment list
+
+A list is an array of comments. Each one carries a name, what happened, when it
+happened, and optionally a body.
+
+Two shapes appear here: a comment **with** a body sits in a card, and one
+**without** is a single line - a logged action rather than something written.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Button, Card, Space, Tag, Timeline, Tooltip, Typography } from 'antd';
+
+const body = (
+  <Typography>
+    <p style={{ marginBottom: 0 }}>
+      Far out in the uncharted backwaters of the unfashionable end of the western
+      spiral arm of the Galaxy lies a small unregarded yellow sun.
+    </p>
+  </Typography>
+);
+
+const copy = (
+  <Tooltip title="Custom action">
+    <Button type="text" size="small" aria-label="Custom action">
+      Copy
+    </Button>
+  </Tooltip>
+);
+
+const headerStyle = (name, ereignis, showTime, aktionen) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+    <Typography.Text strong>{name}</Typography.Text>
+    <Typography.Text>{ereignis}</Typography.Text>
+    <Typography.Text type="secondary">{showTime}</Typography.Text>
+    <span style={{ marginInlineStart: 'auto' }}>{aktionen}</span>
+  </div>
+);
+
+const comment = (name, ereignis, showTime, content, aktionen, danger) => ({
+  icon: <Avatar size="small" style={{ flex: 'none' }} aria-label={name}>{name[0].toUpperCase()}</Avatar>,
+  content: content ? (
+    <Card
+      size="small"
+      style={danger ? { borderColor: 'var(--ant-color-error-border)' } : undefined}
+      styles={{ header: { background: 'var(--ant-color-bg-layout)' } }}
+      title={headerStyle(name, ereignis, showTime, aktionen)}
+    >
+      {content}
+    </Card>
+  ) : (
+    headerStyle(name, ereignis, showTime, aktionen)
+  ),
+});
+
+export default () => (
+  <Timeline
+    aria-label="Comment list example"
+    items={[
+      comment('janed', 'added a comment', 'on Jan 1, 2020', body, copy),
+      comment('juanab', 'pushed incident X0Z235', 'on Jan 3, 2020', null, copy),
+      comment('pancho1', 'edited case', 'on Jan 9, 2020', null, null),
+      comment(
+        'pedror',
+        <Space size={4} wrap>
+          added tags <Tag>case</Tag> <Tag>phishing</Tag> <Tag>security</Tag>
+        </Space>,
+        'on Jan 11, 2020',
+        null,
+        copy
+      ),
+      comment(
+        'Assistant',
+        '',
+        'on Jan 14, 2020, 1:39:04 PM',
+        <Typography>
+          <p style={{ marginBottom: 0 }}>An error occurred sending your message.</p>
+        </Typography>,
+        copy,
+        true
+      ),
+    ]}
+  />
+);
+```
+
+## Comment
+
+A single comment adapts to what it is given. With a body it becomes a card with
+a header; without one it stays a single line.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Card, Timeline, Typography } from 'antd';
+
+const headerStyle = (name, ereignis, showTime) => (
+  <span>
+    <Typography.Text strong>{name}</Typography.Text>{' '}
+    <Typography.Text>{ereignis}</Typography.Text>{' '}
+    <Typography.Text type="secondary">{showTime}</Typography.Text>
+  </span>
+);
+
+export default () => (
+  <Timeline
+    aria-label="Comment example"
+    items={[
+      {
+        icon: <Avatar size="small" style={{ flex: 'none' }} aria-label="janed">J</Avatar>,
+        content: (
+          <Card
+            size="small"
+            title={headerStyle('janed', 'added a comment', 'on Jan 1, 2020')}
+            styles={{ header: { background: 'var(--ant-color-bg-layout)' } }}
+          >
+            <Typography>
+              <p style={{ marginBottom: 0 }}>
+                This comment has a body, so it sits in a card.
+              </p>
+            </Typography>
+          </Card>
+        ),
+      },
+      {
+        icon: <Avatar size="small" style={{ flex: 'none' }} aria-label="juanab">J</Avatar>,
+        content: headerStyle('juanab', 'pushed incident X0Z235', 'on Jan 3, 2020'),
+      },
+    ]}
+  />
+);
+```
+
+## Timeline avatar
+
+The dot on the line matters more than it looks. Three cases:
+
+- By default a comment shows a person's initial. It needs a label with the full
+  name.
+- For a system update, an icon in a subdued avatar reads better than initials -
+  nobody wrote it.
+- Anything else can be placed there: a coloured avatar, a picture.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Card, Timeline, Typography } from 'antd';
+import { SettingOutlined } from '@ant-design/icons';
+
+const headerStyle = (name, ereignis, showTime) => (
+  <span>
+    <Typography.Text strong>{name}</Typography.Text>{' '}
+    <Typography.Text>{ereignis}</Typography.Text>{' '}
+    <Typography.Text type="secondary">{showTime}</Typography.Text>
+  </span>
+);
+
+export default () => (
+  <Timeline
+    aria-label="Timeline avatar example"
+    items={[
+      {
+        icon: <Avatar size="small" style={{ flex: 'none' }} aria-label="Jane Doe">J</Avatar>,
+        content: (
+          <Card
+            size="small"
+            title={headerStyle('janed', 'added a comment', 'on Jan 1, 2020')}
+            styles={{ header: { background: 'var(--ant-color-bg-layout)' } }}
+          >
+            <Typography>
+              <p style={{ marginBottom: 0 }}>The default avatar shows an initial.</p>
+            </Typography>
+          </Card>
+        ),
+      },
+      {
+        icon: (
+          <Avatar
+            size="small"
+            aria-label="System"
+            style={{ flex: 'none', background: 'var(--ant-color-bg-layout)', color: 'var(--ant-color-text)' }}
+          >
+            <SettingOutlined />
+          </Avatar>
+        ),
+        content: headerStyle('system', 'pushed a new version', 'on Jan 3, 2020'),
+      },
+      {
+        icon: (
+          <Avatar size="small" style={{ flex: 'none' }} aria-label="Pancho Perez" style={{ flex: 'none', background: 'var(--ant-color-primary)' }}>
+            P
+          </Avatar>
+        ),
+        content: headerStyle('pancho1', 'edited case', 'on Jan 9, 2020'),
+      },
+    ]}
+  />
+);
+```
+
+## Comment event actions
+
+A comment can carry actions of its own: edit, delete, share, copy. They sit to
+the right of the metadata in the header. Where there are several, group them
+behind one control rather than lining them all up.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Button, Card, Dropdown, Timeline, Typography } from 'antd';
+import { EllipsisOutlined } from '@ant-design/icons';
+
+export default () => {
+  const [pinned, setPinned] = React.useState(false);
+
+  const menu = {
+    items: [
+      { key: 'edit', label: 'Edit' },
+      { key: 'share', label: 'Share' },
+      { key: 'delete', label: 'Delete', danger: true },
+    ],
+  };
+
+  const headerStyle = (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <Typography.Text strong>janed</Typography.Text>
+      <Typography.Text>added a comment</Typography.Text>
+      <Typography.Text type="secondary">on Jan 1, 2020</Typography.Text>
+      <span style={{ marginInlineStart: 'auto', display: 'flex', gap: 4 }}>
+        <Button
+          type="text"
+          size="small"
+          aria-label={pinned ? 'Unpin comment' : 'Pin comment'}
+          onClick={() => setPinned(!pinned)}
+        >
+          {pinned ? 'Pinned' : 'Pin'}
+        </Button>
+        <Dropdown menu={menu} trigger={['click']}>
+          <Button type="text" size="small" aria-label="More actions">
+            <EllipsisOutlined />
+          </Button>
+        </Dropdown>
+      </span>
+    </div>
+  );
+
+  return (
+    <Timeline
+      aria-label="Comment event actions example"
+      items={[
+        {
+          icon: <Avatar size="small" style={{ flex: 'none' }} aria-label="Jane Doe">J</Avatar>,
+          content: (
+            <Card
+              size="small"
+              title={headerStyle}
+              styles={{ header: { background: 'var(--ant-color-bg-layout)' } }}
+            >
+              <Typography>
+                <p style={{ marginBottom: 0 }}>
+                  Actions belong in the header, to the right of the metadata.
+                </p>
+              </Typography>
+            </Card>
+          ),
+        },
+      ]}
+    />
+  );
+};
+```
+
+## A comment system
+
+Put a list together with an input and it becomes a comment system: existing
+comments above, a field below, and a new comment appended when it is sent.
+
+While a comment is being sent, the field and the button should say so - a field
+that still accepts typing suggests the text can still change.
+
+```tsx interactive
+import React from 'react';
+import { Avatar, Button, Card, Input, Space, Timeline, Typography } from 'antd';
+
+const headerStyle = (name, showTime) => (
+  <span>
+    <Typography.Text strong>{name}</Typography.Text>{' '}
+    <Typography.Text>added a comment</Typography.Text>{' '}
+    <Typography.Text type="secondary">{showTime}</Typography.Text>
+  </span>
+);
+
+export default () => {
+  const [comments, setComments] = React.useState([
+    { name: 'janed', showTime: 'on Jan 1, 2020', text: 'The first comment.' },
+  ]);
+  const [draft, setDraft] = React.useState('');
+  const [sending, setSending] = React.useState(false);
+
+  const send = () => {
+    if (!draft.trim()) return;
+    setSending(true);
+    window.setTimeout(() => {
+      setComments((k) => [...k, { name: 'you', showTime: 'just now', text: draft }]);
+      setDraft('');
+      setSending(false);
+    }, 600);
+  };
+
+  return (
+    <Space orientation="vertical" size={16} style={{ display: 'flex' }}>
+      <Timeline
+        aria-label="Comment system example"
+        items={comments.map((k) => ({
+          icon: <Avatar size="small" style={{ flex: 'none' }} aria-label={k.name}>{k.name[0].toUpperCase()}</Avatar>,
+          content: (
+            <Card
+              size="small"
+              title={headerStyle(k.name, k.showTime)}
+              styles={{ header: { background: 'var(--ant-color-bg-layout)' } }}
+            >
+              <Typography>
+                <p style={{ marginBottom: 0 }}>{k.text}</p>
+              </Typography>
+            </Card>
+          ),
+        }))}
+      />
+
+      <Input.TextArea
+        rows={3}
+        value={draft}
+        readOnly={sending}
+        onChange={(e) => setDraft(e.target.value)}
+        placeholder="Add a comment"
+      />
+      <Button type="primary" loading={sending} onClick={send}>
+        Add comment
+      </Button>
+    </Space>
+  );
+};
+```
+
+:::note[Omitted: the Markdown editor]
+
+**Affects:** 0 specimens - an editor, not a comment.
+
+Comment bodies are often written with a Markdown editor and rendered with a
+Markdown formatter. Ant Design has neither, and building a Markdown
+editor is component work rather than theming. A plain text area stands in its
+place; the comment list around it is unchanged.
+
+:::
