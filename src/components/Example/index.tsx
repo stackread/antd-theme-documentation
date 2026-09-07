@@ -64,6 +64,17 @@ const scope = {
   Icon: IconComponent,
 };
 
+/*
+ * No `default` key may survive in the scope - react-live turns every key
+ * into a binding, and `const default = ...` is a syntax error on every
+ * example of every page. The icons spread is guarded above, but WHICH
+ * namespace carries a `default` depends on the bundler's ESM interop:
+ * the deployed build (registry install, no workspace) surfaced one
+ * through a spread that the local build does not. Stripped here, after
+ * all spreads, whatever its origin.
+ */
+delete (scope as { default?: unknown }).default;
+
 /**
  * Brings the source into the shape react-live can run.
  *
