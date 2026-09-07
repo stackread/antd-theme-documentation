@@ -42,6 +42,12 @@ jobs:
       # probe it before it ships (see smoke.mjs).
       - run: npx playwright install --with-deps chromium
       - name: smoke
+        # Same env as the build: `serve` loads the config too, and without
+        # it would serve at '/' while the built assets live under the
+        # project base - every probe URL would hit the 404 page.
+        env:
+          DOCS_URL: https://stackread.github.io
+          DOCS_BASE_URL: /antd-theme-documentation/
         run: |
           npx docusaurus serve --port 3999 --no-open &
           sleep 5
