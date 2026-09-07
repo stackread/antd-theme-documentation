@@ -13,7 +13,7 @@
     "@docusaurus/core": "^3.10.2",
     "@docusaurus/preset-classic": "^3.10.2",
     "@mdx-js/react": "^3.1.1",
-    "@stackread/antd-theme": "^0.0.0",
+    "@stackread/antd-theme": "^0.1.0",
     "antd": "6.6.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.0",

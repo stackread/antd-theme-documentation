@@ -20,8 +20,13 @@ const config: Config = {
    * needed here, and every dependency is one more thing to carry.
    */
 
-  url: 'http://localhost',
-  baseUrl: '/',
+  /*
+   * Local runs and the 86-page test rig live at '/'; the deployed site
+   * (GitHub Pages, project page) needs its repo name as baseUrl. CI sets
+   * the env vars, everything local stays untouched.
+   */
+  url: process.env.DOCS_URL ?? 'http://localhost',
+  baseUrl: process.env.DOCS_BASE_URL ?? '/',
 
   onBrokenLinks: 'throw',
 
