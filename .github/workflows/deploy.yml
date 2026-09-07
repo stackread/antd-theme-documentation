@@ -32,9 +32,6 @@ jobs:
           DOCS_URL: https://stackread.github.io
           DOCS_BASE_URL: /antd-theme-documentation/
       - uses: actions/configure-pages@v5
-        with:
-          # Enables Pages on first run - no manual settings switch needed.
-          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: build
