@@ -38,6 +38,14 @@ jobs:
         env:
           DOCS_URL: https://stackread.github.io
           DOCS_BASE_URL: /antd-theme-documentation/
+      # The deployed artifact is a different build from the tested one -
+      # probe it before it ships (see smoke.mjs).
+      - run: npx playwright install --with-deps chromium
+      - name: smoke
+        run: |
+          npx docusaurus serve --port 3999 --no-open &
+          sleep 5
+          node smoke.mjs http://localhost:3999/antd-theme-documentation
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
