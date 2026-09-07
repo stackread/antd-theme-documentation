@@ -20,8 +20,19 @@ const page = await browser.newPage();
 let red = 0;
 for (const path of PAGES) {
   await page.goto(BASE + path, { waitUntil: 'domcontentloaded', timeout: 60000 });
-  await page.waitForTimeout(4000);
-  const errors = await page.getByText(/SyntaxError|ReferenceError/).count();
+  /*
+   * The examples render client-side (hydration, then react-live) - on a
+   * CI runner that takes far longer than on a dev machine. Wait for the
+   * page to show its hand either way instead of napping a fixed time.
+   */
+  await page
+    .locator('[class*="ant-"]')
+    .first()
+    .or(page.getByText(/SyntaxError|ReferenceError|Page Not Found/))
+    .first()
+    .waitFor({ state: 'visible', timeout: 90000 })
+    .catch(() => {});
+  const errors = await page.getByText(/SyntaxError|ReferenceError|Page Not Found/).count();
   const antd = await page.locator('[class*="ant-"]').count();
   console.log(`${path}: errors=${errors}, antd=${antd}`);
   if (errors > 0 || antd === 0) red++;
